@@ -11,7 +11,13 @@ function Login() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const res = await axios.post("/api/auth/login", { email, password });
+      const API_URL =
+        import.meta.env.MODE === "production"
+          ? "https://satinder-portfolio-backend-codebase.onrender.com/api/auth/login"
+          : "/api/auth/login";
+
+      const res = await axios.post(API_URL, { email, password });
+
       localStorage.setItem("token", res.data.token);
 
       // Check for admin role
