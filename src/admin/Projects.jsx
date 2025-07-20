@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
+const API = import.meta.env.VITE_API_URL || "/api";
 
 export default function Projects() {
   const [projects, setProjects] = useState([]);
@@ -13,7 +14,7 @@ export default function Projects() {
   const token = localStorage.getItem("token");
 
   const fetchProjects = async () => {
-    const res = await axios.get("/api/projects");
+    const res = await axios.get(`${API}/projects`);
     setProjects(res.data);
   };
 

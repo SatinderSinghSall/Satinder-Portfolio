@@ -1,11 +1,12 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
+const API = import.meta.env.VITE_API_URL || "/api";
 
 export default function Projects() {
   const [projects, setProjects] = useState([]);
 
   useEffect(() => {
-    axios.get("/api/projects").then((res) => setProjects(res.data));
+    axios.get(`${API}/projects`).then((res) => setProjects(res.data));
   }, []);
 
   return (

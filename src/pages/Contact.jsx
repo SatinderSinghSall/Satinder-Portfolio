@@ -1,5 +1,6 @@
 import { useState } from "react";
 import axios from "axios";
+const API = import.meta.env.VITE_API_URL || "/api";
 
 export default function Contact() {
   const [form, setForm] = useState({ name: "", email: "", message: "" });
@@ -11,7 +12,7 @@ export default function Contact() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    await axios.post("/api/contact", form);
+    await axios.post(`${API}/contact`, form);
     setSent(true);
     setForm({ name: "", email: "", message: "" });
   };

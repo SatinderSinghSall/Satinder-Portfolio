@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
+const API = import.meta.env.VITE_API_URL || "/api";
 
 export default function Blogs() {
   const [blogs, setBlogs] = useState([]);
@@ -8,7 +9,7 @@ export default function Blogs() {
   const token = localStorage.getItem("token");
 
   const fetchBlogs = async () => {
-    const res = await axios.get("/api/blogs");
+    const res = await axios.get(`${API}/blogs`);
     setBlogs(res.data);
   };
 

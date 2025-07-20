@@ -1,12 +1,13 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import axios from "axios";
+const API = import.meta.env.VITE_API_URL || "/api";
 
 export default function Blog() {
   const [blogs, setBlogs] = useState([]);
 
   useEffect(() => {
-    axios.get("/api/blogs").then((res) => setBlogs(res.data));
+    axios.get(`${API}/blogs`).then((res) => setBlogs(res.data));
   }, []);
 
   return (
