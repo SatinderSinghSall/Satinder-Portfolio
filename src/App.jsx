@@ -10,6 +10,7 @@ import Projects from "./admin/Projects";
 import Login from "./pages/Login";
 import AdminRoute from "./components/AdminRoute.jsx";
 import Blogs from "./admin/Blogs.jsx";
+import ContactMessages from "./admin/ContactMessages.jsx";
 
 function App() {
   return (
@@ -44,6 +45,15 @@ function App() {
           element={
             <AdminRoute>
               <Blogs />
+            </AdminRoute>
+          }
+        />
+
+        <Route
+          path="/admin/contact-messages"
+          element={
+            <AdminRoute>
+              <ContactMessages />
             </AdminRoute>
           }
         />

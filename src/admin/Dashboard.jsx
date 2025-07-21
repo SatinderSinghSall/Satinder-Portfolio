@@ -16,11 +16,21 @@ export default function Dashboard() {
           Manage Projects
         </Link>
 
-        <Link to="/admin/blogs" className="text-blue-600 underline">
+        <Link to="/admin/blogs" className="text-blue-600 underline block">
           Manage Blogs
         </Link>
 
-        <button onClick={handleLogout} className="text-red-600 underline block">
+        <Link
+          to="/admin/contact-messages"
+          className="text-blue-600 underline block"
+        >
+          View Contact Messages
+        </Link>
+
+        <button
+          onClick={handleLogout}
+          className="bg-red-600 cursor-pointer text-white px-4 py-2 rounded mt-4 hover:bg-red-700 transition"
+        >
           Logout
         </button>
       </div>
