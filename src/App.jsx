@@ -11,6 +11,8 @@ import Login from "./pages/Login";
 import AdminRoute from "./components/AdminRoute.jsx";
 import Blogs from "./admin/Blogs.jsx";
 import ContactMessages from "./admin/ContactMessages.jsx";
+import Footer from "./components/Footer";
+import NotFound from "./pages/NotFound.jsx";
 
 function App() {
   return (
@@ -23,6 +25,7 @@ function App() {
         <Route path="/blog" element={<Blog />} />
         <Route path="/blog/:id" element={<BlogDetails />} />
         <Route path="/contact" element={<Contact />} />
+        <Route path="*" element={<NotFound />} />
 
         <Route
           path="/admin/dashboard"
@@ -57,7 +60,10 @@ function App() {
             </AdminRoute>
           }
         />
+
+        <Route path="*" element={<NotFound />} />
       </Routes>
+      <Footer />
     </Router>
   );
 }

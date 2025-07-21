@@ -10,7 +10,7 @@ export default function Contact() {
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
-    setErrors({ ...errors, [e.target.name]: "" }); // Clear error when typing
+    setErrors({ ...errors, [e.target.name]: "" });
   };
 
   const validateForm = () => {
@@ -46,85 +46,99 @@ export default function Contact() {
   };
 
   return (
-    <div className="p-6 max-w-xl mx-auto">
-      <h2 className="text-2xl font-bold mb-4">Contact Me</h2>
+    <section className="min-h-screen flex items-center justify-center bg-gradient-to-b from-[#0f0c29] via-[#302b63] to-[#24243e] text-white px-6 py-16">
+      <div className="w-full max-w-xl bg-white/5 backdrop-blur-md border border-white/10 rounded-3xl shadow-2xl p-8 space-y-6 transition-all duration-300">
+        <h2 className="text-4xl font-extrabold text-center mb-4">
+          Contact <span className="text-blue-500">Satinder.dev</span>
+        </h2>
 
-      {sent && (
-        <p className="text-green-500 mb-4">Message sent successfully!</p>
-      )}
-      {errors.general && <p className="text-red-500 mb-4">{errors.general}</p>}
+        {sent && (
+          <p className="text-green-400 text-center font-semibold animate-pulse">
+            ✅ Message sent successfully!
+          </p>
+        )}
+        {errors.general && (
+          <p className="text-red-400 text-center font-semibold">
+            {errors.general}
+          </p>
+        )}
 
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <div>
-          <input
-            name="name"
-            value={form.name}
-            onChange={handleChange}
-            placeholder="Name"
-            className="w-full p-2 border"
-          />
-          {errors.name && <p className="text-red-500 text-sm">{errors.name}</p>}
-        </div>
+        <form onSubmit={handleSubmit} className="space-y-5">
+          <div>
+            <input
+              name="name"
+              value={form.name}
+              onChange={handleChange}
+              placeholder="Your Name"
+              className="w-full p-4 bg-white/10 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+            {errors.name && (
+              <p className="text-red-400 text-sm mt-1">{errors.name}</p>
+            )}
+          </div>
 
-        <div>
-          <input
-            name="email"
-            type="email"
-            value={form.email}
-            onChange={handleChange}
-            placeholder="Email"
-            className="w-full p-2 border"
-          />
-          {errors.email && (
-            <p className="text-red-500 text-sm">{errors.email}</p>
-          )}
-        </div>
+          <div>
+            <input
+              name="email"
+              type="email"
+              value={form.email}
+              onChange={handleChange}
+              placeholder="Your Email"
+              className="w-full p-4 bg-white/10 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+            {errors.email && (
+              <p className="text-red-400 text-sm mt-1">{errors.email}</p>
+            )}
+          </div>
 
-        <div>
-          <textarea
-            name="message"
-            value={form.message}
-            onChange={handleChange}
-            placeholder="Message"
-            className="w-full p-2 border h-32"
-          />
-          {errors.message && (
-            <p className="text-red-500 text-sm">{errors.message}</p>
-          )}
-        </div>
+          <div>
+            <textarea
+              name="message"
+              value={form.message}
+              onChange={handleChange}
+              placeholder="Your Message"
+              rows="5"
+              className="w-full p-4 bg-white/10 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            ></textarea>
+            {errors.message && (
+              <p className="text-red-400 text-sm mt-1">{errors.message}</p>
+            )}
+          </div>
 
-        <button
-          type="submit"
-          disabled={loading}
-          className={`flex items-center justify-center gap-2 px-4 py-2 text-white ${
-            loading ? "bg-blue-400 cursor-not-allowed" : "bg-blue-600"
-          }`}
-        >
-          {loading && (
-            <svg
-              className="w-5 h-5 animate-spin text-white"
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-            >
-              <circle
-                className="opacity-25"
-                cx="12"
-                cy="12"
-                r="10"
-                stroke="currentColor"
-                strokeWidth="4"
-              ></circle>
-              <path
-                className="opacity-75"
-                fill="currentColor"
-                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
-              ></path>
-            </svg>
-          )}
-          {loading ? "Sending..." : "Send"}
-        </button>
-      </form>
-    </div>
+          <button
+            type="submit"
+            disabled={loading}
+            className={`w-full py-4 rounded-xl font-bold flex justify-center items-center gap-2 text-white transition-all duration-300 ${
+              loading
+                ? "bg-blue-400 cursor-not-allowed"
+                : "bg-gradient-to-r from-blue-500 to-purple-600 hover:from-purple-500 hover:to-pink-500"
+            }`}
+          >
+            {loading && (
+              <svg
+                className="animate-spin w-5 h-5 text-white"
+                fill="none"
+                viewBox="0 0 24 24"
+              >
+                <circle
+                  className="opacity-25"
+                  cx="12"
+                  cy="12"
+                  r="10"
+                  stroke="currentColor"
+                  strokeWidth="4"
+                />
+                <path
+                  className="opacity-75"
+                  fill="currentColor"
+                  d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
+                />
+              </svg>
+            )}
+            {loading ? "Sending..." : "🚀 Send Message"}
+          </button>
+        </form>
+      </div>
+    </section>
   );
 }

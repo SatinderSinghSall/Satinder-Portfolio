@@ -22,21 +22,50 @@ export default function BlogDetails() {
       .finally(() => setLoading(false));
   }, [id]);
 
-  if (loading) return <p className="p-6">Loading blog post...</p>;
-  if (error) return <p className="p-6 text-red-600">{error}</p>;
-  if (!blog) return <p className="p-6">Blog not found.</p>;
+  if (loading)
+    return (
+      <section className="min-h-screen flex items-center justify-center bg-gradient-to-b from-[#0f0c29] via-[#302b63] to-[#24243e] text-white text-lg animate-pulse">
+        Loading blog post...
+      </section>
+    );
+
+  if (error)
+    return (
+      <section className="min-h-screen flex items-center justify-center bg-gradient-to-b from-[#0f0c29] via-[#302b63] to-[#24243e] text-red-500 text-lg">
+        {error}
+      </section>
+    );
+
+  if (!blog)
+    return (
+      <section className="min-h-screen flex items-center justify-center bg-gradient-to-b from-[#0f0c29] via-[#302b63] to-[#24243e] text-gray-300 text-lg">
+        Blog not found.
+      </section>
+    );
 
   return (
-    <div className="p-6 max-w-3xl mx-auto">
-      <h2 className="text-3xl font-bold mb-4">{blog.title}</h2>
-      {blog.image && (
-        <img
-          src={blog.image}
-          alt={blog.title}
-          className="mb-4 w-full object-cover rounded"
-        />
-      )}
-      <p>{blog.content}</p>
-    </div>
+    <section className="min-h-screen bg-gradient-to-b from-[#0f0c29] via-[#302b63] to-[#24243e] py-16 px-6 text-white">
+      <div className="max-w-4xl mx-auto bg-white/5 backdrop-blur-md border border-white/10 rounded-3xl shadow-xl p-8">
+        <h1 className="text-4xl font-extrabold mb-6 leading-tight text-center">
+          {blog.title}
+        </h1>
+
+        {blog.image && (
+          <div className="overflow-hidden rounded-2xl mb-6">
+            <img
+              src={blog.image}
+              alt={blog.title}
+              className="w-full h-64 object-cover transition-transform duration-500 hover:scale-105"
+            />
+          </div>
+        )}
+
+        <div className="prose prose-invert text-gray-300 max-w-none leading-relaxed space-y-4">
+          {blog.content.split("\n").map((paragraph, idx) => (
+            <p key={idx}>{paragraph}</p>
+          ))}
+        </div>
+      </div>
+    </section>
   );
 }
