@@ -13,6 +13,9 @@ import Blogs from "./admin/Blogs.jsx";
 import ContactMessages from "./admin/ContactMessages.jsx";
 import Footer from "./components/Footer";
 import NotFound from "./pages/NotFound.jsx";
+import About from "./components/About.jsx";
+import Skills from "./components/Skills.jsx";
+import Experience from "./components/Experience.jsx";
 
 function App() {
   return (
@@ -25,7 +28,10 @@ function App() {
         <Route path="/blog" element={<Blog />} />
         <Route path="/blog/:id" element={<BlogDetails />} />
         <Route path="/contact" element={<Contact />} />
+        <Route path="/about" element={<About />} />
+        <Route path="/skills" element={<Skills />} />
         <Route path="*" element={<NotFound />} />
+        <Route path="/experience" element={<Experience />} />
 
         <Route
           path="/admin/dashboard"
