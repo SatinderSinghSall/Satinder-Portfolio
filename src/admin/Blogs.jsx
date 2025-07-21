@@ -26,9 +26,9 @@ export default function Blogs() {
     const headers = { Authorization: `Bearer ${token}` };
 
     if (editingId) {
-      await axios.put(`/api/blogs/${editingId}`, form, { headers });
+      await axios.put(`${API}/blogs/${editingId}`, form, { headers });
     } else {
-      await axios.post("/api/blogs", form, { headers });
+      await axios.post(`${API}/blogs`, form, { headers });
     }
 
     setForm({ title: "", content: "", image: "" });
@@ -42,7 +42,7 @@ export default function Blogs() {
   };
 
   const handleDelete = async (id) => {
-    await axios.delete(`/api/blogs/${id}`, {
+    await axios.delete(`${API}/blogs/${id}`, {
       headers: { Authorization: `Bearer ${token}` },
     });
     fetchBlogs();

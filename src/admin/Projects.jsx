@@ -31,9 +31,9 @@ export default function Projects() {
     const headers = { Authorization: `Bearer ${token}` };
 
     if (editingId) {
-      await axios.put(`/api/projects/${editingId}`, form, { headers });
+      await axios.put(`${API}/projects/${editingId}`, form, { headers });
     } else {
-      await axios.post("/api/projects", form, { headers });
+      await axios.post(`${API}/projects`, form, { headers });
     }
     setForm({ title: "", description: "", link: "", image: "" });
     setEditingId(null);
@@ -46,7 +46,7 @@ export default function Projects() {
   };
 
   const handleDelete = async (id) => {
-    await axios.delete(`/api/projects/${id}`, {
+    await axios.delete(`${API}/projects/${id}`, {
       headers: { Authorization: `Bearer ${token}` },
     });
     fetchProjects();
