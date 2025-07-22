@@ -1,4 +1,5 @@
 import { Code, Smartphone, Layers, Globe, Zap, Paintbrush } from "lucide-react";
+import { Link } from "react-router-dom"; // or "next/link" if using Next.js
 
 export default function MyServices() {
   const services = [
@@ -60,6 +61,22 @@ export default function MyServices() {
               <p className="text-gray-300 text-base">{service.description}</p>
             </div>
           ))}
+        </div>
+
+        <div className="mt-16 space-y-4">
+          <h3 className="text-3xl md:text-4xl font-bold text-white">
+            Ready to level up your digital presence?
+          </h3>
+          <p className="text-lg md:text-xl text-gray-300 max-w-2xl mx-auto">
+            Let’s collaborate and bring your vision to life. Get in touch today
+            and start building something amazing!
+          </p>
+          <Link
+            to="/contact"
+            className="inline-block bg-blue-600 hover:bg-blue-700 text-white font-semibold py-4 px-8 rounded-full text-xl transition-all duration-300 shadow-lg hover:shadow-xl"
+          >
+            Contact Me 🚀
+          </Link>
         </div>
       </div>
     </section>
