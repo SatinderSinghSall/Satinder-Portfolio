@@ -48,7 +48,7 @@ export default function Projects() {
                     className="w-full h-56 object-cover transition-transform duration-500 group-hover:scale-110"
                   />
                 </div>
-                <div className="p-6 flex flex-col h-full justify-between">
+                <div className="p-6 flex flex-col gap-4">
                   <h3 className="text-2xl font-bold mb-2 group-hover:text-blue-400 transition-colors">
                     {project.title}
                   </h3>
