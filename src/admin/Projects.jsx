@@ -53,12 +53,10 @@ export default function Projects() {
     if (
       !form.title ||
       !form.description ||
-      !form.link ||
-      !form.image ||
-      !form.technologies ||
-      !form.githubLink
+      !form.githubLink ||
+      !form.technologies.length
     ) {
-      setError("All fields are required.");
+      setError("All fields except project link are required.");
       return;
     }
 
@@ -66,24 +64,35 @@ export default function Projects() {
     const headers = { Authorization: `Bearer ${token}` };
 
     try {
-      if (editingId) {
-        await axios.put(`${API}/projects/${editingId}`, form, { headers });
-      } else {
-        await axios.post(`${API}/projects`, form, { headers });
+      const formData = new FormData();
+      formData.append("title", form.title);
+      formData.append("description", form.description);
+      formData.append("link", form.link);
+      formData.append("githubLink", form.githubLink);
+      formData.append("technologies", form.technologies.join(","));
+      if (form.imageFile) {
+        formData.append("image", form.imageFile);
       }
+
+      if (editingId) {
+        await axios.put(`${API}/projects/${editingId}`, formData, { headers });
+      } else {
+        await axios.post(`${API}/projects`, formData, { headers });
+      }
+
       setForm({
         title: "",
         description: "",
         link: "",
-        image: "",
-        technologies: [],
         githubLink: "",
+        technologies: [],
+        imageFile: null,
       });
       setEditingId(null);
       fetchProjects();
     } catch (err) {
-      setError("Failed to save project.");
       console.error(err);
+      setError("Failed to save project.");
     } finally {
       setLoading(false);
     }
@@ -155,11 +164,10 @@ export default function Projects() {
           className="w-full p-2 border"
         />
         <input
+          type="file"
           name="image"
-          value={form.image}
-          onChange={handleChange}
-          placeholder="Image URL"
-          className="w-full p-2 border"
+          accept="image/*"
+          onChange={(e) => setForm({ ...form, imageFile: e.target.files[0] })}
         />
         <button
           type="submit"
