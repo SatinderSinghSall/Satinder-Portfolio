@@ -1,6 +1,7 @@
 import { useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import axios from "axios";
+import { FaGithub } from "react-icons/fa";
 
 const API = import.meta.env.VITE_API_URL || "/api";
 
@@ -58,20 +59,49 @@ export default function ProjectDetail() {
     <div className="min-h-screen bg-gradient-to-b from-[#0f0c29] via-[#302b63] to-[#24243e] text-white p-8">
       <div className="max-w-4xl mx-auto">
         <h1 className="text-4xl font-bold mb-4">{project.title}</h1>
+
         <img
           src={project.image}
           alt={project.title}
           className="w-full rounded-xl mb-4"
         />
+
         <p className="mb-6 text-gray-300">{project.description}</p>
-        <a
-          href={project.link}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="inline-block px-6 py-3 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-xl font-semibold hover:from-purple-500 hover:to-pink-500 transition"
-        >
-          🚀 Visit Live Project
-        </a>
+
+        <div className="flex flex-wrap gap-3 mb-8">
+          {project.technologies.map((tech, idx) => (
+            <span
+              key={idx}
+              className="relative inline-block px-5 py-2 text-sm font-semibold rounded-full 
+                 bg-gradient-to-r from-purple-500 via-pink-500 to-red-500 
+                 text-white shadow-lg backdrop-blur-md
+                 hover:scale-105 hover:shadow-2xl transition-all duration-300
+                 before:absolute before:inset-0 before:rounded-full before:bg-white/10 before:blur-sm"
+            >
+              {tech}
+            </span>
+          ))}
+        </div>
+
+        <div className="flex flex-wrap gap-4 mb-6">
+          <a
+            href={project.link}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-block px-6 py-3 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-xl font-semibold hover:from-purple-500 hover:to-pink-500 transition"
+          >
+            🚀 Visit Live Project
+          </a>
+          <a
+            href={project.githubLink}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-gray-700 to-gray-900 text-white rounded-xl font-semibold hover:from-gray-600 hover:to-gray-800 transition"
+          >
+            <FaGithub className="text-2xl" />
+            View GitHub Code
+          </a>
+        </div>
       </div>
     </div>
   );

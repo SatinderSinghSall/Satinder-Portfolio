@@ -7,6 +7,8 @@ export default function Projects() {
   const [form, setForm] = useState({
     title: "",
     description: "",
+    technologies: [],
+    githubLink: "",
     link: "",
     image: "",
   });
@@ -34,13 +36,28 @@ export default function Projects() {
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
+    if (e.target.name === "technologies") {
+      setForm({
+        ...form,
+        technologies: e.target.value.split(",").map((t) => t.trim()),
+      });
+    } else {
+      setForm({ ...form, [e.target.name]: e.target.value });
+    }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
 
-    if (!form.title || !form.description || !form.link || !form.image) {
+    if (
+      !form.title ||
+      !form.description ||
+      !form.link ||
+      !form.image ||
+      !form.technologies ||
+      !form.githubLink
+    ) {
       setError("All fields are required.");
       return;
     }
@@ -54,7 +71,14 @@ export default function Projects() {
       } else {
         await axios.post(`${API}/projects`, form, { headers });
       }
-      setForm({ title: "", description: "", link: "", image: "" });
+      setForm({
+        title: "",
+        description: "",
+        link: "",
+        image: "",
+        technologies: [],
+        githubLink: "",
+      });
       setEditingId(null);
       fetchProjects();
     } catch (err) {
@@ -71,6 +95,8 @@ export default function Projects() {
       description: project.description,
       link: project.link,
       image: project.image,
+      technologies: project.technologies,
+      githubLink: project.githubLink,
     });
     setEditingId(project._id);
   };
@@ -100,11 +126,25 @@ export default function Projects() {
           placeholder="Title"
           className="w-full p-2 border"
         />
-        <input
+        <textarea
           name="description"
           value={form.description}
           onChange={handleChange}
           placeholder="Description"
+          className="w-full p-2 border"
+        />
+        <input
+          name="technologies"
+          value={form.technologies.join(", ")}
+          onChange={handleChange}
+          placeholder="Technologies (comma separated)"
+          className="w-full p-2 border"
+        />
+        <input
+          name="githubLink"
+          value={form.githubLink}
+          onChange={handleChange}
+          placeholder="GitHub Link"
           className="w-full p-2 border"
         />
         <input
@@ -168,6 +208,22 @@ export default function Projects() {
             <li key={proj._id} className="mb-4 border-b pb-2">
               <h3 className="text-xl font-semibold">{proj.title}</h3>
               <p>{proj.description}</p>
+              <ul className="flex gap-2 flex-wrap">
+                {proj.technologies.map((tech, idx) => (
+                  <li key={idx} className="text-sm bg-gray-200 rounded px-2">
+                    {tech}
+                  </li>
+                ))}
+              </ul>
+              <p className="text-sm text-gray-500">
+                <a
+                  href={proj.githubLink}
+                  target="_blank"
+                  className="text-blue-500"
+                >
+                  GitHub
+                </a>
+              </p>
               <a href={proj.link} target="_blank" className="text-blue-500">
                 Visit
               </a>
