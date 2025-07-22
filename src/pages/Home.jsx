@@ -15,7 +15,7 @@ export default function Home() {
         {/* Subtitle */}
         <p className="text-lg md:text-2xl max-w-2xl mb-6 text-gray-300">
           Welcome to my personal portfolio 👋 — I'm a developer who loves
-          building modern, impactful web applications.
+          building modern, impactful web & mobile applications.
         </p>
 
         {/* Call-to-Action Buttons */}
