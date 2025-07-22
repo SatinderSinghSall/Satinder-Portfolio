@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
+import { Link } from "react-router-dom";
 
 const API = import.meta.env.VITE_API_URL || "/api";
 
@@ -57,14 +58,12 @@ export default function Projects() {
                       ? project.description.slice(0, 120) + "..."
                       : project.description}
                   </p>
-                  <a
-                    href={project.link}
-                    target="_blank"
-                    rel="noopener noreferrer"
+                  <Link
+                    to={`/projects/${project._id}`}
                     className="mt-auto w-full inline-block text-center font-semibold py-3 rounded-xl bg-gradient-to-r from-blue-500 to-purple-600 hover:from-purple-500 hover:to-pink-500 transition-all text-white shadow-md"
                   >
-                    🚀 Visit Project
-                  </a>
+                    🚀 View Details
+                  </Link>
                 </div>
               </div>
             ))}
