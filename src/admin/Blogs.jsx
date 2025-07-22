@@ -1,10 +1,20 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
+import ReactMarkdown from "react-markdown";
+
 const API = import.meta.env.VITE_API_URL || "/api";
 
 export default function Blogs() {
   const [blogs, setBlogs] = useState([]);
-  const [form, setForm] = useState({ title: "", content: "", image: "" });
+  const [form, setForm] = useState({
+    title: "",
+    summary: "",
+    content: "",
+    image: "",
+    tags: "",
+    author: "",
+    status: "draft",
+  });
   const [editingId, setEditingId] = useState(null);
   const [loading, setLoading] = useState(false);
   const [fetching, setFetching] = useState(false);
@@ -36,20 +46,32 @@ export default function Blogs() {
     setError("");
 
     if (!form.title || !form.content || !form.image) {
-      setError("All fields are required.");
+      setError("Title, Content, and Image are required.");
       return;
     }
 
     setLoading(true);
     const headers = { Authorization: `Bearer ${token}` };
+    const payload = {
+      ...form,
+      tags: form.tags.split(",").map((tag) => tag.trim()),
+    };
 
     try {
       if (editingId) {
-        await axios.put(`${API}/blogs/${editingId}`, form, { headers });
+        await axios.put(`${API}/blogs/${editingId}`, payload, { headers });
       } else {
-        await axios.post(`${API}/blogs`, form, { headers });
+        await axios.post(`${API}/blogs`, payload, { headers });
       }
-      setForm({ title: "", content: "", image: "" });
+      setForm({
+        title: "",
+        summary: "",
+        content: "",
+        image: "",
+        tags: "",
+        author: "",
+        status: "draft",
+      });
       setEditingId(null);
       fetchBlogs();
     } catch (err) {
@@ -63,8 +85,12 @@ export default function Blogs() {
   const handleEdit = (blog) => {
     setForm({
       title: blog.title,
+      summary: blog.summary,
       content: blog.content,
       image: blog.image,
+      tags: blog.tags.join(", "),
+      author: blog.author,
+      status: blog.status,
     });
     setEditingId(blog._id);
   };
@@ -81,12 +107,12 @@ export default function Blogs() {
   };
 
   return (
-    <div className="p-6">
-      <h2 className="text-2xl font-bold mb-4">Manage Blog Posts</h2>
+    <div className="p-6 max-w-3xl mx-auto">
+      <h2 className="text-3xl font-bold mb-6">Manage Blog Posts</h2>
 
-      {error && <p className="text-red-500 mb-3">{error}</p>}
+      {error && <p className="text-red-500 mb-4">{error}</p>}
 
-      <form onSubmit={handleSubmit} className="space-y-3 mb-8">
+      <form onSubmit={handleSubmit} className="space-y-3 mb-10">
         <input
           name="title"
           value={form.title}
@@ -94,11 +120,18 @@ export default function Blogs() {
           placeholder="Title"
           className="w-full p-2 border"
         />
+        <input
+          name="summary"
+          value={form.summary}
+          onChange={handleChange}
+          placeholder="Summary"
+          className="w-full p-2 border"
+        />
         <textarea
           name="content"
           value={form.content}
           onChange={handleChange}
-          placeholder="Content"
+          placeholder="Markdown Content"
           className="w-full p-2 border h-32"
         />
         <input
@@ -108,35 +141,37 @@ export default function Blogs() {
           placeholder="Image URL"
           className="w-full p-2 border"
         />
+        <input
+          name="tags"
+          value={form.tags}
+          onChange={handleChange}
+          placeholder="Tags (comma separated)"
+          className="w-full p-2 border"
+        />
+        <input
+          name="author"
+          value={form.author}
+          onChange={handleChange}
+          placeholder="Author Name"
+          className="w-full p-2 border"
+        />
+        <select
+          name="status"
+          value={form.status}
+          onChange={handleChange}
+          className="w-full p-2 border"
+        >
+          <option value="draft">Draft</option>
+          <option value="published">Published</option>
+        </select>
+
         <button
           type="submit"
           disabled={loading}
-          className={`flex items-center gap-2 px-4 py-2 text-white ${
-            loading ? "bg-blue-400 cursor-not-allowed" : "bg-blue-600"
+          className={`px-4 py-2 text-white ${
+            loading ? "bg-blue-400" : "bg-blue-600"
           }`}
         >
-          {loading && (
-            <svg
-              className="w-5 h-5 animate-spin"
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-            >
-              <circle
-                className="opacity-25"
-                cx="12"
-                cy="12"
-                r="10"
-                stroke="currentColor"
-                strokeWidth="4"
-              ></circle>
-              <path
-                className="opacity-75"
-                fill="currentColor"
-                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
-              ></path>
-            </svg>
-          )}
           {loading
             ? editingId
               ? "Updating..."
@@ -150,17 +185,34 @@ export default function Blogs() {
       {fetching ? (
         <p>Loading blog posts...</p>
       ) : (
-        <ul>
+        <ul className="space-y-6">
           {blogs.map((blog) => (
-            <li key={blog._id} className="mb-4 border-b pb-2">
-              <h3 className="text-xl font-semibold">{blog.title}</h3>
+            <li key={blog._id} className="border p-4 rounded-md">
+              <h3 className="text-xl font-bold">{blog.title}</h3>
+              <p className="text-gray-500 text-sm mb-2">
+                By {blog.author} •{" "}
+                {new Date(blog.publishedAt).toLocaleDateString()}
+              </p>
               <img
                 src={blog.image}
                 alt=""
-                className="w-48 h-32 object-cover my-2"
+                className="w-full h-48 object-cover mb-2 rounded"
               />
-              <p>{blog.content.slice(0, 100)}...</p>
-              <div className="space-x-2 mt-2">
+              <p className="text-sm italic mb-2">{blog.summary}</p>
+              <div className="prose">
+                <ReactMarkdown>{blog.content}</ReactMarkdown>
+              </div>
+              <div className="flex flex-wrap gap-2 mt-2">
+                {blog.tags.map((tag) => (
+                  <span
+                    key={tag}
+                    className="text-xs bg-gray-200 px-2 py-1 rounded"
+                  >
+                    {tag}
+                  </span>
+                ))}
+              </div>
+              <div className="mt-3 space-x-2">
                 <button
                   onClick={() => handleEdit(blog)}
                   className="text-yellow-500"
