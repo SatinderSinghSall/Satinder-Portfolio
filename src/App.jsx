@@ -19,7 +19,6 @@ import Experience from "./components/Experience.jsx";
 import ProjectDetail from "./pages/ProjectDetail.jsx";
 import Services from "./pages/Services.jsx";
 
-
 function App() {
   return (
     <Router>
