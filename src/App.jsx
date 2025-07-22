@@ -17,6 +17,7 @@ import About from "./components/About.jsx";
 import Skills from "./components/Skills.jsx";
 import Experience from "./components/Experience.jsx";
 import ProjectDetail from "./pages/ProjectDetail.jsx";
+import Services from "./pages/Services.jsx";
 
 function App() {
   return (
@@ -34,6 +35,7 @@ function App() {
         <Route path="*" element={<NotFound />} />
         <Route path="/experience" element={<Experience />} />
         <Route path="/projects/:id" element={<ProjectDetail />} />
+        <Route path="/services" element={<Services />} />
 
         <Route
           path="/admin/dashboard"

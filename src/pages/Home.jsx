@@ -2,6 +2,7 @@ import About from "../components/About";
 import Skills from "../components/Skills";
 import ContactCTA_Button from "../components/ContactCTA_Button";
 import Experience from "../components/Experience";
+import Services from "./Services";
 
 export default function Home() {
   return (
@@ -54,6 +55,9 @@ export default function Home() {
 
       {/* About Section */}
       <About />
+
+      {/* Services Section */}
+      <Services />
 
       {/* Experience Section */}
       <Experience />
