@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
+import AdminLayout from "../components/AdminLayout";
+
 const API = import.meta.env.VITE_API_URL || "/api";
 
 export default function Projects() {
@@ -35,7 +37,6 @@ export default function Projects() {
   }, []);
 
   const handleChange = (e) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
     if (e.target.name === "technologies") {
       setForm({
         ...form,
@@ -70,9 +71,7 @@ export default function Projects() {
       formData.append("link", form.link);
       formData.append("githubLink", form.githubLink);
       formData.append("technologies", form.technologies.join(","));
-      if (form.imageFile) {
-        formData.append("image", form.imageFile);
-      }
+      if (form.imageFile) formData.append("image", form.imageFile);
 
       if (editingId) {
         await axios.put(`${API}/projects/${editingId}`, formData, { headers });
@@ -122,7 +121,7 @@ export default function Projects() {
   };
 
   return (
-    <div className="p-6">
+    <AdminLayout>
       <h2 className="text-2xl font-bold mb-4">Manage Projects</h2>
 
       {error && <p className="text-red-500 mb-3">{error}</p>}
@@ -173,38 +172,38 @@ export default function Projects() {
           type="submit"
           disabled={loading}
           className={`flex items-center gap-2 px-4 py-2 text-white ${
-            loading ? "bg-blue-400 cursor-not-allowed" : "bg-blue-600"
+            loading ? "bg-blue-400" : "bg-blue-600"
           }`}
         >
-          {loading && (
-            <svg
-              className="w-5 h-5 animate-spin"
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-            >
-              <circle
-                className="opacity-25"
-                cx="12"
-                cy="12"
-                r="10"
-                stroke="currentColor"
-                strokeWidth="4"
-              ></circle>
-              <path
-                className="opacity-75"
-                fill="currentColor"
-                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
-              ></path>
-            </svg>
+          {loading ? (
+            <>
+              <svg
+                className="w-5 h-5 animate-spin"
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+              >
+                <circle
+                  className="opacity-25"
+                  cx="12"
+                  cy="12"
+                  r="10"
+                  stroke="currentColor"
+                  strokeWidth="4"
+                />
+                <path
+                  className="opacity-75"
+                  fill="currentColor"
+                  d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
+                />
+              </svg>
+              {editingId ? "Updating..." : "Adding..."}
+            </>
+          ) : editingId ? (
+            "Update Project"
+          ) : (
+            "Add Project"
           )}
-          {loading
-            ? editingId
-              ? "Updating..."
-              : "Adding..."
-            : editingId
-            ? "Update Project"
-            : "Add Project"}
         </button>
       </form>
 
@@ -253,6 +252,6 @@ export default function Projects() {
           ))}
         </ul>
       )}
-    </div>
+    </AdminLayout>
   );
 }

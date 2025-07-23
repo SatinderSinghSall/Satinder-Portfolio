@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
+import AdminLayout from "../components/AdminLayout"; // ✅ import layout
 
 const API = import.meta.env.VITE_API_URL || "/api";
 
@@ -39,35 +40,41 @@ export default function Messages() {
   }, []);
 
   return (
-    <div className="p-6">
-      <h2 className="text-2xl font-bold mb-4">Contact Messages</h2>
-      {loading ? (
-        <p>Loading messages...</p>
-      ) : messages.length === 0 ? (
-        <p>No messages found.</p>
-      ) : (
-        <ul className="space-y-4">
-          {messages.map((msg) => (
-            <li key={msg._id} className="border p-4 rounded shadow-sm">
-              <p>
-                <b>Name:</b> {msg.name}
-              </p>
-              <p>
-                <b>Email:</b> {msg.email}
-              </p>
-              <p>
-                <b>Message:</b> {msg.message}
-              </p>
-              <button
-                onClick={() => handleDelete(msg._id)}
-                className="text-red-500 mt-2"
+    <AdminLayout>
+      <div className="max-w-4xl mx-auto p-6">
+        <h2 className="text-3xl font-bold mb-6">Contact Messages</h2>
+
+        {loading ? (
+          <p>Loading messages...</p>
+        ) : messages.length === 0 ? (
+          <p>No messages found.</p>
+        ) : (
+          <ul className="space-y-4">
+            {messages.map((msg) => (
+              <li
+                key={msg._id}
+                className="border p-4 rounded shadow-sm bg-white"
               >
-                Delete
-              </button>
-            </li>
-          ))}
-        </ul>
-      )}
-    </div>
+                <div className="mb-2">
+                  <span className="font-semibold">Name:</span> {msg.name}
+                </div>
+                <div className="mb-2">
+                  <span className="font-semibold">Email:</span> {msg.email}
+                </div>
+                <div className="mb-2">
+                  <span className="font-semibold">Message:</span> {msg.message}
+                </div>
+                <button
+                  onClick={() => handleDelete(msg._id)}
+                  className="text-red-500 mt-2 hover:underline"
+                >
+                  Delete
+                </button>
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
+    </AdminLayout>
   );
 }
