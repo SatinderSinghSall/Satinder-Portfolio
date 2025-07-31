@@ -1,5 +1,7 @@
 import { FaLinkedin, FaGithub, FaTwitter } from "react-icons/fa";
 import profileImage from "../assets/Satinder_Image.jpg";
+import resumePDF from "../assets/Satinder_Resume.pdf";
+import { FaDownload } from "react-icons/fa";
 
 export default function About() {
   return (
@@ -44,12 +46,25 @@ export default function About() {
           </div>
 
           {/* Right: Image */}
-          <div className="flex-1 flex justify-center">
-            <img
-              src={profileImage}
-              alt="Satinder Singh Sall"
-              className="w-80 h-80 object-cover rounded-2xl shadow-xl border-4 border-blue-500"
-            />
+          <div className="flex-1 flex flex-col items-center space-y-6">
+            <div className="relative p-1 rounded-full bg-gradient-to-tr from-blue-500 via-purple-600 to-cyan-400 shadow-lg hover:shadow-blue-500/30 transition duration-500">
+              <img
+                src={profileImage}
+                alt="Satinder Singh Sall"
+                className="w-80 h-80 object-cover rounded-2xl shadow-xl border-4 border-black"
+              />
+            </div>
+
+            <a
+              href={resumePDF}
+              download="Satinder_Resume.pdf"
+              className="inline-block"
+            >
+              <button className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-600 to-blue-500 text-white font-semibold rounded-xl shadow-md hover:from-blue-700 hover:to-blue-600 hover:shadow-lg transition-all duration-300 ease-in-out">
+                <FaDownload className="text-lg" />
+                Download My Resume
+              </button>
+            </a>
           </div>
         </div>
 
