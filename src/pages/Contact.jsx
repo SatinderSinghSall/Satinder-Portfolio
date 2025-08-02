@@ -35,6 +35,7 @@ export default function Contact() {
     setLoading(true);
     try {
       await axios.post(`${API}/contact`, form);
+      toast.success("Message sent successfully!");
       setSent(true);
       setForm({ name: "", email: "", message: "" });
       setErrors({});
@@ -55,7 +56,8 @@ export default function Contact() {
 
         {sent && (
           <p className="text-green-400 text-center font-semibold animate-pulse">
-            ✅ Message sent successfully!
+            ✅ Your message has been sent successfully and will be responded to
+            shortly.
           </p>
         )}
         {errors.general && (
