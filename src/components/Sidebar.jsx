@@ -7,6 +7,7 @@ import {
   LogOut,
   BadgePlus,
 } from "lucide-react";
+import toast from "react-hot-toast";
 
 export default function Sidebar() {
   const location = useLocation();
@@ -42,6 +43,7 @@ export default function Sidebar() {
 
   const handleLogout = () => {
     localStorage.removeItem("token");
+    toast.success("Admin logout successful!");
     navigate("/login");
   };
 

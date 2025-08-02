@@ -1,6 +1,7 @@
 import { useState } from "react";
 import axios from "axios";
 import AdminLayout from "../components/AdminLayout";
+import toast from "react-hot-toast";
 
 const API = import.meta.env.VITE_API_URL || "/api";
 
@@ -40,6 +41,7 @@ export default function AddProject() {
       !form.imageFile ||
       !form.link
     ) {
+      toast.error("All fields are required.");
       setError("All fields are required.");
       return;
     }
@@ -66,6 +68,8 @@ export default function AddProject() {
         technologies: [],
         imageFile: null,
       });
+
+      toast.success("Project added successfully!");
     } catch (err) {
       console.error(err);
       setError("Failed to save project.");

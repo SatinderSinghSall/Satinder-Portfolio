@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import toast from "react-hot-toast";
 
 function Login() {
   const [email, setEmail] = useState("");
@@ -29,11 +30,13 @@ function Login() {
       localStorage.setItem("token", res.data.token);
 
       if (res.data.user.role === "admin") {
+        toast.success("Admin login successful!");
         navigate("/admin/dashboard");
       } else {
         setError("Access denied: Admins only");
       }
     } catch (err) {
+      toast.error(err.response?.data?.message || "Login failed");
       setError(err.response?.data?.message || "Login failed");
     } finally {
       setLoading(false);

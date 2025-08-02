@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import { FolderOpen, FileText, Mail } from "lucide-react";
 import Sidebar from "../components/Sidebar";
+import toast from "react-hot-toast";
 
 const API = import.meta.env.VITE_API_URL || "/api";
 
@@ -35,6 +36,7 @@ export default function Dashboard() {
 
   const handleLogout = () => {
     localStorage.removeItem("token");
+    toast.success("Admin logout successful!");
     navigate("/login");
   };
 

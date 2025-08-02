@@ -1,5 +1,6 @@
 import { useState } from "react";
 import axios from "axios";
+import toast from "react-hot-toast";
 const API = import.meta.env.VITE_API_URL || "/api";
 
 export default function Contact() {
