@@ -18,6 +18,7 @@ import Skills from "./components/Skills.jsx";
 import Experience from "./components/Experience.jsx";
 import ProjectDetail from "./pages/ProjectDetail.jsx";
 import Services from "./pages/Services.jsx";
+import AddProject from "./admin/AddProject.jsx";
 
 function App() {
   return (
@@ -42,6 +43,14 @@ function App() {
           element={
             <AdminRoute>
               <Dashboard />
+            </AdminRoute>
+          }
+        />
+        <Route
+          path="/admin/add-project"
+          element={
+            <AdminRoute>
+              <AddProject />
             </AdminRoute>
           }
         />

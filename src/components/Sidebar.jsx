@@ -5,6 +5,7 @@ import {
   BookText,
   Mail,
   LogOut,
+  BadgePlus,
 } from "lucide-react";
 
 export default function Sidebar() {
@@ -16,6 +17,11 @@ export default function Sidebar() {
       path: "/admin/dashboard",
       label: "Dashboard",
       icon: <LayoutDashboard size={18} />,
+    },
+    {
+      path: "/admin/add-project",
+      label: "Add a Project",
+      icon: <BadgePlus size={18} />,
     },
     {
       path: "/admin/projects",
