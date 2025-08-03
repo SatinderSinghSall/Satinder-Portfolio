@@ -48,6 +48,10 @@ export default function Blog() {
                     className="text-2xl font-bold mb-3 group-hover:text-blue-400 transition-colors"
                   >
                     {blog.title}
+                    <p className="text-sm text-gray-400 mb-2">
+                      By {blog.author || "Admin"} •{" "}
+                      {new Date(blog.publishedAt).toLocaleDateString()}
+                    </p>
                   </Link>
                   <p className="text-gray-300 text-sm mb-4">
                     {blog.content.length > 150
