@@ -6,6 +6,7 @@ import {
   Mail,
   LogOut,
   BadgePlus,
+  SquarePlus,
 } from "lucide-react";
 import toast from "react-hot-toast";
 
@@ -28,6 +29,11 @@ export default function Sidebar() {
       path: "/admin/projects",
       label: "Manage Projects",
       icon: <FolderKanban size={18} />,
+    },
+    {
+      path: "/admin/add-blog",
+      label: "Add a Blog",
+      icon: <SquarePlus size={18} />,
     },
     {
       path: "/admin/blogs",

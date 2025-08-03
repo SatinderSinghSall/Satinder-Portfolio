@@ -19,6 +19,7 @@ import Experience from "./components/Experience.jsx";
 import ProjectDetail from "./pages/ProjectDetail.jsx";
 import Services from "./pages/Services.jsx";
 import AddProject from "./admin/AddProject.jsx";
+import AddBlog from "./admin/AddBlog.jsx";
 
 function App() {
   return (
@@ -63,6 +64,14 @@ function App() {
           }
         />
         <Route
+          path="/admin/add-blog"
+          element={
+            <AdminRoute>
+              <AddBlog />
+            </AdminRoute>
+          }
+        />
+        <Route
           path="/admin/blogs"
           element={
             <AdminRoute>
@@ -70,7 +79,6 @@ function App() {
             </AdminRoute>
           }
         />
-
         <Route
           path="/admin/contact-messages"
           element={
