@@ -18,78 +18,83 @@ export default function Sidebar() {
     {
       path: "/admin/dashboard",
       label: "Dashboard",
-      icon: <LayoutDashboard size={18} />,
+      icon: <LayoutDashboard size={20} />,
     },
     {
       path: "/admin/add-project",
-      label: "Add a Project",
-      icon: <BadgePlus size={18} />,
+      label: "Add Project",
+      icon: <BadgePlus size={20} />,
     },
     {
       path: "/admin/projects",
       label: "Manage Projects",
-      icon: <FolderKanban size={18} />,
+      icon: <FolderKanban size={20} />,
     },
     {
       path: "/admin/add-blog",
-      label: "Add a Blog",
-      icon: <SquarePlus size={18} />,
+      label: "Add Blog",
+      icon: <SquarePlus size={20} />,
     },
     {
       path: "/admin/blogs",
       label: "Manage Blogs",
-      icon: <BookText size={18} />,
+      icon: <BookText size={20} />,
     },
     {
       path: "/admin/contact-messages",
-      label: "Contact Messages",
-      icon: <Mail size={18} />,
+      label: "Messages",
+      icon: <Mail size={20} />,
     },
   ];
 
   const handleLogout = () => {
     localStorage.removeItem("token");
-    toast.success("Admin logout successful!");
+    toast.success("Logged out successfully!");
     navigate("/login");
   };
 
   return (
-    <aside className="w-64 fixed top-16 left-0 h-[calc(100vh-4rem)] bg-[#0f172a] text-white shadow-lg z-50 flex flex-col justify-between">
-      <div>
-        <div className="p-6 border-b border-gray-700">
-          <h2 className="text-xl font-bold tracking-wide text-white">
+    <aside className="w-64 fixed top-16 left-0 h-[calc(100vh-4rem)] bg-[#0f172a]/90 backdrop-blur-lg text-gray-100 shadow-xl rounded-r-2xl flex flex-col justify-between transition-all duration-300">
+      {/* Scrollable content */}
+      <div className="flex-1 overflow-y-auto">
+        {/* Header */}
+        <div className="p-6 border-b border-gray-700 sticky top-0 bg-[#0f172a]/90 backdrop-blur-lg z-10">
+          <h2 className="text-2xl font-extrabold text-white tracking-wide">
             Admin Panel
           </h2>
         </div>
-        <nav className="p-4 space-y-2">
+
+        {/* Nav Links */}
+        <nav className="p-4 flex flex-col gap-2">
           {navItems.map(({ path, label, icon }) => {
             const isActive = location.pathname === path;
-
             return (
               <Link
                 key={path}
                 to={path}
-                className={`flex items-center gap-3 px-4 py-2 rounded-lg transition duration-200 ${
-                  isActive
-                    ? "bg-blue-600 text-white font-semibold shadow-sm"
-                    : "hover:bg-gray-800 text-gray-300"
-                }`}
+                className={`flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-all duration-200
+                  ${
+                    isActive
+                      ? "bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg"
+                      : "text-gray-400 hover:bg-gray-800/70 hover:text-white"
+                  }`}
               >
                 {icon}
-                <span className="text-sm">{label}</span>
+                <span>{label}</span>
               </Link>
             );
           })}
         </nav>
       </div>
 
-      <div className="p-4 border-t border-gray-700">
+      {/* Logout Button */}
+      <div className="p-4 border-t border-gray-700 bg-[#0f172a]/90 backdrop-blur-lg">
         <button
           onClick={handleLogout}
-          className="flex items-center gap-3 px-4 py-2 rounded-lg text-gray-300 hover:bg-red-600 hover:text-white transition duration-200 w-full"
+          className="w-full flex items-center justify-center gap-3 px-4 py-3 rounded-xl bg-red-600 hover:bg-red-700 text-white font-semibold transition-all duration-200 shadow-md"
         >
-          <LogOut size={18} />
-          <span className="text-sm">Logout</span>
+          <LogOut size={20} />
+          <span>Logout</span>
         </button>
       </div>
     </aside>
