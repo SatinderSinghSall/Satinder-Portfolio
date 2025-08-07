@@ -44,12 +44,12 @@ export default function Sidebar() {
     },
     {
       path: "/admin/youtube/new",
-      label: "Add a YouTube Video",
+      label: "Add a YouTube",
       icon: <Youtube size={20} />,
     },
     {
       path: "/admin/youtube",
-      label: "Manage YouTube Video",
+      label: "Manage YouTube",
       icon: <BookText size={20} />,
     },
     {
@@ -66,7 +66,7 @@ export default function Sidebar() {
   };
 
   return (
-    <aside className="w-70 fixed top-16 left-0 h-[calc(100vh-4rem)] bg-[#0f172a]/90 backdrop-blur-lg text-gray-100 shadow-xl rounded-r-2xl flex flex-col justify-between transition-all duration-300">
+    <aside className="w-65 fixed top-16 left-0 h-[calc(100vh-4rem)] bg-[#0f172a]/90 backdrop-blur-lg text-gray-100 shadow-xl rounded-r-2xl flex flex-col justify-between transition-all duration-300">
       {/* Scrollable content */}
       <div className="flex-1 overflow-y-auto">
         {/* Header */}

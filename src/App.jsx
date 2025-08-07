@@ -94,19 +94,18 @@ function App() {
           }
         />
         <Route
-          path="/admin/youtube"
-          element={
-            <AdminRoute>
-              <ManageYouTube />
-            </AdminRoute>
-          }
-        />
-
-        <Route
           path="admin/youtube/new"
           element={
             <AdminRoute>
               <AddYouTube />
+            </AdminRoute>
+          }
+        />
+        <Route
+          path="/admin/youtube"
+          element={
+            <AdminRoute>
+              <ManageYouTube />
             </AdminRoute>
           }
         />

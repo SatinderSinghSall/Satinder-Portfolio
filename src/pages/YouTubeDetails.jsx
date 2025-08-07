@@ -1,6 +1,8 @@
 import { useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import axios from "axios";
+import { Link } from "react-router-dom";
+import { BiError } from "react-icons/bi";
 
 const API = import.meta.env.VITE_API_URL || "/api";
 
@@ -19,16 +21,30 @@ export default function YouTubeDetails() {
 
   if (loading) {
     return (
-      <section className="min-h-screen flex items-center justify-center text-white">
-        <p>Loading video...</p>
+      <section className="min-h-screen flex flex-col items-center justify-center bg-black text-white">
+        <div className="w-12 h-12 border-4 border-white border-t-transparent rounded-full animate-spin mb-4"></div>
+        <p className="text-lg font-medium">Loading video...</p>
       </section>
     );
   }
 
   if (!video) {
     return (
-      <section className="min-h-screen flex items-center justify-center text-white">
-        <p>Video not found.</p>
+      <section className="min-h-screen flex items-center justify-center bg-gradient-to-b from-[#0f0c29] via-[#302b63] to-[#24243e] px-6">
+        <div className="bg-white/5 backdrop-blur-sm p-8 rounded-2xl shadow-2xl text-white text-center max-w-md w-full animate-fade-in">
+          <BiError className="text-5xl mx-auto mb-4 text-red-400" />
+          <h2 className="text-2xl font-bold mb-2">Video Not Found</h2>
+          <p className="text-gray-300 mb-6">
+            Sorry, we couldn’t find the video you’re looking for. It might have
+            been removed or the link is broken.
+          </p>
+          <Link
+            to="/"
+            className="inline-block bg-blue-600 hover:bg-blue-700 transition-colors text-white font-medium py-2 px-4 rounded-full"
+          >
+            Go back home
+          </Link>
+        </div>
       </section>
     );
   }
