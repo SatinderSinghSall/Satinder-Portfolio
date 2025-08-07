@@ -1,7 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import axios from "axios";
-import { FolderOpen, FileText, Mail } from "lucide-react";
+import { FolderOpen, FileText, Mail, Youtube } from "lucide-react";
 import Sidebar from "../components/Sidebar";
 import toast from "react-hot-toast";
 
@@ -12,6 +12,7 @@ export default function Dashboard() {
   const [projectsCount, setProjectsCount] = useState(0);
   const [blogsCount, setBlogsCount] = useState(0);
   const [messagesCount, setMessagesCount] = useState(0);
+  const [youTubeCount, setYouTubeCount] = useState(0);
   const [loading, setLoading] = useState(false);
   const token = localStorage.getItem("token");
 
@@ -24,6 +25,7 @@ export default function Dashboard() {
         setProjectsCount(res.data.projectsCount);
         setBlogsCount(res.data.blogsCount);
         setMessagesCount(res.data.messagesCount);
+        setYouTubeCount(res.data.youTubeCount);
       } catch (error) {
         console.error("Failed to fetch dashboard data", error);
       } finally {
@@ -100,6 +102,17 @@ export default function Dashboard() {
                 <div>
                   <h2 className="text-xl font-semibold">Contact Messages</h2>
                   <p className="text-4xl font-bold mt-1">{messagesCount}</p>
+                </div>
+              </div>
+            </div>
+
+            {/* YouTube Card */}
+            <div className="bg-gradient-to-r from-red-500 to-red-600 text-white p-6 rounded-xl shadow-lg hover:scale-105 transition-transform">
+              <div className="flex items-center gap-4">
+                <Youtube className="w-12 h-12" />
+                <div>
+                  <h2 className="text-xl font-semibold">YouTube Count</h2>
+                  <p className="text-4xl font-bold mt-1">{youTubeCount}</p>
                 </div>
               </div>
             </div>
