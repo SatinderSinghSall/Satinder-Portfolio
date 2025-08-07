@@ -23,7 +23,7 @@ import AddBlog from "./admin/AddBlog.jsx";
 import WatchMyYouTube from "./pages/WatchMyYouTube.jsx";
 import YouTubeDetails from "./pages/YouTubeDetails.jsx";
 import AddYouTube from "./admin/AddYouTube.jsx";
-import ManageYouTube from "./admin/Youtube.jsx";
+import ManageYouTube from "./admin/YouTube.jsx";
 
 function App() {
   return (
