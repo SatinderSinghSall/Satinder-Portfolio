@@ -7,6 +7,8 @@ import {
   LogOut,
   BadgePlus,
   SquarePlus,
+  DiamondPlus,
+  Youtube,
 } from "lucide-react";
 import toast from "react-hot-toast";
 
@@ -41,6 +43,16 @@ export default function Sidebar() {
       icon: <BookText size={20} />,
     },
     {
+      path: "/admin/youtube/new",
+      label: "Add a YouTube Video",
+      icon: <Youtube size={20} />,
+    },
+    {
+      path: "/admin/youtube",
+      label: "Manage YouTube Video",
+      icon: <BookText size={20} />,
+    },
+    {
       path: "/admin/contact-messages",
       label: "Messages",
       icon: <Mail size={20} />,
@@ -54,7 +66,7 @@ export default function Sidebar() {
   };
 
   return (
-    <aside className="w-64 fixed top-16 left-0 h-[calc(100vh-4rem)] bg-[#0f172a]/90 backdrop-blur-lg text-gray-100 shadow-xl rounded-r-2xl flex flex-col justify-between transition-all duration-300">
+    <aside className="w-70 fixed top-16 left-0 h-[calc(100vh-4rem)] bg-[#0f172a]/90 backdrop-blur-lg text-gray-100 shadow-xl rounded-r-2xl flex flex-col justify-between transition-all duration-300">
       {/* Scrollable content */}
       <div className="flex-1 overflow-y-auto">
         {/* Header */}

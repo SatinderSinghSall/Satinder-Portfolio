@@ -20,6 +20,10 @@ import ProjectDetail from "./pages/ProjectDetail.jsx";
 import Services from "./pages/Services.jsx";
 import AddProject from "./admin/AddProject.jsx";
 import AddBlog from "./admin/AddBlog.jsx";
+import WatchMyYouTube from "./pages/WatchMyYouTube.jsx";
+import YouTubeDetails from "./pages/YouTubeDetails.jsx";
+import AddYouTube from "./admin/AddYouTube.jsx";
+import ManageYouTube from "./admin/Youtube.jsx";
 
 function App() {
   return (
@@ -38,6 +42,8 @@ function App() {
         <Route path="/experience" element={<Experience />} />
         <Route path="/projects/:id" element={<ProjectDetail />} />
         <Route path="/services" element={<Services />} />
+        <Route path="/youtube" element={<WatchMyYouTube />} />
+        <Route path="/youtube/:id" element={<YouTubeDetails />} />
 
         <Route
           path="/admin/dashboard"
@@ -84,6 +90,23 @@ function App() {
           element={
             <AdminRoute>
               <ContactMessages />
+            </AdminRoute>
+          }
+        />
+        <Route
+          path="/admin/youtube"
+          element={
+            <AdminRoute>
+              <ManageYouTube />
+            </AdminRoute>
+          }
+        />
+
+        <Route
+          path="admin/youtube/new"
+          element={
+            <AdminRoute>
+              <AddYouTube />
             </AdminRoute>
           }
         />
