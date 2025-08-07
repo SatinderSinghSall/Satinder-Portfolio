@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import { Link } from "react-router-dom";
 import { BiError } from "react-icons/bi";
+import { FaYoutube } from "react-icons/fa";
 
 const API = import.meta.env.VITE_API_URL || "/api";
 
@@ -49,13 +50,18 @@ export default function YouTubeDetails() {
     );
   }
 
+  function getEmbedUrl(url) {
+    const match = url.match(/(?:watch\?v=|youtu\.be\/)([a-zA-Z0-9_-]+)/);
+    return match ? `https://www.youtube.com/embed/${match[1]}` : url;
+  }
+
   return (
     <section className="min-h-screen bg-gradient-to-b from-[#0f0c29] via-[#302b63] to-[#24243e] py-16 px-6 text-white">
       <div className="max-w-4xl mx-auto space-y-6">
         <div className="aspect-video rounded-xl overflow-hidden shadow-xl">
           <iframe
             className="w-full h-full"
-            src={video.videoUrl}
+            src={getEmbedUrl(video.videoUrl)}
             title={video.title}
             frameBorder="0"
             allowFullScreen
@@ -85,6 +91,18 @@ export default function YouTubeDetails() {
             ))}
           </div>
         )}
+
+        <div className="pt-6">
+          <a
+            href={video.videoUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-2 bg-red-600 hover:bg-red-700 transition-colors text-white font-semibold py-2 px-4 rounded-full"
+          >
+            <FaYoutube className="text-xl" />
+            Watch on YouTube
+          </a>
+        </div>
       </div>
     </section>
   );
