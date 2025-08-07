@@ -9,6 +9,11 @@ export default function AddEditYouTube() {
   const navigate = useNavigate();
   const { id } = useParams();
   const isEdit = Boolean(id);
+  const [file, setFile] = useState(null);
+
+  const handleFileChange = (e) => {
+    setFile(e.target.files[0]);
+  };
 
   const [form, setForm] = useState({
     title: "",
@@ -45,15 +50,39 @@ export default function AddEditYouTube() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const payload = {
-      ...form,
-      tags: form.tags.split(",").map((t) => t.trim()),
-    };
 
     const config = {
       headers: {
         Authorization: `Bearer ${localStorage.getItem("token")}`,
       },
+    };
+
+    let thumbnailUrl = form.thumbnail;
+
+    // Upload image to backend if a file is selected
+    if (file) {
+      const formData = new FormData();
+      formData.append("image", file);
+
+      try {
+        const res = await axios.post(`${API}/youtube/upload`, formData, {
+          headers: {
+            "Content-Type": "multipart/form-data",
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        });
+        thumbnailUrl = res.data.url;
+      } catch (err) {
+        console.error("Thumbnail upload failed", err);
+        alert("Thumbnail upload failed.");
+        return;
+      }
+    }
+
+    const payload = {
+      ...form,
+      thumbnail: thumbnailUrl,
+      tags: form.tags.split(",").map((t) => t.trim()),
     };
 
     try {
@@ -101,12 +130,10 @@ export default function AddEditYouTube() {
             />
 
             <input
-              type="url"
-              name="thumbnail"
-              placeholder="Thumbnail URL"
-              value={form.thumbnail}
-              onChange={handleChange}
-              className="w-full p-3 rounded border border-gray-300 bg-white text-black placeholder-gray-500"
+              type="file"
+              accept="image/*"
+              onChange={handleFileChange}
+              className="w-full p-3 rounded border border-gray-300 bg-white text-black"
             />
 
             <textarea
