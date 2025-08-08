@@ -20,6 +20,7 @@ import {
   SiRender,
   SiTypescript,
   SiAndroid,
+  SiNextdotjs,
 } from "react-icons/si";
 
 export default function Skills() {
@@ -34,6 +35,7 @@ export default function Skills() {
           name: "React & React Native",
           icon: <FaReact className="text-cyan-400" />,
         },
+        { name: "Next.js", icon: <SiNextdotjs className="text-white" /> },
         { name: "Redux", icon: <SiRedux className="text-purple-500" /> },
         {
           name: "Tailwind CSS",

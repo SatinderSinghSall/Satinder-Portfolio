@@ -1,4 +1,4 @@
-import { Github, Linkedin, Twitter, Mail } from "lucide-react";
+import { Github, Linkedin, Twitter, Mail, Youtube } from "lucide-react";
 import { Link } from "react-router-dom";
 
 export default function Footer() {
@@ -22,50 +22,31 @@ export default function Footer() {
 
         {/* Quick Links */}
         <div>
-          <h3 className="text-2xl font-semibold mb-5 text-gray-200">
+          <h3 className="text-2xl text-center font-semibold mb-5 text-gray-200">
             Quick Links
           </h3>
-          <ul className="space-y-3 text-gray-400 font-medium">
-            <li>
-              <Link
-                to="/"
-                className="hover:text-blue-400 hover:pl-1 transition-all duration-200"
-              >
-                Home
-              </Link>
-            </li>
-            <li>
-              <Link
-                to="/about"
-                className="hover:text-blue-400 hover:pl-1 transition-all duration-200"
-              >
-                About Me
-              </Link>
-            </li>
-            <li>
-              <Link
-                to="/projects"
-                className="hover:text-blue-400 hover:pl-1 transition-all duration-200"
-              >
-                Projects
-              </Link>
-            </li>
-            <li>
-              <Link
-                to="/blog"
-                className="hover:text-blue-400 hover:pl-1 transition-all duration-200"
-              >
-                Blog
-              </Link>
-            </li>
-            <li>
-              <Link
-                to="/contact"
-                className="hover:text-blue-400 hover:pl-1 transition-all duration-200"
-              >
-                Contact
-              </Link>
-            </li>
+          <ul className="grid grid-cols-3 gap-x-6 gap-y-2 text-gray-400 font-medium text-center">
+            {[
+              { name: "Home", path: "/" },
+              { name: "About Me", path: "/about" },
+              { name: "Projects", path: "/projects" },
+              { name: "Blog", path: "/blog" },
+              { name: "Contact", path: "/contact" },
+              { name: "Services", path: "/services" },
+              { name: "YouTube", path: "/youtube" },
+              { name: "Skills", path: "/skills" },
+              { name: "Experience", path: "/experience" },
+            ].map((link, index) => (
+              <li key={index}>
+                <Link
+                  to={link.path}
+                  className="group inline-block w-fit hover:text-blue-400 transition-colors duration-200 relative"
+                >
+                  {link.name}
+                  <span className="block h-0.5 bg-blue-400 scale-x-0 group-hover:scale-x-100 transition-transform origin-left duration-300 mt-0.5" />
+                </Link>
+              </li>
+            ))}
           </ul>
         </div>
 
@@ -90,6 +71,14 @@ export default function Footer() {
               className="hover:text-blue-400 transition hover:scale-110 duration-300"
             >
               <Linkedin size={30} />
+            </a>
+            <a
+              href="https://www.youtube.com/@satindersinghsall.3841/featured"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hover:text-blue-400 transition hover:scale-110 duration-300"
+            >
+              <Youtube size={30} />
             </a>
             <a
               href="https://x.com/SallSatinder"

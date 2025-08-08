@@ -1,4 +1,4 @@
-import { FaLinkedin, FaGithub, FaTwitter } from "react-icons/fa";
+import { FaLinkedin, FaGithub, FaTwitter, FaYoutube } from "react-icons/fa";
 import profileImage from "../assets/Satinder_Image.jpg";
 import resumePDF from "../assets/Satinder_Resume.pdf";
 import { FaDownload } from "react-icons/fa";
@@ -85,6 +85,11 @@ export default function About() {
               href: "https://x.com/SallSatinder",
               icon: <FaTwitter />,
               label: "Twitter",
+            },
+            {
+              href: "https://www.youtube.com/@satindersinghsall.3841/featured",
+              icon: <FaYoutube />,
+              label: "YouTube"
             },
           ].map((item, index) => (
             <a
