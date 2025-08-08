@@ -1,4 +1,9 @@
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  useLocation,
+} from "react-router-dom";
 import Navbar from "./components/Navbar";
 import Home from "./pages/Home";
 import Projects_User from "./pages/Projects_User.jsx";
@@ -26,9 +31,12 @@ import AddYouTube from "./admin/AddYouTube.jsx";
 import ManageYouTube from "./admin/YouTube.jsx";
 
 function App() {
+  const location = useLocation();
+  const isAdminPage = location.pathname.startsWith("/admin");
+
   return (
-    <Router>
-      <Navbar />
+    <>
+      {!isAdminPage && <Navbar />}
       <Routes>
         <Route path="/login" element={<Login />} />
         <Route path="/" element={<Home />} />
@@ -112,9 +120,15 @@ function App() {
 
         <Route path="*" element={<NotFound />} />
       </Routes>
-      <Footer />
-    </Router>
+      {!isAdminPage && <Footer />}
+    </>
   );
 }
 
-export default App;
+export default function AppWrapper() {
+  return (
+    <Router>
+      <App />
+    </Router>
+  );
+}
