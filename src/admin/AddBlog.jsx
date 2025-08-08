@@ -65,7 +65,7 @@ export default function AddBlog() {
 
   return (
     <AdminLayout>
-      <div className="max-w-3xl mx-auto mt-8">
+      <div className="max-w-3xl mx-auto">
         <div className="bg-white shadow-lg rounded-xl p-8 border border-gray-100">
           <h2 className="text-3xl font-bold text-gray-800 mb-6">
             ➕ Add a New Blog Post

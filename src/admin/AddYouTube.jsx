@@ -111,8 +111,8 @@ export default function AddYouTube() {
 
   return (
     <AdminLayout>
-      <section className="min-h-screen py-12 px-6 bg-gray-50 text-black">
-        <div className="max-w-2xl mx-auto bg-white p-8 rounded-xl shadow-lg border border-gray-200">
+      <section className="min-h-screen bg-gray-50 text-black">
+        <div className="max-w-3xl mx-auto bg-white p-8 rounded-xl shadow-lg border border-gray-200">
           <h1 className="text-3xl font-bold mb-6 text-gray-800">
             ➕ Add YouTube Video
           </h1>
