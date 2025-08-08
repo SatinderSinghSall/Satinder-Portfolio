@@ -36,7 +36,8 @@ export default function WatchMyYouTube() {
         </h2>
         <p className="text-center text-gray-300 mb-12 text-lg max-w-3xl mx-auto">
           Explore curated content from my YouTube channel on web development,
-          tech insights, and tutorials.
+          tech insights, mobile app development, Data Structures & Algorithems
+          and tutorials.
         </p>
 
         {loading ? (
