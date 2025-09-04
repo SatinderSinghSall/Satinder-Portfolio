@@ -66,7 +66,9 @@ export default function ProjectDetail() {
           className="w-full rounded-xl mb-4"
         />
 
-        <p className="mb-6 text-gray-300">{project.description}</p>
+        <p className="mb-6 text-gray-300 whitespace-pre-line">
+          {project.description}
+        </p>
 
         <div className="flex flex-wrap gap-3 mb-8">
           {project.technologies.map((tech, idx) => (
