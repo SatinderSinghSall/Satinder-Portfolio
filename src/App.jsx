@@ -30,6 +30,9 @@ import YouTubeDetails from "./pages/YouTubeDetails.jsx";
 import AddYouTube from "./admin/AddYouTube.jsx";
 import ManageYouTube from "./admin/YouTube.jsx";
 
+//! To run the backend for DEVELOPMENT -> npm run dev
+//! To run the backend for PRODUCTION -> npm start
+
 function App() {
   const location = useLocation();
   const isAdminPage = location.pathname.startsWith("/admin");

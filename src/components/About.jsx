@@ -13,13 +13,22 @@ export default function About() {
             <h2 className="text-4xl font-bold text-blue-500 mb-6">About Me</h2>
             <p className="text-gray-300 text-lg leading-relaxed mb-4">
               I'm a passionate and dedicated{" "}
-              <strong>Computer Science student</strong> at REVA University,
-              Bengaluru, with a strong foundation in web development, mobile app
-              development, cloud computing, and backend systems.
+              <strong>
+                student of Computer Science (MCA) at KiiT University,
+                Bhubaneswar, Odisha, India
+              </strong>
+              , with a strong foundation in web development, mobile app
+              development (including Android & native mobile/tablet apps), cloud
+              computing, and backend systems. I completed my{" "}
+              <strong>
+                bachelor’s in Computer Applications at REVA University,
+                Bengaluru
+              </strong>
+              .
             </p>
             <p className="text-gray-300 text-lg leading-relaxed mb-4">
               I specialize in modern web technologies like{" "}
-              <strong>HTML, CSS, JavaScript, React, NodeJS, ExpressJS</strong>,
+              <strong>TypeScript, JavaScript, React, NodeJS, ExpressJS</strong>,
               and possess solid experience in database systems including{" "}
               <strong>SQL, MySQL, NoSQL, MongoDB</strong>. I build
               user-friendly, responsive apps with clean design and solid
@@ -40,8 +49,10 @@ export default function About() {
             </p>
             <p className="text-gray-300 text-lg leading-relaxed">
               Currently, I’m advancing my skills through{" "}
-              <strong>Mobile App Development</strong>, eager to contribute to
-              innovative teams and real-world projects.
+              <strong>Game Development </strong>
+              and <strong>Mobile App Development</strong> (including Android and
+              native mobile/tablet apps), eager to contribute to innovative
+              teams and real-world projects.
             </p>
           </div>
 
@@ -89,7 +100,7 @@ export default function About() {
             {
               href: "https://www.youtube.com/@satindersinghsall.3841/featured",
               icon: <FaYoutube />,
-              label: "YouTube"
+              label: "YouTube",
             },
           ].map((item, index) => (
             <a
