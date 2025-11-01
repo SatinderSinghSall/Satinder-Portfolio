@@ -1,7 +1,12 @@
-import { FaLinkedin, FaGithub, FaTwitter, FaYoutube } from "react-icons/fa";
+import {
+  FaLinkedin,
+  FaGithub,
+  FaTwitter,
+  FaYoutube,
+  FaDownload,
+} from "react-icons/fa";
 import profileImage from "../assets/Satinder_Image.jpg";
 import resumePDF from "../assets/Satinder_Resume.pdf";
-import { FaDownload } from "react-icons/fa";
 
 export default function About() {
   return (
@@ -32,15 +37,19 @@ export default function About() {
               and possess solid experience in database systems including{" "}
               <strong>SQL, MySQL, NoSQL, MongoDB</strong>. I build
               user-friendly, responsive apps with clean design and solid
-              functionality— incorporating features such as login/signup
+              functionality — incorporating features such as login/signup
               systems, validation, authentication, and authorization.
             </p>
             <p className="text-gray-300 text-lg leading-relaxed mb-4">
               I'm experienced with backend APIs, RESTful services, and deploying
               applications via platforms like <strong>Render, Vercel</strong>{" "}
-              and <strong>GitHub</strong>. From building simple applications to
-              deploying complex, database-driven platforms — I thrive on
-              crafting impactful solutions.
+              and <strong>GitHub</strong>. I also have hands-on experience with{" "}
+              <strong>Docker</strong> for containerization and{" "}
+              <strong>CI/CD Pipelines</strong> for automated testing and
+              deployment — ensuring efficient and reliable software delivery.
+              From building simple applications to deploying complex,
+              database-driven platforms — I thrive on crafting impactful
+              solutions.
             </p>
             <p className="text-gray-300 text-lg leading-relaxed mb-4">
               Outside tech, I’m an aviation enthusiast and a lifelong learner,

@@ -7,8 +7,15 @@ import {
   FaGithub,
   FaGitAlt,
   FaMobileAlt,
+  FaDocker,
+  FaJava,
+  FaPython,
+  FaCuttlefish,
 } from "react-icons/fa";
 import {
+  SiC,
+  SiCplusplus,
+  SiKotlin,
   SiExpress,
   SiMongodb,
   SiMysql,
@@ -21,16 +28,29 @@ import {
   SiTypescript,
   SiAndroid,
   SiNextdotjs,
+  SiJenkins,
+  SiUnity,
 } from "react-icons/si";
 
 export default function Skills() {
   const skills = [
     {
+      category: "Programming Languages",
+      items: [
+        { name: "C", icon: <SiC className="text-blue-400" /> },
+        { name: "C++", icon: <SiCplusplus className="text-indigo-400" /> },
+        { name: "Java", icon: <FaJava className="text-orange-500" /> },
+        { name: "Python", icon: <FaPython className="text-yellow-400" /> },
+        { name: "Kotlin", icon: <SiKotlin className="text-purple-400" /> },
+        { name: "C#", icon: <FaCuttlefish className="text-green-400" /> },
+        { name: "JavaScript", icon: <FaJs className="text-yellow-400" /> },
+      ],
+    },
+    {
       category: "Frontend",
       items: [
         { name: "HTML5", icon: <FaHtml5 className="text-orange-500" /> },
         { name: "CSS3", icon: <FaCss3Alt className="text-blue-500" /> },
-        { name: "JavaScript", icon: <FaJs className="text-yellow-400" /> },
         {
           name: "React & React Native",
           icon: <FaReact className="text-cyan-400" />,
@@ -71,6 +91,11 @@ export default function Skills() {
       items: [
         { name: "Git", icon: <FaGitAlt className="text-orange-600" /> },
         { name: "GitHub", icon: <FaGithub className="text-white" /> },
+        { name: "Docker", icon: <FaDocker className="text-blue-400" /> },
+        {
+          name: "CI/CD Pipelines",
+          icon: <SiJenkins className="text-red-400" />,
+        },
         { name: "Vercel", icon: <SiVercel className="text-white" /> },
         { name: "Render", icon: <SiRender className="text-blue-400" /> },
       ],
@@ -86,6 +111,13 @@ export default function Skills() {
           name: "Android App Dev",
           icon: <SiAndroid className="text-green-500" />,
         },
+      ],
+    },
+    {
+      category: "Game Development",
+      items: [
+        { name: "Unity", icon: <SiUnity className="text-gray-300" /> },
+        { name: "C#", icon: <FaCuttlefish className="text-green-400" /> },
       ],
     },
   ];

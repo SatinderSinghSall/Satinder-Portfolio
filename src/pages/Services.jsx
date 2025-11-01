@@ -1,5 +1,14 @@
-import { Code, Smartphone, Layers, Globe, Zap, Paintbrush } from "lucide-react";
-import { Link } from "react-router-dom"; // or "next/link" if using Next.js
+import {
+  Code,
+  Smartphone,
+  Layers,
+  Globe,
+  Zap,
+  Paintbrush,
+  Gamepad2,
+  CloudCog,
+} from "lucide-react";
+import { Link } from "react-router-dom";
 
 export default function MyServices() {
   const services = [
@@ -7,37 +16,49 @@ export default function MyServices() {
       icon: <Code size={48} className="text-blue-500" />,
       title: "Web Development",
       description:
-        "Responsive and high-performance websites tailored to your business needs using the latest technologies.",
+        "Responsive, scalable, and high-performance websites tailored to your goals using modern technologies like React, Next.js, and TypeScript.",
     },
     {
       icon: <Smartphone size={48} className="text-pink-500" />,
       title: "Mobile App Development",
       description:
-        "Cross-platform mobile applications with stunning UI and smooth user experience.",
+        "Cross-platform mobile applications (Android & Native) built with clean design, fast performance, and smooth user experience.",
     },
     {
       icon: <Layers size={48} className="text-green-500" />,
       title: "Full Stack Solutions",
       description:
-        "End-to-end solutions covering both frontend and backend development with clean architecture.",
+        "Complete end-to-end solutions covering frontend, backend, databases, and deployment — from concept to live product.",
+    },
+    {
+      icon: <Gamepad2 size={48} className="text-indigo-500" />,
+      title: "Game Development",
+      description:
+        "Creating immersive and interactive games using Unity and C#, focusing on engaging gameplay and smooth performance across devices.",
+    },
+    {
+      icon: <CloudCog size={48} className="text-cyan-400" />,
+      title: "DevOps & Cloud Deployment",
+      description:
+        "Automating workflows and deployments using Docker, CI/CD pipelines, and platforms like Render, Vercel, and GitHub Actions.",
     },
     {
       icon: <Globe size={48} className="text-purple-500" />,
       title: "SEO Optimization",
       description:
-        "Boost your online visibility with optimized content, meta tags, and performance improvements.",
+        "Boosting your visibility and rankings through SEO strategies, performance tuning, and web best practices.",
     },
     {
       icon: <Zap size={48} className="text-yellow-500" />,
       title: "Performance Tuning",
       description:
-        "Enhance your application's speed and responsiveness with advanced performance tuning strategies.",
+        "Improving load times, responsiveness, and overall efficiency through code optimization and advanced caching strategies.",
     },
     {
       icon: <Paintbrush size={48} className="text-red-500" />,
       title: "UI/UX Design",
       description:
-        "Crafting user-friendly and visually appealing designs that keep your audience engaged.",
+        "Designing visually appealing, intuitive, and accessible user interfaces that elevate user engagement and satisfaction.",
     },
   ];
 
@@ -46,8 +67,8 @@ export default function MyServices() {
       <div className="max-w-7xl mx-auto text-center space-y-6">
         <h1 className="text-4xl md:text-5xl font-bold mb-6">🚀 My Services</h1>
         <p className="text-lg md:text-xl text-gray-300 max-w-3xl mx-auto">
-          Elevating your digital presence with modern design and development
-          solutions.
+          Building impactful digital experiences — from websites and apps to
+          games and cloud solutions.
         </p>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10 mt-12">
@@ -68,8 +89,8 @@ export default function MyServices() {
             Ready to level up your digital presence?
           </h3>
           <p className="text-lg md:text-xl text-gray-300 max-w-2xl mx-auto">
-            Let’s collaborate and bring your vision to life. Get in touch today
-            and start building something amazing!
+            Let’s collaborate and bring your vision to life — whether it’s an
+            app, a game, or a full-stack platform.
           </p>
           <Link
             to="/contact"
