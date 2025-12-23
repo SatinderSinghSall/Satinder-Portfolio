@@ -8,57 +8,78 @@ import {
   BadgePlus,
   SquarePlus,
   Youtube,
-  ChevronLeft,
-  ChevronRight,
 } from "lucide-react";
-import { useState } from "react";
 import toast from "react-hot-toast";
 
 export default function Sidebar() {
   const location = useLocation();
   const navigate = useNavigate();
-  const [collapsed, setCollapsed] = useState(false);
 
   const navItems = [
     {
-      path: "/admin/dashboard",
-      label: "Dashboard",
-      icon: <LayoutDashboard size={20} />,
+      section: "Main",
+      items: [
+        {
+          path: "/admin/dashboard",
+          label: "Dashboard",
+          icon: <LayoutDashboard size={20} />,
+        },
+      ],
     },
     {
-      path: "/admin/add-project",
-      label: "Add Project",
-      icon: <BadgePlus size={20} />,
+      section: "Projects",
+      items: [
+        {
+          path: "/admin/add-project",
+          label: "Add Project",
+          icon: <BadgePlus size={20} />,
+        },
+        {
+          path: "/admin/projects",
+          label: "Manage Projects",
+          icon: <FolderKanban size={20} />,
+        },
+      ],
     },
     {
-      path: "/admin/projects",
-      label: "Manage Projects",
-      icon: <FolderKanban size={20} />,
+      section: "Blogs",
+      items: [
+        {
+          path: "/admin/add-blog",
+          label: "Add Blog",
+          icon: <SquarePlus size={20} />,
+        },
+        {
+          path: "/admin/blogs",
+          label: "Manage Blogs",
+          icon: <BookText size={20} />,
+        },
+      ],
     },
     {
-      path: "/admin/add-blog",
-      label: "Add Blog",
-      icon: <SquarePlus size={20} />,
+      section: "Media",
+      items: [
+        {
+          path: "/admin/youtube/new",
+          label: "Add YouTube",
+          icon: <Youtube size={20} />,
+        },
+        {
+          path: "/admin/youtube",
+          label: "Manage YouTube",
+          icon: <BookText size={20} />,
+        },
+      ],
     },
     {
-      path: "/admin/blogs",
-      label: "Manage Blogs",
-      icon: <BookText size={20} />,
-    },
-    {
-      path: "/admin/youtube/new",
-      label: "Add a YouTube",
-      icon: <Youtube size={20} />,
-    },
-    {
-      path: "/admin/youtube",
-      label: "Manage YouTube",
-      icon: <BookText size={20} />,
-    },
-    {
-      path: "/admin/contact-messages",
-      label: "Messages",
-      icon: <Mail size={20} />,
+      section: "Communication",
+      items: [
+        {
+          path: "/admin/contact-messages",
+          label: "Messages",
+          icon: <Mail size={20} />,
+        },
+      ],
     },
   ];
 
@@ -70,66 +91,65 @@ export default function Sidebar() {
 
   return (
     <aside
-      className={`group fixed top-0 left-0 h-screen transition-all duration-300 
-      ${collapsed ? "w-20" : "w-64"} 
+      className="fixed left-0 top-0 h-screen w-64 
       bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900 
-      border-r border-white/10 text-gray-100 shadow-xl flex flex-col justify-between`}
+      border-r border-white/10 text-gray-100 shadow-xl flex flex-col"
     >
-      {/* Header */}
-      <div className="flex items-center justify-between p-4 border-b border-white/10">
-        {!collapsed && (
-          <h2 className="text-xl font-bold tracking-wide">Admin Panel</h2>
-        )}
-        <button
-          onClick={() => setCollapsed(!collapsed)}
-          className="p-2 rounded-lg bg-white/5 hover:bg-white/10 transition-all"
-        >
-          {collapsed ? <ChevronRight size={18} /> : <ChevronLeft size={18} />}
-        </button>
+      {/* Logo / Header */}
+      <div className="px-6 py-5 border-b border-white/10">
+        <h2 className="text-2xl font-bold tracking-wide text-white">
+          Admin Panel
+        </h2>
+        <p className="text-sm text-gray-400 mt-1">Control & Management</p>
       </div>
 
       {/* Navigation */}
-      <nav className="p-3 flex flex-col gap-2 flex-1 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-600">
-        {navItems.map(({ path, label, icon }) => {
-          const isActive = location.pathname === path;
-          return (
-            <Link
-              key={path}
-              to={path}
-              className={`relative flex items-center gap-3 px-4 py-3 rounded-lg font-medium transition-all duration-200
-                ${
-                  isActive
-                    ? "bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg"
-                    : "text-gray-400 hover:bg-white/5 hover:text-white"
-                }`}
-            >
-              <span className="transition-transform group-hover:scale-110">
-                {icon}
-              </span>
-              {!collapsed && <span>{label}</span>}
-              {collapsed && (
-                <span className="absolute left-full ml-3 px-2 py-1 rounded-md bg-gray-800 text-sm opacity-0 group-hover:opacity-100 whitespace-nowrap shadow-lg transition-all">
-                  {label}
-                </span>
-              )}
-              {isActive && (
-                <span className="absolute left-0 top-0 h-full w-1 bg-blue-400 rounded-r-lg animate-pulse"></span>
-              )}
-            </Link>
-          );
-        })}
+      <nav className="flex-1 overflow-y-auto px-4 py-5 space-y-6">
+        {navItems.map((group) => (
+          <div key={group.section}>
+            <p className="mb-3 text-xs font-semibold uppercase tracking-wider text-gray-400">
+              {group.section}
+            </p>
+
+            <div className="space-y-1">
+              {group.items.map(({ path, label, icon }) => {
+                const isActive = location.pathname === path;
+
+                return (
+                  <Link
+                    key={path}
+                    to={path}
+                    className={`relative flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200
+                      ${
+                        isActive
+                          ? "bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-md"
+                          : "text-gray-400 hover:bg-white/5 hover:text-white"
+                      }`}
+                  >
+                    {isActive && (
+                      <span className="absolute left-0 top-0 h-full w-1 bg-blue-400 rounded-r-lg"></span>
+                    )}
+
+                    {icon}
+                    <span className="font-medium">{label}</span>
+                  </Link>
+                );
+              })}
+            </div>
+          </div>
+        ))}
       </nav>
 
       {/* Logout */}
-      <div className="p-4 border-t border-white/10">
+      <div className="px-4 py-5 border-t border-white/10">
         <button
           onClick={handleLogout}
-          className={`flex items-center justify-center gap-3 px-4 py-3 rounded-xl bg-red-600 hover:bg-red-700 text-white font-semibold transition-all duration-200 shadow-md ${
-            collapsed ? "w-12 h-12 p-0" : "w-full"
-          }`}
+          className="flex items-center justify-center gap-3 w-full px-4 py-3 
+            rounded-xl bg-red-600 hover:bg-red-700 
+            text-white font-semibold transition-all shadow-md"
         >
           <LogOut size={20} />
-          {!collapsed && <span>Logout</span>}
+          Logout
         </button>
       </div>
     </aside>
