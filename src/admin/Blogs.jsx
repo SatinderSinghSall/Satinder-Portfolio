@@ -3,6 +3,15 @@ import axios from "axios";
 import ReactMarkdown from "react-markdown";
 import AdminLayout from "../components/AdminLayout";
 import toast from "react-hot-toast";
+import {
+  PencilSquareIcon,
+  TrashIcon,
+  PlusIcon,
+  DocumentTextIcon,
+  TagIcon,
+  UserIcon,
+  PhotoIcon,
+} from "@heroicons/react/24/outline";
 
 const API = import.meta.env.VITE_API_URL || "/api";
 
@@ -17,6 +26,7 @@ export default function Blogs() {
     author: "",
     status: "draft",
   });
+
   const [editingId, setEditingId] = useState(null);
   const [loading, setLoading] = useState(false);
   const [fetching, setFetching] = useState(false);
@@ -24,7 +34,31 @@ export default function Blogs() {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [deletingId, setDeletingId] = useState(null);
   const [deleting, setDeleting] = useState(false);
+
   const token = localStorage.getItem("token");
+
+  const Spinner = ({ size = "5" }) => (
+    <svg
+      className={`animate-spin h-${size} w-${size} text-white`}
+      xmlns="http://www.w3.org/2000/svg"
+      fill="none"
+      viewBox="0 0 24 24"
+    >
+      <circle
+        className="opacity-25"
+        cx="12"
+        cy="12"
+        r="10"
+        stroke="currentColor"
+        strokeWidth="4"
+      />
+      <path
+        className="opacity-75"
+        fill="currentColor"
+        d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
+      />
+    </svg>
+  );
 
   const fetchBlogs = async () => {
     setFetching(true);
@@ -32,8 +66,7 @@ export default function Blogs() {
       const res = await axios.get(`${API}/blogs`);
       setBlogs(res.data);
     } catch (err) {
-      toast.error("Failed to fetch blogs.");
-      console.error("Failed to fetch blogs", err);
+      toast.error("Failed to fetch blogs");
     } finally {
       setFetching(false);
     }
@@ -43,33 +76,32 @@ export default function Blogs() {
     fetchBlogs();
   }, []);
 
-  const handleChange = (e) => {
+  const handleChange = (e) =>
     setForm({ ...form, [e.target.name]: e.target.value });
-  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
 
     if (!form.title || !form.content || !form.image) {
-      toast.error("Title, Content, and Image are required.");
-      setError("Title, Content, and Image are required.");
+      toast.error("Title, Content, and Image are required");
       return;
     }
 
     setLoading(true);
     const headers = { Authorization: `Bearer ${token}` };
+
     const payload = {
       ...form,
-      tags: form.tags.split(",").map((tag) => tag.trim()),
+      tags: form.tags.split(",").map((t) => t.trim()),
     };
 
     try {
-      if (editingId) {
-        await axios.put(`${API}/blogs/${editingId}`, payload, { headers });
-      } else {
-        await axios.post(`${API}/blogs`, payload, { headers });
-      }
+      editingId
+        ? await axios.put(`${API}/blogs/${editingId}`, payload, { headers })
+        : await axios.post(`${API}/blogs`, payload, { headers });
+
+      toast.success("Blog saved successfully");
       setForm({
         title: "",
         summary: "",
@@ -81,36 +113,10 @@ export default function Blogs() {
       });
       setEditingId(null);
       fetchBlogs();
-      toast.success("Blog saved successfully!");
-    } catch (err) {
-      toast.error("Failed to save blog post.");
-      setError("Failed to save blog post.");
-      console.error(err);
+    } catch {
+      toast.error("Failed to save blog");
     } finally {
       setLoading(false);
-    }
-  };
-
-  const openDeleteModal = (id) => {
-    setDeletingId(id);
-    setShowDeleteModal(true);
-  };
-
-  const confirmDelete = async () => {
-    if (!deletingId) return;
-    setDeleting(true);
-    const headers = { Authorization: `Bearer ${token}` };
-    try {
-      await axios.delete(`${API}/blogs/${deletingId}`, { headers });
-      fetchBlogs();
-      toast.success("Blog deleted successfully!");
-      setShowDeleteModal(false);
-      setDeletingId(null);
-    } catch (err) {
-      toast.error("Failed to delete blog.");
-      console.error("Failed to delete blog", err);
-    } finally {
-      setDeleting(false);
     }
   };
 
@@ -125,181 +131,248 @@ export default function Blogs() {
       status: blog.status,
     });
     setEditingId(blog._id);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
+  const confirmDelete = async () => {
+    if (!deletingId) return;
+    setDeleting(true);
+    const headers = { Authorization: `Bearer ${token}` };
+
+    try {
+      await axios.delete(`${API}/blogs/${deletingId}`, { headers });
+      toast.success("Blog deleted");
+      fetchBlogs();
+    } catch {
+      toast.error("Delete failed");
+    } finally {
+      setDeleting(false);
+      setShowDeleteModal(false);
+      setDeletingId(null);
+    }
   };
 
   return (
     <AdminLayout>
-      <div className="max-w-5xl mx-auto px-4">
-        <h2 className="text-4xl font-extrabold mb-8 text-gray-800">
-          Manage Blog Posts
-        </h2>
+      <div className="w-full max-w-[1400px] mx-auto px-6">
+        <div className="flex items-center justify-between mb-6">
+          <div className="flex items-center gap-3">
+            <DocumentTextIcon className="h-7 w-7 text-indigo-600" />
+            <div>
+              <h2 className="text-2xl font-semibold text-gray-800">
+                Blog Management
+              </h2>
+              <p className="text-sm text-gray-500">
+                Create and manage blog content
+              </p>
+            </div>
+          </div>
+          <span className="text-sm text-gray-500">
+            Total Posts: {blogs.length}
+          </span>
+        </div>
 
-        {error && <p className="text-red-500 mb-4">{error}</p>}
-
-        {/* Blog Form */}
         <form
           onSubmit={handleSubmit}
-          className="space-y-4 mb-10 bg-white shadow-lg rounded-xl p-6 border border-gray-200"
+          className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm mb-10"
         >
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <input
-              name="title"
-              value={form.title}
-              onChange={handleChange}
-              placeholder="Blog Title"
-              className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
+          <h3 className="font-semibold text-gray-700 mb-4">
+            {editingId ? "Edit Blog Post" : "Create New Blog"}
+          </h3>
+
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+            <div className="relative">
+              <DocumentTextIcon className="h-5 w-5 absolute left-3 top-3 text-gray-400" />
+              <input
+                name="title"
+                value={form.title}
+                onChange={handleChange}
+                placeholder="Blog Title"
+                className="w-full pl-10 pr-3 py-2.5 border rounded-md"
+              />
+            </div>
+
             <input
               name="summary"
               value={form.summary}
               onChange={handleChange}
               placeholder="Summary"
-              className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-3 py-2.5 border rounded-md"
             />
-            <input
-              name="image"
-              value={form.image}
-              onChange={handleChange}
-              placeholder="Image URL"
-              className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-            <input
-              name="tags"
-              value={form.tags}
-              onChange={handleChange}
-              placeholder="Tags (comma separated)"
-              className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
+
+            <div className="relative">
+              <PhotoIcon className="h-5 w-5 absolute left-3 top-3 text-gray-400" />
+              <input
+                name="image"
+                value={form.image}
+                onChange={handleChange}
+                placeholder="Image URL"
+                className="w-full pl-10 pr-3 py-2.5 border rounded-md"
+              />
+            </div>
+
+            <div className="relative">
+              <TagIcon className="h-5 w-5 absolute left-3 top-3 text-gray-400" />
+              <input
+                name="tags"
+                value={form.tags}
+                onChange={handleChange}
+                placeholder="Tags (comma separated)"
+                className="w-full pl-10 pr-3 py-2.5 border rounded-md"
+              />
+            </div>
           </div>
+
           <textarea
             name="content"
             value={form.content}
             onChange={handleChange}
             placeholder="Markdown Content"
-            className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 h-32"
+            className="w-full mt-4 p-3 border rounded-md h-40"
           />
-          <div className="grid grid-cols-2 gap-4">
-            <input
-              name="author"
-              value={form.author}
-              onChange={handleChange}
-              placeholder="Author Name"
-              className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+            <div className="relative">
+              <UserIcon className="h-5 w-5 absolute left-3 top-3 text-gray-400" />
+              <input
+                name="author"
+                value={form.author}
+                onChange={handleChange}
+                placeholder="Author Name"
+                className="w-full pl-10 pr-3 py-2.5 border rounded-md"
+              />
+            </div>
+
             <select
               name="status"
               value={form.status}
               onChange={handleChange}
-              className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-3 py-2.5 border rounded-md"
             >
               <option value="draft">Draft</option>
               <option value="published">Published</option>
             </select>
           </div>
+
           <button
             type="submit"
             disabled={loading}
-            className={`w-full py-3 text-white font-semibold rounded-lg transition-all ${
+            className={`mt-5 inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-md text-white font-medium transition
+            ${
               loading
-                ? "bg-blue-400 cursor-not-allowed"
-                : "bg-gradient-to-r from-blue-500 to-indigo-600 hover:scale-105"
-            }`}
+                ? "bg-indigo-400 cursor-not-allowed"
+                : "bg-indigo-600 hover:bg-indigo-700"
+            }
+          `}
           >
-            {loading
-              ? editingId
-                ? "Updating..."
-                : "Adding..."
-              : editingId
-              ? "Update Blog Post"
-              : "Add Blog Post"}
+            {loading ? (
+              <>
+                <Spinner />
+                {editingId ? "Updating blog..." : "Creating blog..."}
+              </>
+            ) : (
+              <>
+                <PlusIcon className="h-5 w-5" />
+                {editingId ? "Update Blog" : "Create Blog"}
+              </>
+            )}
           </button>
         </form>
 
-        {/* Blog List */}
         {fetching ? (
-          <p className="text-center text-gray-600">Loading blog posts...</p>
+          <p className="text-center text-gray-500">Loading blogs...</p>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 xl:grid-cols-2 gap-4">
             {blogs.map((blog) => (
               <div
                 key={blog._id}
-                className="bg-white rounded-xl shadow-md overflow-hidden transition hover:shadow-xl"
+                className="bg-white border rounded-lg p-4 hover:shadow-md transition"
               >
-                <img
-                  src={blog.image}
-                  alt={blog.title}
-                  className="w-full h-48 object-cover"
-                />
-                <div className="p-4">
-                  <h3 className="text-xl font-semibold text-gray-800 mb-2">
-                    {blog.title}
-                  </h3>
-                  <p className="text-gray-500 text-sm mb-2">
-                    By {blog.author} •{" "}
-                    {new Date(blog.publishedAt).toLocaleDateString()}
-                  </p>
-                  <p className="text-gray-600 mb-2">{blog.summary}</p>
-                  <div className="prose max-h-24 overflow-hidden text-gray-700 text-sm">
-                    <ReactMarkdown>{blog.content}</ReactMarkdown>
+                <div className="flex justify-between items-start">
+                  <div>
+                    <h3 className="font-semibold text-gray-800">
+                      {blog.title}
+                    </h3>
+                    <p className="text-xs text-gray-500">
+                      {blog.author} • {blog.status.toUpperCase()}
+                    </p>
                   </div>
-                  <div className="flex flex-wrap gap-2 mt-3">
-                    {blog.tags.map((tag) => (
-                      <span
-                        key={tag}
-                        className="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded-full"
-                      >
-                        #{tag}
-                      </span>
-                    ))}
-                  </div>
-                  <div className="flex justify-end gap-4 mt-4">
+
+                  <div className="flex gap-2">
                     <button
                       onClick={() => handleEdit(blog)}
-                      className="text-yellow-500 hover:underline"
+                      className="p-2 hover:bg-gray-100 rounded-md"
                     >
-                      Edit
+                      <PencilSquareIcon className="h-5 w-5 text-indigo-600" />
                     </button>
                     <button
-                      onClick={() => openDeleteModal(blog._id)}
-                      className="text-red-500 hover:underline"
+                      onClick={() => {
+                        setDeletingId(blog._id);
+                        setShowDeleteModal(true);
+                      }}
+                      className="p-2 hover:bg-red-50 rounded-md"
                     >
-                      Delete
+                      <TrashIcon className="h-5 w-5 text-red-600" />
                     </button>
                   </div>
+                </div>
+
+                <p className="text-sm text-gray-600 mt-2 line-clamp-2">
+                  {blog.summary}
+                </p>
+
+                <div className="prose text-xs mt-2 max-h-24 overflow-hidden">
+                  <ReactMarkdown>{blog.content}</ReactMarkdown>
+                </div>
+
+                <div className="flex flex-wrap gap-2 mt-3">
+                  {blog.tags.map((tag) => (
+                    <span
+                      key={tag}
+                      className="text-xs bg-gray-100 px-2 py-1 rounded"
+                    >
+                      {tag}
+                    </span>
+                  ))}
                 </div>
               </div>
             ))}
           </div>
         )}
 
-        {/* Delete Modal */}
         {showDeleteModal && (
-          <div className="fixed inset-0 flex items-center justify-center bg-black/50 backdrop-blur-sm z-50">
-            <div className="bg-white rounded-xl shadow-2xl p-6 w-96 text-center relative">
-              <h3 className="text-xl font-semibold text-gray-800 mb-4">
-                Confirm Delete
-              </h3>
-              <p className="text-gray-600 mb-6">
-                Are you sure you want to delete this blog post?
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+            <div className="bg-white p-6 rounded-lg w-96">
+              <h3 className="font-semibold text-lg mb-2">Confirm Delete</h3>
+              <p className="text-sm text-gray-600 mb-4">
+                This action cannot be undone.
               </p>
-              <div className="flex justify-center gap-4">
+              <div className="flex justify-end gap-3">
                 <button
                   onClick={() => setShowDeleteModal(false)}
-                  className="px-4 py-2 rounded-lg bg-gray-200 hover:bg-gray-300 transition"
-                  disabled={deleting}
+                  className="px-4 py-2 bg-gray-200 rounded"
                 >
                   Cancel
                 </button>
                 <button
                   onClick={confirmDelete}
-                  className={`px-4 py-2 rounded-lg text-white transition ${
-                    deleting
-                      ? "bg-red-400 cursor-not-allowed"
-                      : "bg-red-600 hover:bg-red-700"
-                  }`}
                   disabled={deleting}
+                  className={`px-4 py-2 rounded-md text-white flex items-center gap-2 transition
+                    ${
+                      deleting
+                        ? "bg-red-400 cursor-not-allowed"
+                        : "bg-red-600 hover:bg-red-700"
+                    }
+                  `}
                 >
-                  {deleting ? "Deleting..." : "Delete"}
+                  {deleting ? (
+                    <>
+                      <Spinner />
+                      Deleting...
+                    </>
+                  ) : (
+                    "Delete"
+                  )}
                 </button>
               </div>
             </div>

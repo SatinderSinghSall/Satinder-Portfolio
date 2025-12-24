@@ -1,10 +1,27 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import AdminLayout from "../components/AdminLayout";
-import { Edit, Trash2, PlusCircle } from "lucide-react";
 import toast from "react-hot-toast";
+import {
+  Edit,
+  Trash2,
+  Plus,
+  FolderKanban,
+  Github,
+  ExternalLink,
+  AlertTriangle,
+  Loader2,
+  TagIcon,
+} from "lucide-react";
 
 const API = import.meta.env.VITE_API_URL || "/api";
+
+const Spinner = ({ text }) => (
+  <div className="flex items-center gap-2">
+    <Loader2 className="w-5 h-5 animate-spin" />
+    <span>{text}</span>
+  </div>
+);
 
 export default function Projects() {
   const [projects, setProjects] = useState([]);
@@ -16,11 +33,13 @@ export default function Projects() {
     link: "",
     image: "",
   });
+
   const [editingId, setEditingId] = useState(null);
   const [loading, setLoading] = useState(false);
   const [fetching, setFetching] = useState(false);
   const [error, setError] = useState("");
   const token = localStorage.getItem("token");
+
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [selectedProjectId, setSelectedProjectId] = useState(null);
   const [deleteLoading, setDeleteLoading] = useState(false);
@@ -30,8 +49,8 @@ export default function Projects() {
     try {
       const res = await axios.get(`${API}/projects`);
       setProjects(res.data);
-    } catch (err) {
-      console.error("Error fetching projects", err);
+    } catch {
+      toast.error("Failed to fetch projects");
     } finally {
       setFetching(false);
     }
@@ -61,10 +80,8 @@ export default function Projects() {
       !form.description ||
       !form.githubLink ||
       !form.technologies.length ||
-      (!form.image && !form.imageFile) ||
       !form.link
     ) {
-      setError("All fields are required.");
       toast.error("All fields are required.");
       return;
     }
@@ -81,14 +98,11 @@ export default function Projects() {
       formData.append("technologies", form.technologies.join(","));
       if (form.imageFile) formData.append("image", form.imageFile);
 
-      if (editingId) {
-        await axios.put(`${API}/projects/${editingId}`, formData, { headers });
-        toast.success("Project updated successfully!");
-      } else {
-        await axios.post(`${API}/projects`, formData, { headers });
-        toast.success("Project added successfully!");
-      }
+      editingId
+        ? await axios.put(`${API}/projects/${editingId}`, formData, { headers })
+        : await axios.post(`${API}/projects`, formData, { headers });
 
+      toast.success(editingId ? "Project updated" : "Project added");
       setForm({
         title: "",
         description: "",
@@ -99,10 +113,8 @@ export default function Projects() {
       });
       setEditingId(null);
       fetchProjects();
-    } catch (err) {
-      console.error(err);
-      setError("Failed to save project.");
-      toast.error("Failed to save project.");
+    } catch {
+      toast.error("Failed to save project");
     } finally {
       setLoading(false);
     }
@@ -118,19 +130,21 @@ export default function Projects() {
       githubLink: project.githubLink,
     });
     setEditingId(project._id);
+    window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
   const handleDelete = async () => {
     if (!selectedProjectId) return;
     setDeleteLoading(true);
-    const headers = { Authorization: `Bearer ${token}` };
+
     try {
-      await axios.delete(`${API}/projects/${selectedProjectId}`, { headers });
-      toast.success("Project deleted successfully!");
+      await axios.delete(`${API}/projects/${selectedProjectId}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      toast.success("Project deleted");
       fetchProjects();
-    } catch (err) {
-      console.error("Failed to delete project", err);
-      toast.error("Failed to delete project.");
+    } catch {
+      toast.error("Delete failed");
     } finally {
       setDeleteLoading(false);
       setIsDeleteModalOpen(false);
@@ -140,196 +154,222 @@ export default function Projects() {
 
   return (
     <AdminLayout>
-      <h2 className="text-3xl font-bold mb-6">Manage Projects</h2>
+      <div className="w-full max-w-[1400px] mx-auto px-6">
+        {/* HEADER */}
+        <div className="flex items-center justify-between mb-6">
+          <div className="flex items-center gap-3">
+            <FolderKanban className="w-7 h-7 text-indigo-600" />
+            <div>
+              <h2 className="text-2xl font-semibold text-gray-800">
+                Project Management
+              </h2>
+              <p className="text-sm text-gray-500">
+                Manage your portfolio projects
+              </p>
+            </div>
+          </div>
+          <span className="text-sm text-gray-500">
+            Total Projects: {projects.length}
+          </span>
+        </div>
 
-      {error && <p className="text-red-500 mb-4">{error}</p>}
-
-      {/* Form Section */}
-      <div className="bg-white shadow-lg rounded-xl p-6 mb-8">
-        <h3 className="text-xl font-semibold mb-4 flex items-center gap-2">
-          <PlusCircle className="w-5 h-5" />
-          {editingId ? "Edit Project" : "Add New Project"}
-        </h3>
         <form
           onSubmit={handleSubmit}
-          className="grid grid-cols-1 md:grid-cols-2 gap-4"
+          className="bg-white border rounded-xl p-6 shadow-sm mb-10"
         >
-          <input
-            name="title"
-            value={form.title}
-            onChange={handleChange}
-            placeholder="Project Title"
-            className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-400"
-          />
-          <input
-            name="githubLink"
-            value={form.githubLink}
-            onChange={handleChange}
-            placeholder="GitHub Link"
-            className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-400"
-          />
-          <input
-            name="link"
-            value={form.link}
-            onChange={handleChange}
-            placeholder="Project Link"
-            className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-400"
-          />
-          <input
-            name="technologies"
-            value={form.technologies.join(", ")}
-            onChange={handleChange}
-            placeholder="Technologies (comma separated)"
-            className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-400 col-span-2"
-          />
+          <h3 className="font-semibold text-gray-700 mb-4">
+            {editingId ? "Edit Project" : "Add New Project"}
+          </h3>
+
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+            {/* Project Title */}
+            <div className="relative">
+              <FolderKanban className="w-5 h-5 absolute left-3 top-3 text-gray-400" />
+              <input
+                name="title"
+                value={form.title}
+                onChange={handleChange}
+                placeholder="Project Title"
+                className="w-full pl-10 pr-3 py-2.5 border rounded-md focus:ring-2 focus:ring-indigo-500"
+              />
+            </div>
+
+            {/* GitHub Link */}
+            <div className="relative">
+              <Github className="w-5 h-5 absolute left-3 top-3 text-gray-400" />
+              <input
+                name="githubLink"
+                value={form.githubLink}
+                onChange={handleChange}
+                placeholder="GitHub Repository URL"
+                className="w-full pl-10 pr-3 py-2.5 border rounded-md focus:ring-2 focus:ring-indigo-500"
+              />
+            </div>
+
+            {/* Live Link */}
+            <div className="relative">
+              <ExternalLink className="w-5 h-5 absolute left-3 top-3 text-gray-400" />
+              <input
+                name="link"
+                value={form.link}
+                onChange={handleChange}
+                placeholder="Live Project URL"
+                className="w-full pl-10 pr-3 py-2.5 border rounded-md focus:ring-2 focus:ring-indigo-500"
+              />
+            </div>
+
+            {/* Technologies */}
+            <div className="relative lg:col-span-2">
+              <TagIcon className="w-5 h-5 absolute left-3 top-3 text-gray-400" />
+              <input
+                name="technologies"
+                value={form.technologies.join(", ")}
+                onChange={handleChange}
+                placeholder="Technologies (comma separated)"
+                className="w-full pl-10 pr-3 py-2.5 border rounded-md focus:ring-2 focus:ring-indigo-500"
+              />
+            </div>
+          </div>
+
+          {/* Description */}
           <textarea
             name="description"
             value={form.description}
             onChange={handleChange}
-            placeholder="Description"
-            className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-400 col-span-2"
+            placeholder="Project description"
+            className="w-full mt-4 p-3 border rounded-md h-32 focus:ring-2 focus:ring-indigo-500"
           />
-          <input
-            type="file"
-            name="image"
-            accept="image/*"
-            onChange={(e) => setForm({ ...form, imageFile: e.target.files[0] })}
-            className="col-span-2"
-          />
+
+          {/* Image Upload */}
+          <div className="mt-4">
+            <label className="block text-sm font-medium text-gray-600 mb-1">
+              Project Image
+            </label>
+            <input
+              type="file"
+              accept="image/*"
+              onChange={(e) =>
+                setForm({ ...form, imageFile: e.target.files[0] })
+              }
+              className="block w-full text-sm text-gray-600
+                file:mr-4 file:py-2 file:px-4
+                file:rounded-md file:border-0
+                file:bg-gray-100 file:text-gray-700
+                hover:file:bg-gray-200"
+            />
+          </div>
+
+          {/* Submit */}
           <button
             type="submit"
             disabled={loading}
-            className={`col-span-2 flex justify-center items-center gap-2 px-6 py-3 text-white rounded-lg font-semibold transition ${
-              loading ? "bg-blue-400" : "bg-blue-600 hover:bg-blue-700"
-            }`}
+            className={`mt-6 inline-flex items-center justify-center gap-2 px-6 py-2.5 rounded-md text-white font-medium transition
+                ${
+                  loading
+                    ? "bg-indigo-400 cursor-not-allowed"
+                    : "bg-indigo-600 hover:bg-indigo-700"
+                }
+              `}
           >
-            {loading
-              ? editingId
-                ? "Updating..."
-                : "Adding..."
-              : editingId
-              ? "Update Project"
-              : "Add Project"}
+            {loading ? (
+              <Spinner
+                text={editingId ? "Updating project..." : "Adding project..."}
+              />
+            ) : (
+              <>
+                <Plus className="w-5 h-5" />
+                {editingId ? "Update Project" : "Add Project"}
+              </>
+            )}
           </button>
         </form>
-      </div>
 
-      {/* Project List */}
-      <div className="grid gap-6 md:grid-cols-2">
         {fetching ? (
-          <p>Loading projects...</p>
+          <div className="flex justify-center gap-2 text-gray-600">
+            <Spinner text="Loading projects..." />
+          </div>
         ) : (
-          projects.map((proj) => (
-            <div
-              key={proj._id}
-              className="bg-white shadow-md rounded-lg p-5 flex flex-col justify-between"
-            >
-              <div>
-                <h3 className="text-xl font-bold mb-2">{proj.title}</h3>
-                <p className="text-gray-600 mb-3">{proj.description}</p>
-                <div className="flex flex-wrap gap-2 mb-3">
-                  {proj.technologies.map((tech, idx) => (
+          <div className="grid md:grid-cols-2 gap-4">
+            {projects.map((proj) => (
+              <div
+                key={proj._id}
+                className="bg-white border rounded-lg p-5 hover:shadow-md transition"
+              >
+                <h3 className="font-semibold text-gray-800">{proj.title}</h3>
+                <p className="text-sm text-gray-600 mt-2">{proj.description}</p>
+
+                <div className="flex flex-wrap gap-2 mt-3">
+                  {proj.technologies.map((tech) => (
                     <span
-                      key={idx}
-                      className="px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-sm"
+                      key={tech}
+                      className="text-xs bg-gray-100 px-2 py-1 rounded"
                     >
                       {tech}
                     </span>
                   ))}
                 </div>
-                <a
-                  href={proj.githubLink}
-                  target="_blank"
-                  className="text-blue-500 hover:underline mr-4"
-                >
-                  GitHub
-                </a>
-                <a
-                  href={proj.link}
-                  target="_blank"
-                  className="text-blue-500 hover:underline"
-                >
-                  Visit
-                </a>
-              </div>
-              <div className="flex gap-4 mt-4">
-                <button
-                  onClick={() => handleEdit(proj)}
-                  className="flex items-center gap-1 text-yellow-500 hover:text-yellow-600"
-                >
-                  <Edit className="w-4 h-4" /> Edit
-                </button>
-                <button
-                  onClick={() => {
-                    setSelectedProjectId(proj._id);
-                    setIsDeleteModalOpen(true);
-                  }}
-                  className="flex items-center gap-1 text-red-500 hover:text-red-600"
-                >
-                  <Trash2 className="w-4 h-4" /> Delete
-                </button>
-              </div>
-            </div>
-          ))
-        )}
-      </div>
 
-      {isDeleteModalOpen && (
-        <div className="fixed inset-0 flex items-center justify-center bg-white/10 backdrop-blur-sm z-50">
-          <div className="bg-white rounded-xl shadow-lg p-6 max-w-sm w-full">
-            <h3 className="text-xl font-semibold mb-4 text-gray-800">
-              Confirm Delete
-            </h3>
-            <p className="text-gray-600 mb-6">
-              Are you sure you want to delete this project? This action cannot
-              be undone.
-            </p>
-            <div className="flex justify-end gap-4">
-              <button
-                onClick={() => setIsDeleteModalOpen(false)}
-                className="px-4 py-2 rounded-lg bg-gray-200 hover:bg-gray-300 text-gray-700"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={handleDelete}
-                disabled={deleteLoading}
-                className={`px-4 py-2 rounded-lg text-white flex items-center justify-center gap-2 ${
-                  deleteLoading ? "bg-red-400" : "bg-red-600 hover:bg-red-700"
-                }`}
-              >
-                {deleteLoading ? (
-                  <>
-                    <svg
-                      className="animate-spin h-5 w-5 text-white"
-                      xmlns="http://www.w3.org/2000/svg"
-                      fill="none"
-                      viewBox="0 0 24 24"
+                <div className="flex justify-between items-center mt-5">
+                  <div className="flex gap-4 text-gray-500">
+                    <a href={proj.githubLink} target="_blank">
+                      <Github className="w-5 h-5 hover:text-gray-800" />
+                    </a>
+                    <a href={proj.link} target="_blank">
+                      <ExternalLink className="w-5 h-5 hover:text-gray-800" />
+                    </a>
+                  </div>
+
+                  <div className="flex gap-3">
+                    <button onClick={() => handleEdit(proj)}>
+                      <Edit className="w-5 h-5 text-indigo-600" />
+                    </button>
+                    <button
+                      onClick={() => {
+                        setSelectedProjectId(proj._id);
+                        setIsDeleteModalOpen(true);
+                      }}
                     >
-                      <circle
-                        className="opacity-25"
-                        cx="12"
-                        cy="12"
-                        r="10"
-                        stroke="currentColor"
-                        strokeWidth="4"
-                      ></circle>
-                      <path
-                        className="opacity-75"
-                        fill="currentColor"
-                        d="M4 12a8 8 0 018-8v4l3-3-3-3v4a8 8 0 00-8 8z"
-                      ></path>
-                    </svg>
-                    Deleting...
-                  </>
-                ) : (
-                  "Delete"
-                )}
-              </button>
+                      <Trash2 className="w-5 h-5 text-red-600" />
+                    </button>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {isDeleteModalOpen && (
+          <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
+            <div className="bg-white p-6 rounded-lg w-96">
+              <h3 className="flex items-center gap-2 font-semibold text-lg">
+                <AlertTriangle className="w-5 h-5 text-red-600" />
+                Delete Project
+              </h3>
+              <p className="text-sm text-gray-600 my-4">
+                This action cannot be undone.
+              </p>
+
+              <div className="flex justify-end gap-3">
+                <button
+                  onClick={() => setIsDeleteModalOpen(false)}
+                  className="px-4 py-2 bg-gray-200 rounded"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleDelete}
+                  disabled={deleteLoading}
+                  className={`px-4 py-2 rounded text-white flex items-center gap-2 ${
+                    deleteLoading ? "bg-red-400" : "bg-red-600 hover:bg-red-700"
+                  }`}
+                >
+                  {deleteLoading ? <Spinner text="Deleting..." /> : "Delete"}
+                </button>
+              </div>
             </div>
           </div>
-        </div>
-      )}
+        )}
+      </div>
     </AdminLayout>
   );
 }

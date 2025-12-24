@@ -2,17 +2,53 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import AdminLayout from "../components/AdminLayout";
 import toast from "react-hot-toast";
+import {
+  VideoCameraIcon,
+  PlusIcon,
+  PencilSquareIcon,
+  TrashIcon,
+  PhotoIcon,
+  TagIcon,
+  UserIcon,
+  LinkIcon,
+} from "@heroicons/react/24/outline";
 
 const API = import.meta.env.VITE_API_URL || "/api";
 
+const Spinner = ({ text }) => (
+  <div className="flex items-center gap-2">
+    <svg
+      className="animate-spin h-5 w-5"
+      xmlns="http://www.w3.org/2000/svg"
+      fill="none"
+      viewBox="0 0 24 24"
+    >
+      <circle
+        className="opacity-25"
+        cx="12"
+        cy="12"
+        r="10"
+        stroke="currentColor"
+        strokeWidth="4"
+      />
+      <path
+        className="opacity-75"
+        fill="currentColor"
+        d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
+      />
+    </svg>
+    {text}
+  </div>
+);
+
 export default function ManageYouTube() {
   const [videos, setVideos] = useState([]);
-  const [loading, setLoading] = useState(false);
+  const [fetching, setFetching] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [editingId, setEditingId] = useState(null);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [deletingId, setDeletingId] = useState(null);
-  const [submitting, setSubmitting] = useState(false);
 
   const [form, setForm] = useState({
     title: "",
@@ -25,15 +61,14 @@ export default function ManageYouTube() {
   });
 
   const fetchVideos = async () => {
-    setLoading(true);
+    setFetching(true);
     try {
       const res = await axios.get(`${API}/youtube`);
       setVideos(res.data);
-    } catch (err) {
-      toast.error("Failed to fetch videos.");
-      console.error(err);
+    } catch {
+      toast.error("Failed to fetch videos");
     } finally {
-      setLoading(false);
+      setFetching(false);
     }
   };
 
@@ -41,10 +76,8 @@ export default function ManageYouTube() {
     fetchVideos();
   }, []);
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setForm((prev) => ({ ...prev, [name]: value }));
-  };
+  const handleChange = (e) =>
+    setForm({ ...form, [e.target.name]: e.target.value });
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -55,21 +88,16 @@ export default function ManageYouTube() {
       tags: form.tags.split(",").map((t) => t.trim()),
     };
 
-    const config = {
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem("token")}`,
-      },
+    const headers = {
+      Authorization: `Bearer ${localStorage.getItem("token")}`,
     };
 
     try {
-      if (editingId) {
-        await axios.put(`${API}/youtube/${editingId}`, payload, config);
-        toast.success("Video updated!");
-      } else {
-        await axios.post(`${API}/youtube`, payload, config);
-        toast.success("Video added!");
-      }
+      editingId
+        ? await axios.put(`${API}/youtube/${editingId}`, payload, { headers })
+        : await axios.post(`${API}/youtube`, payload, { headers });
 
+      toast.success(editingId ? "Video updated" : "Video added");
       setForm({
         title: "",
         videoUrl: "",
@@ -81,9 +109,8 @@ export default function ManageYouTube() {
       });
       setEditingId(null);
       fetchVideos();
-    } catch (err) {
-      console.error("Submit error:", err);
-      toast.error(err.response?.data?.message || "Failed to submit.");
+    } catch {
+      toast.error("Failed to save video");
     } finally {
       setSubmitting(false);
     }
@@ -100,240 +127,237 @@ export default function ManageYouTube() {
       status: video.status,
     });
     setEditingId(video._id);
-  };
-
-  const handleDelete = (id) => {
-    setDeletingId(id);
-    setShowDeleteModal(true);
+    window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
   const confirmDelete = async () => {
-    const token = localStorage.getItem("token");
-    const headers = { Authorization: `Bearer ${token}` };
+    if (!deletingId) return;
+    setDeleting(true);
+
     try {
-      setDeleting(true);
-      await axios.delete(`${API}/youtube/${deletingId}`, { headers });
-      toast.success("Video deleted!");
+      await axios.delete(`${API}/youtube/${deletingId}`, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      });
+      toast.success("Video deleted");
       fetchVideos();
-      setShowDeleteModal(false);
-    } catch (err) {
-      toast.error("Failed to delete video.");
-      console.error(err);
+    } catch {
+      toast.error("Delete failed");
     } finally {
       setDeleting(false);
       setDeletingId(null);
+      setShowDeleteModal(false);
     }
   };
 
   return (
     <AdminLayout>
-      <div className="max-w-5xl mx-auto px-4 py-6">
-        <h2 className="text-4xl font-extrabold text-gray-800 mb-6">
-          Manage YouTube Videos
-        </h2>
+      <div className="w-full max-w-[1400px] mx-auto px-6">
+        <div className="flex items-center justify-between mb-6">
+          <div className="flex items-center gap-3">
+            <VideoCameraIcon className="h-7 w-7 text-red-600" />
+            <div>
+              <h2 className="text-2xl font-semibold text-gray-800">
+                YouTube Management
+              </h2>
+              <p className="text-sm text-gray-500">Manage video content</p>
+            </div>
+          </div>
+          <span className="text-sm text-gray-500">
+            Total Videos: {videos.length}
+          </span>
+        </div>
 
-        {/* Add/Edit Form */}
         <form
           onSubmit={handleSubmit}
-          className="bg-white shadow-md rounded-xl p-6 mb-10 space-y-5"
+          className="bg-white border rounded-xl p-6 shadow-sm mb-10"
         >
-          <h3 className="text-2xl font-bold mb-2">
-            {editingId ? "Edit" : "Add"} Video
+          <h3 className="font-semibold text-gray-700 mb-4">
+            {editingId ? "Edit Video" : "Add New Video"}
           </h3>
 
-          <input
-            type="text"
-            name="title"
-            placeholder="Title"
-            value={form.title}
-            onChange={handleChange}
-            className="w-full p-3 rounded border border-gray-300"
-            required
-          />
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+            <div className="relative">
+              <VideoCameraIcon className="h-5 w-5 absolute left-3 top-3 text-gray-400" />
+              <input
+                name="title"
+                value={form.title}
+                onChange={handleChange}
+                placeholder="Video Title"
+                className="w-full pl-10 py-2.5 border rounded-md"
+              />
+            </div>
 
-          <input
-            type="url"
-            name="videoUrl"
-            placeholder="YouTube Embed URL"
-            value={form.videoUrl}
-            onChange={handleChange}
-            className="w-full p-3 rounded border border-gray-300"
-            required
-          />
+            <div className="relative">
+              <LinkIcon className="h-5 w-5 absolute left-3 top-3 text-gray-400" />
+              <input
+                name="videoUrl"
+                value={form.videoUrl}
+                onChange={handleChange}
+                placeholder="YouTube Embed URL"
+                className="w-full pl-10 py-2.5 border rounded-md"
+              />
+            </div>
 
-          <input
-            type="url"
-            name="thumbnail"
-            placeholder="Thumbnail URL"
-            value={form.thumbnail}
-            onChange={handleChange}
-            className="w-full p-3 rounded border border-gray-300"
-          />
+            <div className="relative">
+              <PhotoIcon className="h-5 w-5 absolute left-3 top-3 text-gray-400" />
+              <input
+                name="thumbnail"
+                value={form.thumbnail}
+                onChange={handleChange}
+                placeholder="Thumbnail URL"
+                className="w-full pl-10 py-2.5 border rounded-md"
+              />
+            </div>
+
+            <div className="relative">
+              <TagIcon className="h-5 w-5 absolute left-3 top-3 text-gray-400" />
+              <input
+                name="tags"
+                value={form.tags}
+                onChange={handleChange}
+                placeholder="Tags (comma separated)"
+                className="w-full pl-10 py-2.5 border rounded-md"
+              />
+            </div>
+          </div>
 
           <textarea
             name="description"
-            rows={4}
-            placeholder="Video description"
             value={form.description}
             onChange={handleChange}
-            className="w-full p-3 rounded border border-gray-300"
+            placeholder="Video description"
+            className="w-full mt-4 p-3 border rounded-md h-32"
           />
 
-          <input
-            type="text"
-            name="tags"
-            placeholder="Tags (comma-separated)"
-            value={form.tags}
-            onChange={handleChange}
-            className="w-full p-3 rounded border border-gray-300"
-          />
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+            <div className="relative">
+              <UserIcon className="h-5 w-5 absolute left-3 top-3 text-gray-400" />
+              <input
+                name="author"
+                value={form.author}
+                onChange={handleChange}
+                placeholder="Author"
+                className="w-full pl-10 py-2.5 border rounded-md"
+              />
+            </div>
 
-          <select
-            name="status"
-            value={form.status}
-            onChange={handleChange}
-            className="w-full p-3 rounded border border-gray-300"
-          >
-            <option value="draft">Draft</option>
-            <option value="published">Published</option>
-          </select>
+            <select
+              name="status"
+              value={form.status}
+              onChange={handleChange}
+              className="w-full py-2.5 border rounded-md"
+            >
+              <option value="draft">Draft</option>
+              <option value="published">Published</option>
+            </select>
+          </div>
 
           <button
-            type="submit"
             disabled={submitting}
-            className={`bg-red-500 hover:bg-red-600 text-white font-semibold px-6 py-2 rounded flex items-center justify-center gap-2 ${
-              submitting ? "opacity-60 cursor-not-allowed" : ""
-            }`}
+            className={`mt-5 inline-flex items-center gap-2 px-5 py-2.5 rounded-md text-white font-medium
+              ${
+                submitting
+                  ? "bg-red-400 cursor-not-allowed"
+                  : "bg-red-600 hover:bg-red-700"
+              }
+            `}
           >
-            {submitting && (
-              <svg
-                className="animate-spin h-5 w-5 text-white"
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-              >
-                <circle
-                  className="opacity-25"
-                  cx="12"
-                  cy="12"
-                  r="10"
-                  stroke="currentColor"
-                  strokeWidth="4"
-                ></circle>
-                <path
-                  className="opacity-75"
-                  fill="currentColor"
-                  d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
-                ></path>
-              </svg>
+            {submitting ? (
+              <Spinner
+                text={editingId ? "Updating video..." : "Adding video..."}
+              />
+            ) : (
+              <>
+                <PlusIcon className="h-5 w-5" />
+                {editingId ? "Update Video" : "Add Video"}
+              </>
             )}
-            {submitting
-              ? editingId
-                ? "Updating..."
-                : "Adding..."
-              : editingId
-              ? "Update"
-              : "Add"}{" "}
-            Video
           </button>
         </form>
 
-        {/* Video List */}
-        {loading ? (
-          <p className="text-center text-gray-600">Loading videos...</p>
-        ) : videos.length === 0 ? (
-          <p className="text-center text-gray-500">No videos found.</p>
+        {fetching ? (
+          <div className="flex justify-center text-gray-600">
+            <Spinner text="Loading videos..." />
+          </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 xl:grid-cols-2 gap-4">
             {videos.map((video) => (
               <div
                 key={video._id}
-                className="bg-white rounded-xl shadow-md overflow-hidden"
+                className="bg-white border rounded-lg p-4 hover:shadow-md transition"
               >
-                <img
-                  src={video.thumbnail || "/placeholder.png"}
-                  alt={video.title}
-                  className="w-full h-48 object-cover"
-                />
-                <div className="p-4">
-                  <h3 className="text-xl font-semibold text-gray-800 mb-1">
-                    {video.title}
-                  </h3>
-                  <p className="text-gray-500 text-sm mb-1">
-                    By {video.author}
-                  </p>
-                  <p className="text-sm text-gray-600 mb-2">
-                    {video.description}
-                  </p>
-                  <div className="flex flex-wrap gap-2">
-                    {video.tags?.map((tag) => (
-                      <span
-                        key={tag}
-                        className="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded-full"
-                      >
-                        #{tag}
-                      </span>
-                    ))}
+                <div className="flex justify-between items-start">
+                  <div>
+                    <h3 className="font-semibold text-gray-800">
+                      {video.title}
+                    </h3>
+                    <p className="text-xs text-gray-500">
+                      {video.author} • {video.status.toUpperCase()}
+                    </p>
                   </div>
-                  <div className="flex justify-between items-center mt-4">
-                    <span
-                      className={`text-xs px-3 py-1 rounded-full ${
-                        video.status === "published"
-                          ? "bg-green-200 text-green-700"
-                          : "bg-yellow-200 text-yellow-700"
-                      }`}
+
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => handleEdit(video)}
+                      className="p-2 hover:bg-gray-100 rounded-md"
                     >
-                      {video.status}
-                    </span>
-                    <div className="flex gap-4">
-                      <button
-                        className="text-blue-600 hover:underline"
-                        onClick={() => window.open(video.videoUrl, "_blank")}
-                      >
-                        View
-                      </button>
-                      <button
-                        className="text-yellow-500 hover:underline"
-                        onClick={() => handleEdit(video)}
-                      >
-                        Edit
-                      </button>
-                      <button
-                        className="text-red-500 hover:underline"
-                        onClick={() => handleDelete(video._id)}
-                      >
-                        Delete
-                      </button>
-                    </div>
+                      <PencilSquareIcon className="h-5 w-5 text-indigo-600" />
+                    </button>
+                    <button
+                      onClick={() => {
+                        setDeletingId(video._id);
+                        setShowDeleteModal(true);
+                      }}
+                      className="p-2 hover:bg-red-50 rounded-md"
+                    >
+                      <TrashIcon className="h-5 w-5 text-red-600" />
+                    </button>
                   </div>
+                </div>
+
+                <p className="text-sm text-gray-600 mt-2 line-clamp-2">
+                  {video.description}
+                </p>
+
+                <div className="flex flex-wrap gap-2 mt-3">
+                  {video.tags.map((tag) => (
+                    <span
+                      key={tag}
+                      className="text-xs bg-gray-100 px-2 py-1 rounded"
+                    >
+                      {tag}
+                    </span>
+                  ))}
                 </div>
               </div>
             ))}
           </div>
         )}
 
-        {/* Delete Confirmation Modal */}
         {showDeleteModal && (
           <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-            <div className="bg-white p-6 rounded-xl shadow-lg w-96 text-center">
-              <h3 className="text-lg font-bold mb-2">Confirm Delete</h3>
-              <p className="text-gray-600 mb-4">
-                Are you sure you want to delete this video?
+            <div className="bg-white p-6 rounded-lg w-96">
+              <h3 className="font-semibold text-lg mb-2">Confirm Delete</h3>
+              <p className="text-sm text-gray-600 mb-4">
+                This action cannot be undone.
               </p>
-              <div className="flex justify-center gap-4">
+              <div className="flex justify-end gap-3">
                 <button
-                  className="bg-gray-200 hover:bg-gray-300 px-4 py-2 rounded"
                   onClick={() => setShowDeleteModal(false)}
-                  disabled={deleting}
+                  className="px-4 py-2 bg-gray-200 rounded"
                 >
                   Cancel
                 </button>
                 <button
-                  className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded"
                   onClick={confirmDelete}
                   disabled={deleting}
+                  className={`px-4 py-2 rounded text-white flex items-center gap-2
+                    ${deleting ? "bg-red-400" : "bg-red-600 hover:bg-red-700"}
+                  `}
                 >
-                  {deleting ? "Deleting..." : "Delete"}
+                  {deleting ? <Spinner text="Deleting..." /> : "Delete"}
                 </button>
               </div>
             </div>
