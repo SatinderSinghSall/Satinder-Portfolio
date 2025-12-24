@@ -80,22 +80,31 @@ export default function AddProject() {
 
   return (
     <AdminLayout>
-      <div className="max-w-3xl mx-auto bg-white p-10 rounded-3xl shadow-xl border border-gray-100">
-        <h2 className="text-3xl font-bold mb-8 text-gray-900">
-          ➕ Add New Project
+      <div className="max-w-3xl mx-auto rounded-3xl bg-gradient-to-br from-white via-white to-blue-50/40 backdrop-blur-xl p-10 shadow-[0_20px_60px_-15px_rgba(0,0,0,0.15)] border border-gray-200/60">
+        <h2 className="text-3xl font-bold mb-10 text-gray-900 flex items-center gap-3">
+          <span className="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-blue-100 text-blue-600">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="h-5 w-5"
+              viewBox="0 0 24 24"
+              fill="currentColor"
+            >
+              <path d="M12 4.5c.414 0 .75.336.75.75v6h6a.75.75 0 010 1.5h-6v6a.75.75 0 01-1.5 0v-6h-6a.75.75 0 010-1.5h6v-6c0-.414.336-.75.75-.75z" />
+            </svg>
+          </span>
+          Add New Project
         </h2>
 
         {error && (
-          <div className="mb-6 flex items-center gap-2 text-red-600 bg-red-50 border border-red-200 p-4 rounded-lg text-sm">
+          <div className="mb-6 flex items-center gap-3 text-red-600 bg-red-50 border border-red-200 px-5 py-4 rounded-2xl text-sm">
             <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="w-5 h-5 text-red-500"
+              className="w-5 h-5"
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor"
-              strokeWidth="2"
             >
               <path
+                strokeWidth="2"
                 strokeLinecap="round"
                 strokeLinejoin="round"
                 d="M12 9v2m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
@@ -105,134 +114,121 @@ export default function AddProject() {
           </div>
         )}
 
-        <form onSubmit={handleSubmit} className="space-y-6">
-          {/* Title */}
-          <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-2">
-              Project Title
-            </label>
-            <input
-              name="title"
-              value={form.title}
-              onChange={handleChange}
-              placeholder="Enter your project title"
-              className="w-full px-4 py-3 border rounded-xl focus:ring-4 focus:ring-blue-200 focus:border-blue-500 transition"
-            />
-          </div>
+        <form onSubmit={handleSubmit} className="space-y-7">
+          {/* Shared input styles */}
+          {[
+            {
+              label: "Project Title",
+              name: "title",
+              placeholder: "Awesome SaaS App",
+            },
+            {
+              label: "GitHub Repository",
+              name: "githubLink",
+              placeholder: "https://github.com/...",
+            },
+            {
+              label: "Live Project Link",
+              name: "link",
+              placeholder: "https://project-demo.com",
+            },
+          ].map((field) => (
+            <div key={field.name}>
+              <label className="text-sm font-semibold text-gray-700 mb-2 block">
+                {field.label}
+              </label>
+              <input
+                name={field.name}
+                value={form[field.name]}
+                onChange={handleChange}
+                placeholder={field.placeholder}
+                className="w-full rounded-2xl border border-gray-300/60 px-5 py-4 text-gray-900 
+                     focus:ring-4 focus:ring-blue-200 focus:border-blue-500 
+                     transition-all outline-none bg-white/80"
+              />
+            </div>
+          ))}
 
           {/* Description */}
           <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-2">
+            <label className="text-sm font-semibold text-gray-700 mb-2 block">
               Description
             </label>
             <textarea
               name="description"
+              rows="4"
               value={form.description}
               onChange={handleChange}
-              placeholder="Describe your project in detail"
-              className="w-full px-4 py-3 border rounded-xl focus:ring-4 focus:ring-blue-200 focus:border-blue-500 transition"
-              rows="4"
+              placeholder="What problem does this project solve?"
+              className="w-full rounded-2xl border border-gray-300/60 px-5 py-4
+                   focus:ring-4 focus:ring-blue-200 focus:border-blue-500
+                   transition-all outline-none bg-white/80 resize-none"
             />
           </div>
 
           {/* Technologies */}
           <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-2">
+            <label className="text-sm font-semibold text-gray-700 mb-2 block">
               Technologies{" "}
-              <span className="text-gray-400 text-xs">(comma separated)</span>
+              <span className="text-xs text-gray-400">(comma separated)</span>
             </label>
             <input
               name="technologies"
               value={form.technologies.join(", ")}
               onChange={handleChange}
-              placeholder="e.g., React, Node.js, Tailwind"
-              className="w-full px-4 py-3 border rounded-xl focus:ring-4 focus:ring-blue-200 focus:border-blue-500 transition"
-            />
-          </div>
-
-          {/* GitHub Link */}
-          <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-2">
-              GitHub Repository
-            </label>
-            <input
-              name="githubLink"
-              value={form.githubLink}
-              onChange={handleChange}
-              placeholder="https://github.com/your-repo"
-              className="w-full px-4 py-3 border rounded-xl focus:ring-4 focus:ring-blue-200 focus:border-blue-500 transition"
-            />
-          </div>
-
-          {/* Project Link */}
-          <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-2">
-              Live Project Link
-            </label>
-            <input
-              name="link"
-              value={form.link}
-              onChange={handleChange}
-              placeholder="https://your-project-demo.com"
-              className="w-full px-4 py-3 border rounded-xl focus:ring-4 focus:ring-blue-200 focus:border-blue-500 transition"
+              placeholder="React, Node.js, Tailwind"
+              className="w-full rounded-2xl border border-gray-300/60 px-5 py-4
+                   focus:ring-4 focus:ring-blue-200 focus:border-blue-500
+                   transition-all outline-none bg-white/80"
             />
           </div>
 
           {/* Image Upload */}
           <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-2">
+            <label className="text-sm font-semibold text-gray-700 mb-2 block">
               Project Image
             </label>
-            <div className="flex items-center gap-4">
+
+            <label className="flex flex-col items-center justify-center gap-3 border-2 border-dashed border-gray-300 rounded-2xl p-8 cursor-pointer hover:border-blue-400 transition bg-white/70">
+              <svg
+                className="w-10 h-10 text-blue-500"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M7 16V4m10 12V4M3 16h18"
+                />
+              </svg>
+              <span className="text-sm text-gray-600">
+                {form.imageFile ? form.imageFile.name : "Click to upload image"}
+              </span>
               <input
                 type="file"
-                name="image"
                 accept="image/*"
+                hidden
                 onChange={(e) =>
                   setForm({ ...form, imageFile: e.target.files[0] })
                 }
-                className="w-full text-gray-500 border rounded-xl p-3 cursor-pointer focus:outline-none"
               />
-            </div>
+            </label>
           </div>
 
-          {/* Submit Button */}
+          {/* Submit */}
           <button
-            type="submit"
             disabled={loading}
-            className={`w-full flex justify-center items-center gap-2 px-6 py-4 text-white font-semibold rounded-xl shadow-md transition-all duration-300 ${
-              loading
-                ? "bg-blue-400 cursor-not-allowed"
-                : "bg-blue-600 hover:bg-blue-700 active:scale-95"
-            }`}
+            className={`w-full rounded-2xl py-4 font-semibold text-white shadow-lg
+        transition-all duration-300 flex justify-center items-center gap-2
+        ${
+          loading
+            ? "bg-blue-400 cursor-not-allowed"
+            : "bg-gradient-to-r from-blue-600 to-indigo-600 hover:scale-[1.01] active:scale-95"
+        }`}
           >
-            {loading ? (
-              <>
-                <svg
-                  className="w-6 h-6 animate-spin"
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                >
-                  <circle
-                    className="opacity-25"
-                    cx="12"
-                    cy="12"
-                    r="10"
-                    stroke="currentColor"
-                    strokeWidth="4"
-                  />
-                  <path
-                    className="opacity-75"
-                    fill="currentColor"
-                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
-                  />
-                </svg>
-                Adding...
-              </>
-            ) : (
-              "Add Project"
-            )}
+            {loading ? "Adding Project..." : "Add Project"}
           </button>
         </form>
       </div>

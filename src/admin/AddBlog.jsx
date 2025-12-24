@@ -65,79 +65,172 @@ export default function AddBlog() {
 
   return (
     <AdminLayout>
-      <div className="max-w-3xl mx-auto">
-        <div className="bg-white shadow-lg rounded-xl p-8 border border-gray-100">
-          <h2 className="text-3xl font-bold text-gray-800 mb-6">
-            ➕ Add a New Blog Post
+      <div className="max-w-3xl mx-auto px-4">
+        <div className="rounded-3xl border border-gray-200/60 bg-gradient-to-br from-white via-white to-blue-50/40 backdrop-blur-xl p-10 shadow-[0_20px_60px_-15px_rgba(0,0,0,0.15)]">
+          <h2 className="text-3xl font-bold text-gray-900 mb-8 flex items-center gap-3">
+            <span className="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-blue-100 text-blue-600">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-5 w-5"
+                viewBox="0 0 24 24"
+                fill="currentColor"
+              >
+                <path d="M12 4.5c.414 0 .75.336.75.75v6h6a.75.75 0 010 1.5h-6v6a.75.75 0 01-1.5 0v-6h-6a.75.75 0 010-1.5h6v-6c0-.414.336-.75.75-.75z" />
+              </svg>
+            </span>
+            Add New Blog Post
           </h2>
 
           {error && (
-            <p className="text-red-500 mb-4 bg-red-50 p-2 rounded">{error}</p>
+            <div className="mb-6 flex items-center gap-3 text-red-600 bg-red-50 border border-red-200 px-5 py-4 rounded-2xl text-sm">
+              <svg
+                className="w-5 h-5"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M12 9v2m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                />
+              </svg>
+              {error}
+            </div>
           )}
 
-          <form onSubmit={handleSubmit} className="space-y-5">
-            <input
-              name="title"
-              value={form.title}
-              onChange={handleChange}
-              placeholder="Title"
-              className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
-            />
-            <input
-              name="summary"
-              value={form.summary}
-              onChange={handleChange}
-              placeholder="Summary"
-              className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
-            />
-            <textarea
-              name="content"
-              value={form.content}
-              onChange={handleChange}
-              placeholder="Markdown Content"
-              className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none h-40"
-            />
-            <input
-              name="image"
-              value={form.image}
-              onChange={handleChange}
-              placeholder="Image URL"
-              className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
-            />
-            <input
-              name="tags"
-              value={form.tags}
-              onChange={handleChange}
-              placeholder="Tags (comma separated)"
-              className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
-            />
-            <input
-              name="author"
-              value={form.author}
-              onChange={handleChange}
-              placeholder="Author Name"
-              className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
-            />
-            <select
-              name="status"
-              value={form.status}
-              onChange={handleChange}
-              className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
-            >
-              <option value="draft">Draft</option>
-              <option value="published">Published</option>
-            </select>
+          <form onSubmit={handleSubmit} className="space-y-7">
+            {/* Title */}
+            <div>
+              <label className="block text-sm font-semibold text-gray-700 mb-2">
+                Blog Title
+              </label>
+              <input
+                name="title"
+                value={form.title}
+                onChange={handleChange}
+                placeholder="How I built my SaaS with React"
+                className="w-full rounded-2xl border border-gray-300/60 px-5 py-4
+                         focus:ring-4 focus:ring-blue-200 focus:border-blue-500
+                         outline-none transition bg-white/80"
+              />
+            </div>
 
+            {/* Summary */}
+            <div>
+              <label className="block text-sm font-semibold text-gray-700 mb-2">
+                Summary
+              </label>
+              <input
+                name="summary"
+                value={form.summary}
+                onChange={handleChange}
+                placeholder="Short description shown in listings"
+                className="w-full rounded-2xl border border-gray-300/60 px-5 py-4
+                         focus:ring-4 focus:ring-blue-200 focus:border-blue-500
+                         outline-none transition bg-white/80"
+              />
+            </div>
+
+            {/* Content */}
+            <div>
+              <label className="block text-sm font-semibold text-gray-700 mb-2">
+                Content (Markdown)
+              </label>
+              <textarea
+                name="content"
+                value={form.content}
+                onChange={handleChange}
+                placeholder="Write your blog content here..."
+                rows={6}
+                className="w-full rounded-2xl border border-gray-300/60 px-5 py-4
+                         focus:ring-4 focus:ring-blue-200 focus:border-blue-500
+                         outline-none transition bg-white/80 resize-none"
+              />
+            </div>
+
+            {/* Image */}
+            <div>
+              <label className="block text-sm font-semibold text-gray-700 mb-2">
+                Cover Image URL
+              </label>
+              <input
+                name="image"
+                value={form.image}
+                onChange={handleChange}
+                placeholder="https://image-url.com/banner.png"
+                className="w-full rounded-2xl border border-gray-300/60 px-5 py-4
+                         focus:ring-4 focus:ring-blue-200 focus:border-blue-500
+                         outline-none transition bg-white/80"
+              />
+            </div>
+
+            {/* Tags */}
+            <div>
+              <label className="block text-sm font-semibold text-gray-700 mb-2">
+                Tags{" "}
+                <span className="text-xs text-gray-400">(comma separated)</span>
+              </label>
+              <input
+                name="tags"
+                value={form.tags}
+                onChange={handleChange}
+                placeholder="react, saas, startup"
+                className="w-full rounded-2xl border border-gray-300/60 px-5 py-4
+                         focus:ring-4 focus:ring-blue-200 focus:border-blue-500
+                         outline-none transition bg-white/80"
+              />
+            </div>
+
+            {/* Author + Status */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  Author
+                </label>
+                <input
+                  name="author"
+                  value={form.author}
+                  onChange={handleChange}
+                  placeholder="Author name"
+                  className="w-full rounded-2xl border border-gray-300/60 px-5 py-4
+                           focus:ring-4 focus:ring-blue-200 focus:border-blue-500
+                           outline-none transition bg-white/80"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  Status
+                </label>
+                <select
+                  name="status"
+                  value={form.status}
+                  onChange={handleChange}
+                  className="w-full rounded-2xl border border-gray-300/60 px-5 py-4
+                           focus:ring-4 focus:ring-blue-200 focus:border-blue-500
+                           outline-none transition bg-white/80"
+                >
+                  <option value="draft">Draft</option>
+                  <option value="published">Published</option>
+                </select>
+              </div>
+            </div>
+
+            {/* Submit */}
             <button
               type="submit"
               disabled={loading}
-              className={`w-full px-4 py-3 text-white rounded-lg font-semibold transition ${
+              className={`w-full rounded-2xl py-4 font-semibold text-white shadow-lg
+              transition-all duration-300 flex justify-center items-center
+              ${
                 loading
                   ? "bg-blue-400 cursor-not-allowed"
-                  : "bg-blue-600 hover:bg-blue-700"
+                  : "bg-gradient-to-r from-blue-600 to-indigo-600 hover:scale-[1.01] active:scale-95"
               }`}
             >
-              {loading ? "Adding..." : "Add Blog Post"}
+              {loading ? "Adding Blog..." : "Add Blog Post"}
             </button>
           </form>
         </div>

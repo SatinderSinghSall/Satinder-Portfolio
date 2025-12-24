@@ -111,75 +111,116 @@ export default function AddYouTube() {
 
   return (
     <AdminLayout>
-      <section className="min-h-screen bg-gray-50 text-black">
-        <div className="max-w-3xl mx-auto bg-white p-8 rounded-xl shadow-lg border border-gray-200">
-          <h1 className="text-3xl font-bold mb-6 text-gray-800">
-            ➕ Add YouTube Video
+      <div className="max-w-3xl mx-auto py-2">
+        <div className="rounded-3xl border border-gray-200/60 bg-gradient-to-br from-white via-white to-red-50/40 backdrop-blur-xl p-10 shadow-[0_20px_60px_-15px_rgba(0,0,0,0.15)]">
+          <h1 className="text-3xl font-bold text-gray-900 mb-8 flex items-center gap-3">
+            <span className="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-red-100 text-red-600">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-5 w-5"
+                viewBox="0 0 24 24"
+                fill="currentColor"
+              >
+                <path d="M23.498 6.186a2.958 2.958 0 0 0-2.08-2.08C19.583 3.5 12 3.5 12 3.5s-7.583 0-9.418.606a2.958 2.958 0 0 0-2.08 2.08C0 8.02 0 12 0 12s0 3.98.502 5.814a2.958 2.958 0 0 0 2.08 2.08C4.417 20.5 12 20.5 12 20.5s7.583 0 9.418-.606a2.958 2.958 0 0 0 2.08-2.08C24 15.98 24 12 24 12s0-3.98-.502-5.814ZM9.75 15.568V8.432L15.818 12 9.75 15.568Z" />
+              </svg>
+            </span>
+            Add YouTube Video
           </h1>
 
-          <form onSubmit={handleSubmit} className="space-y-6">
+          <form onSubmit={handleSubmit} className="space-y-7">
             {/* Title */}
             <div>
+              <label className="block text-sm font-semibold text-gray-700 mb-2">
+                Video Title
+              </label>
               <input
-                type="text"
                 name="title"
-                placeholder="Title *"
                 value={form.title}
                 onChange={handleChange}
-                className={`w-full p-3 rounded border ${
-                  errors.title ? "border-red-500" : "border-gray-300"
-                } bg-white text-black placeholder-gray-500 focus:ring-2 focus:ring-red-400`}
+                placeholder="How I edit YouTube videos"
+                className={`w-full rounded-2xl px-5 py-4 border ${
+                  errors.title ? "border-red-500" : "border-gray-300/60"
+                } focus:ring-4 focus:ring-red-200 focus:border-red-500 outline-none transition bg-white/80`}
               />
               {errors.title && (
                 <p className="text-red-500 text-sm mt-1">{errors.title}</p>
               )}
             </div>
 
-            {/* Video URL */}
+            {/* YouTube URL */}
             <div>
+              <label className="block text-sm font-semibold text-gray-700 mb-2">
+                YouTube URL
+              </label>
               <input
                 type="url"
                 name="videoUrl"
-                placeholder="YouTube URL *"
                 value={form.videoUrl}
                 onChange={handleChange}
-                className={`w-full p-3 rounded border ${
-                  errors.videoUrl ? "border-red-500" : "border-gray-300"
-                } bg-white text-black placeholder-gray-500 focus:ring-2 focus:ring-red-400`}
+                placeholder="https://youtube.com/watch?v=..."
+                className={`w-full rounded-2xl px-5 py-4 border ${
+                  errors.videoUrl ? "border-red-500" : "border-gray-300/60"
+                } focus:ring-4 focus:ring-red-200 focus:border-red-500 outline-none transition bg-white/80`}
               />
               {errors.videoUrl && (
                 <p className="text-red-500 text-sm mt-1">{errors.videoUrl}</p>
               )}
             </div>
 
-            {/* Thumbnail */}
+            {/* Thumbnail Upload */}
             <div>
-              <input
-                type="file"
-                accept="image/*"
-                onChange={handleFileChange}
-                className="w-full p-3 rounded border border-gray-300 bg-white text-black"
-              />
+              <label className="block text-sm font-semibold text-gray-700 mb-2">
+                Thumbnail Image
+              </label>
+
+              <label className="flex flex-col items-center justify-center gap-3 border-2 border-dashed border-gray-300 rounded-2xl p-8 cursor-pointer hover:border-red-400 transition bg-white/70">
+                <svg
+                  className="w-10 h-10 text-red-500"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M7 16V4m10 12V4M3 16h18"
+                  />
+                </svg>
+                <span className="text-sm text-gray-600">
+                  {file ? file.name : "Click to upload thumbnail"}
+                </span>
+                <input
+                  type="file"
+                  accept="image/*"
+                  hidden
+                  onChange={handleFileChange}
+                />
+              </label>
+
               {file && (
                 <img
                   src={URL.createObjectURL(file)}
                   alt="Preview"
-                  className="mt-3 w-40 h-24 object-cover rounded border"
+                  className="mt-4 w-48 h-28 object-cover rounded-xl border"
                 />
               )}
             </div>
 
             {/* Description */}
             <div>
+              <label className="block text-sm font-semibold text-gray-700 mb-2">
+                Description
+              </label>
               <textarea
                 name="description"
                 rows={5}
-                placeholder="Video description *"
                 value={form.description}
                 onChange={handleChange}
-                className={`w-full p-3 rounded border ${
-                  errors.description ? "border-red-500" : "border-gray-300"
-                } bg-white text-black placeholder-gray-500 focus:ring-2 focus:ring-red-400`}
+                placeholder="What is this video about?"
+                className={`w-full rounded-2xl px-5 py-4 border ${
+                  errors.description ? "border-red-500" : "border-gray-300/60"
+                } focus:ring-4 focus:ring-red-200 focus:border-red-500 outline-none transition bg-white/80 resize-none`}
               />
               {errors.description && (
                 <p className="text-red-500 text-sm mt-1">
@@ -190,38 +231,45 @@ export default function AddYouTube() {
 
             {/* Tags */}
             <div>
+              <label className="block text-sm font-semibold text-gray-700 mb-2">
+                Tags{" "}
+                <span className="text-xs text-gray-400">(comma separated)</span>
+              </label>
               <input
-                type="text"
                 name="tags"
-                placeholder="Tags (comma-separated)"
                 value={form.tags}
                 onChange={handleChange}
-                className="w-full p-3 rounded border border-gray-300 bg-white text-black placeholder-gray-500 focus:ring-2 focus:ring-red-400"
+                placeholder="youtube, react, content"
+                className="w-full rounded-2xl px-5 py-4 border border-gray-300/60 focus:ring-4 focus:ring-red-200 focus:border-red-500 outline-none transition bg-white/80"
               />
             </div>
 
             {/* Status */}
             <div>
+              <label className="block text-sm font-semibold text-gray-700 mb-2">
+                Status
+              </label>
               <select
                 name="status"
                 value={form.status}
                 onChange={handleChange}
-                className="w-full p-3 rounded border border-gray-300 bg-white text-black focus:ring-2 focus:ring-red-400"
+                className="w-full rounded-2xl px-5 py-4 border border-gray-300/60 focus:ring-4 focus:ring-red-200 focus:border-red-500 outline-none transition bg-white/80"
               >
                 <option value="draft">Draft</option>
                 <option value="published">Published</option>
               </select>
             </div>
 
-            {/* Submit Button */}
+            {/* Submit */}
             <button
               type="submit"
               disabled={loading}
-              className={`${
+              className={`w-full rounded-2xl py-4 font-semibold text-white shadow-lg transition-all duration-300 flex items-center justify-center gap-2
+              ${
                 loading
-                  ? "bg-gray-400 cursor-not-allowed"
-                  : "bg-red-500 hover:bg-red-600"
-              } px-6 py-3 rounded-lg text-white font-semibold w-full shadow-md transition duration-200 flex items-center justify-center gap-2`}
+                  ? "bg-red-300 cursor-not-allowed"
+                  : "bg-gradient-to-r from-red-500 to-red-600 hover:scale-[1.01] active:scale-95"
+              }`}
             >
               {loading && (
                 <svg
@@ -237,19 +285,19 @@ export default function AddYouTube() {
                     r="10"
                     stroke="currentColor"
                     strokeWidth="4"
-                  ></circle>
+                  />
                   <path
                     className="opacity-75"
                     fill="currentColor"
                     d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
-                  ></path>
+                  />
                 </svg>
               )}
-              {loading ? "Adding..." : "Add a new Video"}
+              {loading ? "Adding Video..." : "Add Video"}
             </button>
           </form>
         </div>
-      </section>
+      </div>
     </AdminLayout>
   );
 }
