@@ -26,8 +26,6 @@ import {
 
 const API = import.meta.env.VITE_API_URL || "/api";
 
-/* ---------------- HELPERS ---------------- */
-
 const getGreeting = () => {
   const hour = new Date().getHours();
   if (hour < 12) return "Good morning";
@@ -50,8 +48,6 @@ const generateTrendDataOnce = (value) =>
   Array.from({ length: 8 }, () => ({
     value: Math.max(1, value + Math.floor(Math.random() * 10 - 5)),
   }));
-
-/* ---------------- WEEKLY DATA ---------------- */
 
 const weeklyOverview = [
   { day: "Mon", value: 4 },
@@ -77,8 +73,6 @@ export default function Dashboard() {
   const [sparklineData, setSparklineData] = useState(null);
   const [dateTime, setDateTime] = useState(formatDateTime());
 
-  /* ---------------- FETCH DASHBOARD DATA ---------------- */
-
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -94,7 +88,6 @@ export default function Dashboard() {
 
         setCounts(data);
 
-        // 🔒 generate sparkline ONCE
         setSparklineData({
           projects: generateTrendDataOnce(data.projects),
           blogs: generateTrendDataOnce(data.blogs),
@@ -109,14 +102,10 @@ export default function Dashboard() {
     fetchData();
   }, [token]);
 
-  /* ---------------- LIVE CLOCK ---------------- */
-
   useEffect(() => {
     const timer = setInterval(() => setDateTime(formatDateTime()), 1000);
     return () => clearInterval(timer);
   }, []);
-
-  /* ---------------- LOGOUT ---------------- */
 
   const handleLogout = () => {
     localStorage.removeItem("token");
@@ -129,7 +118,6 @@ export default function Dashboard() {
       <Sidebar />
 
       <div className="ml-64 flex-1 p-8">
-        {/* HEADER */}
         <div className="flex justify-between items-center mb-10">
           <div>
             <h1 className="text-4xl font-extrabold text-gray-800 flex items-center gap-2">
@@ -154,53 +142,60 @@ export default function Dashboard() {
           </div>
         </div>
 
-        {/* CARDS */}
-        {sparklineData && (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 gap-6">
-            <MetricCard
-              title="Total Projects"
-              count={counts.projects}
-              icon={<FolderOpen />}
-              gradient="from-blue-500 to-blue-700"
-              data={sparklineData.projects}
-              stroke="#bfdbfe"
-            />
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 gap-6">
+          {!sparklineData ? (
+            <>
+              <MetricCardSkeleton />
+              <MetricCardSkeleton />
+              <MetricCardSkeleton />
+              <MetricCardSkeleton />
+              <ServerStatusSkeleton />
+            </>
+          ) : (
+            <>
+              <MetricCard
+                title="Total Projects"
+                count={counts.projects}
+                icon={<FolderOpen />}
+                gradient="from-blue-500 to-blue-700"
+                data={sparklineData.projects}
+                stroke="#bfdbfe"
+              />
 
-            <MetricCard
-              title="Total Blogs"
-              count={counts.blogs}
-              icon={<FileText />}
-              gradient="from-green-500 to-green-700"
-              data={sparklineData.blogs}
-              stroke="#bbf7d0"
-            />
+              <MetricCard
+                title="Total Blogs"
+                count={counts.blogs}
+                icon={<FileText />}
+                gradient="from-green-500 to-green-700"
+                data={sparklineData.blogs}
+                stroke="#bbf7d0"
+              />
 
-            <MetricCard
-              title="Contact Messages"
-              count={counts.messages}
-              icon={<Mail />}
-              gradient="from-yellow-500 to-yellow-700"
-              data={sparklineData.messages}
-              stroke="#fde68a"
-            />
+              <MetricCard
+                title="Contact Messages"
+                count={counts.messages}
+                icon={<Mail />}
+                gradient="from-yellow-500 to-yellow-700"
+                data={sparklineData.messages}
+                stroke="#fde68a"
+              />
 
-            <MetricCard
-              title="YouTube Count"
-              count={counts.youtube}
-              icon={<Youtube />}
-              gradient="from-red-500 to-red-700"
-              data={sparklineData.youtube}
-              stroke="#fecaca"
-            />
+              <MetricCard
+                title="YouTube Count"
+                count={counts.youtube}
+                icon={<Youtube />}
+                gradient="from-red-500 to-red-700"
+                data={sparklineData.youtube}
+                stroke="#fecaca"
+              />
 
-            {/* SERVER CARD */}
-            <div className="sm:col-span-2 lg:col-span-1">
-              <ServerStatusCard />
-            </div>
-          </div>
-        )}
+              <div className="sm:col-span-2 lg:col-span-1">
+                <ServerStatusCard />
+              </div>
+            </>
+          )}
+        </div>
 
-        {/* WEEKLY OVERVIEW */}
         <div className="mt-12 bg-white rounded-2xl p-6 shadow">
           <h2 className="text-xl font-bold mb-4">Weekly Overview</h2>
 
@@ -223,8 +218,6 @@ export default function Dashboard() {
     </div>
   );
 }
-
-/* ---------------- METRIC CARD ---------------- */
 
 function MetricCard({ title, count, icon, gradient, data, stroke }) {
   return (
@@ -257,7 +250,22 @@ function MetricCard({ title, count, icon, gradient, data, stroke }) {
   );
 }
 
-/* ---------------- SERVER STATUS CARD ---------------- */
+function MetricCardSkeleton() {
+  return (
+    <div className="bg-white p-6 rounded-2xl shadow-lg animate-pulse">
+      <div className="flex justify-between items-center">
+        <div className="space-y-2">
+          <div className="h-3 w-24 bg-gray-200 rounded"></div>
+          <div className="h-8 w-20 bg-gray-300 rounded"></div>
+        </div>
+
+        <div className="h-12 w-12 bg-gray-200 rounded-xl"></div>
+      </div>
+
+      <div className="mt-6 h-14 bg-gray-200 rounded-lg"></div>
+    </div>
+  );
+}
 
 function ServerStatusCard() {
   return (
@@ -289,6 +297,25 @@ function ServerStatusCard() {
       <div className="mt-4 h-1 bg-gray-700 rounded-full">
         <div className="h-full w-[98%] bg-green-500 rounded-full"></div>
       </div>
+    </div>
+  );
+}
+
+function ServerStatusSkeleton() {
+  return (
+    <div className="bg-gray-900 p-6 rounded-2xl shadow-lg animate-pulse h-full">
+      <div className="space-y-4">
+        <div className="h-4 w-32 bg-gray-700 rounded"></div>
+        <div className="h-8 w-24 bg-gray-600 rounded"></div>
+
+        <div className="space-y-2">
+          <div className="h-3 w-40 bg-gray-700 rounded"></div>
+          <div className="h-3 w-32 bg-gray-700 rounded"></div>
+          <div className="h-3 w-28 bg-gray-700 rounded"></div>
+        </div>
+      </div>
+
+      <div className="mt-6 h-1 bg-gray-700 rounded-full"></div>
     </div>
   );
 }
