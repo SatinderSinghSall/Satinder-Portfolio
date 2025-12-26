@@ -35,13 +35,17 @@ import ManageYouTube from "./admin/YouTube.jsx";
 
 function App() {
   const location = useLocation();
-  const isAdminPage = location.pathname.startsWith("/admin");
+
+  const isAdminPage =
+    location.pathname.startsWith("/admin") || location.pathname === "/login";
 
   return (
     <>
       {!isAdminPage && <Navbar />}
+
       <Routes>
         <Route path="/login" element={<Login />} />
+
         <Route path="/" element={<Home />} />
         <Route path="/projects" element={<Projects_User />} />
         <Route path="/blog" element={<Blog />} />
@@ -49,13 +53,13 @@ function App() {
         <Route path="/contact" element={<Contact />} />
         <Route path="/about" element={<About />} />
         <Route path="/skills" element={<Skills />} />
-        <Route path="*" element={<NotFound />} />
         <Route path="/experience" element={<Experience />} />
         <Route path="/projects/:id" element={<ProjectDetail />} />
         <Route path="/services" element={<Services />} />
         <Route path="/youtube" element={<WatchMyYouTube />} />
         <Route path="/youtube/:id" element={<YouTubeDetails />} />
 
+        {/* Admin Routes */}
         <Route
           path="/admin/dashboard"
           element={
@@ -105,7 +109,7 @@ function App() {
           }
         />
         <Route
-          path="admin/youtube/new"
+          path="/admin/youtube/new"
           element={
             <AdminRoute>
               <AddYouTube />
@@ -123,6 +127,7 @@ function App() {
 
         <Route path="*" element={<NotFound />} />
       </Routes>
+
       {!isAdminPage && <Footer />}
     </>
   );
