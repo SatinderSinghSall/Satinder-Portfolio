@@ -29,6 +29,7 @@ import WatchMyYouTube from "./pages/WatchMyYouTube.jsx";
 import YouTubeDetails from "./pages/YouTubeDetails.jsx";
 import AddYouTube from "./admin/AddYouTube.jsx";
 import ManageYouTube from "./admin/YouTube.jsx";
+import ScrollToTop from "./components/ScrollToTop.jsx";
 
 //! To run the backend for DEVELOPMENT -> npm run dev
 //! To run the backend for PRODUCTION -> npm start
@@ -136,6 +137,7 @@ function App() {
 export default function AppWrapper() {
   return (
     <Router>
+      <ScrollToTop />
       <App />
     </Router>
   );

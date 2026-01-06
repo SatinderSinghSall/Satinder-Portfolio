@@ -9,64 +9,106 @@ import { Typewriter } from "react-simple-typewriter";
 export default function Home() {
   return (
     <>
-      <div className="relative min-h-screen flex flex-col items-center justify-center px-6 text-center text-white overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-b from-gray-950 via-gray-900 to-black">
-          <div className="absolute inset-0 bg-[linear-gradient(#2a2a2a_1px,transparent_1px),linear-gradient(90deg,#2a2a2a_1px,transparent_1px)] bg-[size:40px_40px] opacity-20" />
-        </div>
+      <section
+        aria-label="Introduction"
+        className="relative min-h-screen flex items-center justify-center overflow-hidden bg-black text-white"
+      >
+        <div className="absolute inset-0 bg-gradient-to-b from-gray-950 via-gray-900 to-black" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(59,130,246,0.15),transparent_65%)]" />
+        <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.08)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.08)_1px,transparent_1px)] bg-[size:48px_48px] opacity-25" />
 
-        <h1 className="text-5xl md:text-7xl font-extrabold leading-tight mb-4 z-10">
-          <span className="text-gray-300">Hi, I&apos;m</span>{" "}
-          <span className="text-blue-400 drop-shadow-[0_0_10px_rgba(59,130,246,0.8)]">
+        <header className="relative z-10 w-full max-w-5xl px-5 sm:px-8 text-center">
+          <p className="text-xs sm:text-sm uppercase tracking-widest text-gray-400 mb-3">
+            Hello, I’m
+          </p>
+
+          <h1 className="text-4xl sm:text-5xl md:text-7xl font-semibold tracking-tight mb-4">
+            <span className="text-blue-400 drop-shadow-[0_0_22px_rgba(59,130,246,0.55)]">
+              Satinder Singh Sall
+            </span>
+          </h1>
+
+          <p className="text-lg sm:text-xl md:text-2xl text-gray-300 mb-5 sm:mb-7 h-[28px] sm:h-[32px]">
             <Typewriter
               words={[
-                "Satinder Singh Sall",
                 "Full-Stack Engineer",
-                "UI/UX Enthusiast",
-                "Tech Problem Solver",
+                "Building scalable web/mobile systems",
+                "Creating thoughtful user experiences",
               ]}
-              loop={true}
+              loop
               cursor
               cursorStyle="_"
-              typeSpeed={70}
-              deleteSpeed={50}
-              delaySpeed={2000}
+              typeSpeed={55}
+              deleteSpeed={35}
+              delaySpeed={1800}
             />
-          </span>
-        </h1>
+          </p>
 
-        <p className="text-lg md:text-2xl max-w-2xl mb-6 text-gray-400 z-10">
-          Welcome to my personal portfolio 👋 — I&apos;m a developer who loves
-          building <span className="text-green-400">modern</span>,{" "}
-          <span className="text-yellow-400">impactful</span> web & mobile
-          applications.
-        </p>
+          <p className="max-w-xl sm:max-w-2xl md:max-w-3xl mx-auto text-base sm:text-lg md:text-xl leading-relaxed text-gray-400 mb-6 sm:mb-10">
+            I help teams and businesses build reliable, high-quality web and
+            mobile applications with a strong focus on performance, usability,
+            and clean architecture.
+          </p>
 
-        <div className="text-sm text-green-400 font-mono bg-black/50 px-4 py-2 rounded-lg border border-green-500 mb-8 z-10">
-          &lt;code&gt; const passion = "Building for the web"; &lt;/code&gt;
-        </div>
+          <nav className="flex flex-col sm:flex-row items-stretch sm:items-center justify-center gap-3 sm:gap-4 mb-6 sm:mb-10">
+            <a
+              href="/projects"
+              className="inline-flex items-center justify-center px-7 sm:px-8 py-3.5 sm:py-4 rounded-xl bg-blue-600 hover:bg-blue-500 transition-all duration-200 font-medium shadow-lg shadow-blue-500/25 active:scale-95"
+            >
+              View Work
+            </a>
 
-        <div className="flex flex-col sm:flex-row gap-4 mb-8 z-10 w-full max-w-sm sm:max-w-none sm:justify-center">
-          <a
-            href="/projects"
-            className="w-full sm:w-[220px] text-center px-6 py-4 rounded-lg bg-blue-600 hover:bg-blue-700 transition-all duration-200 text-lg font-semibold shadow-lg shadow-blue-500/30 active:scale-95"
-          >
-            🚀 View Projects
-          </a>
-          <a
-            href="/contact"
-            className="w-full sm:w-[220px] text-center px-6 py-4 rounded-lg border-2 border-blue-500 hover:bg-blue-500 hover:text-white transition-all duration-200 text-lg font-semibold shadow-lg shadow-blue-500/20 active:scale-95"
-          >
-            📩 Contact Me
-          </a>
-        </div>
+            <a
+              href="/contact"
+              className="inline-flex items-center justify-center px-7 sm:px-8 py-3.5 sm:py-4 rounded-xl border border-white/20 hover:bg-white/5 transition-all duration-200 font-medium active:scale-95"
+            >
+              Get in Touch
+            </a>
+          </nav>
 
-        <div className="animate-bounce mt-10 z-10">
+          <ul className="flex justify-center items-center text-gray-400">
+            <div className="flex sm:hidden flex-nowrap items-center gap-3 text-[11px]">
+              <li className="whitespace-nowrap">
+                <span className="text-white font-medium">3+</span> yrs exp
+              </li>
+
+              <span className="opacity-40">•</span>
+
+              <li className="whitespace-nowrap">
+                <span className="text-white font-medium">15+</span> projects
+              </li>
+
+              <span className="opacity-40">•</span>
+
+              <li className="whitespace-nowrap">
+                <span className="text-white font-medium">Full-Stack</span>
+              </li>
+            </div>
+
+            <div className="hidden sm:flex flex-row items-center gap-10 text-sm">
+              <li>
+                <span className="text-white font-medium">1+</span> years
+                experience
+              </li>
+              <li>
+                <span className="text-white font-medium">15+</span> projects
+                delivered
+              </li>
+              <li>
+                <span className="text-white font-medium">Full-Stack</span> focus
+              </li>
+            </div>
+          </ul>
+        </header>
+
+        <div className="absolute bottom-6 sm:bottom-8 animate-bounce z-10">
           <svg
             className="w-6 h-6 text-blue-400"
             fill="none"
             stroke="currentColor"
             strokeWidth="2"
             viewBox="0 0 24 24"
+            aria-hidden="true"
           >
             <path
               strokeLinecap="round"
@@ -75,13 +117,15 @@ export default function Home() {
             />
           </svg>
         </div>
-      </div>
+      </section>
 
-      <About />
-      <Services />
-      <Experience />
-      <Skills />
-      <ContactCTA_Button />
+      <main>
+        <About />
+        <Services />
+        <Experience />
+        <Skills />
+        <ContactCTA_Button />
+      </main>
     </>
   );
 }

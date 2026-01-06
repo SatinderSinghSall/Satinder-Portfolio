@@ -47,7 +47,7 @@ export default function Skills() {
       ],
     },
     {
-      category: "Frontend Development",
+      category: "Frontend",
       items: [
         { name: "HTML5", icon: <FaHtml5 className="text-orange-500" /> },
         { name: "CSS3", icon: <FaCss3Alt className="text-blue-500" /> },
@@ -68,9 +68,9 @@ export default function Skills() {
       ],
     },
     {
-      category: "Backend Development",
+      category: "Backend",
       items: [
-        { name: "Node.js", icon: <FaNodeJs className="text-green-500" /> },
+        { name: "Node.js", icon: <FaNodeJs className="text-green-600" /> },
         { name: "Express.js", icon: <SiExpress className="text-gray-300" /> },
       ],
     },
@@ -87,7 +87,7 @@ export default function Skills() {
       ],
     },
     {
-      category: "DevOps & Platforms",
+      category: "Tools & Platforms",
       items: [
         { name: "Git", icon: <FaGitAlt className="text-orange-600" /> },
         { name: "GitHub", icon: <FaGithub className="text-white" /> },
@@ -101,14 +101,14 @@ export default function Skills() {
       ],
     },
     {
-      category: "Mobile Development",
+      category: "Mobile",
       items: [
         {
-          name: "Mobile App Development",
+          name: "Mobile App Dev",
           icon: <FaMobileAlt className="text-pink-400" />,
         },
         {
-          name: "Android Development",
+          name: "Android App Dev",
           icon: <SiAndroid className="text-green-500" />,
         },
       ],
@@ -123,49 +123,36 @@ export default function Skills() {
   ];
 
   return (
-    <section className="border-t border-[#1e293b] bg-[#020617] text-white px-6 py-24">
-      <div className="max-w-7xl mx-auto">
-        {/* HEADER */}
-        <div className="max-w-3xl mx-auto text-center">
-          <h1 className="text-4xl md:text-5xl font-semibold tracking-tight">
-            Skills & Technologies
-          </h1>
-          <p className="mt-4 text-lg text-gray-400">
-            A practical toolkit built through real-world projects and
-            production-grade development.
-          </p>
-        </div>
+    <div className="min-h-screen bg-gradient-to-b from-gray-900 to-black text-white px-6 py-20 flex flex-col items-center">
+      <h2 className="text-4xl md:text-5xl font-bold text-blue-500 mb-14">
+        My Skills
+      </h2>
 
-        {/* GRID */}
-        <div className="mt-16 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-          {skills.map((section, index) => (
-            <div
-              key={index}
-              className="
-                rounded-2xl border border-white/10 bg-white/5
-                p-8 transition-all
-                hover:border-blue-500/40
-              "
-            >
-              <h3 className="text-sm font-semibold text-gray-200 uppercase tracking-wide mb-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10 max-w-6xl w-full">
+        {skills.map((section, index) => (
+          <div
+            key={index}
+            className="bg-gray-800/70 backdrop-blur-md p-6 rounded-2xl shadow-md hover:shadow-blue-500/30 transition-all duration-300 border border-gray-700"
+          >
+            <div className="mb-5">
+              <span className="inline-block text-sm px-3 py-1 bg-blue-500 text-white rounded-full font-medium">
                 {section.category}
-              </h3>
-
-              <ul className="space-y-4">
-                {section.items.map((skill, i) => (
-                  <li
-                    key={i}
-                    className="flex items-center gap-4 text-base text-gray-300"
-                  >
-                    <span className="text-xl">{skill.icon}</span>
-                    <span>{skill.name}</span>
-                  </li>
-                ))}
-              </ul>
+              </span>
             </div>
-          ))}
-        </div>
+            <ul className="space-y-4">
+              {section.items.map((skill, i) => (
+                <li
+                  key={i}
+                  className="flex items-center gap-4 text-lg hover:scale-105 transition-transform"
+                >
+                  <span className="text-2xl">{skill.icon}</span>
+                  <span className="text-gray-200">{skill.name}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        ))}
       </div>
-    </section>
+    </div>
   );
 }

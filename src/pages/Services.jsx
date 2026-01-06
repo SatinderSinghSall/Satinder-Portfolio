@@ -13,90 +13,131 @@ import { Link } from "react-router-dom";
 export default function MyServices() {
   const services = [
     {
-      icon: <Code size={48} className="text-blue-500" />,
+      icon: Code,
       title: "Web Development",
+      stack: "React · Next.js · TypeScript",
       description:
-        "Responsive, scalable, and high-performance websites tailored to your goals using modern technologies like React, Next.js, and TypeScript.",
+        "Modern, responsive, and scalable web applications built with clean architecture and performance in mind.",
     },
     {
-      icon: <Smartphone size={48} className="text-pink-500" />,
+      icon: Smartphone,
       title: "Mobile App Development",
+      stack: "React Native · Android",
       description:
-        "Cross-platform mobile applications (Android & Native) built with clean design, fast performance, and smooth user experience.",
+        "Cross-platform mobile apps with smooth UX, fast performance, and a native-like experience.",
     },
     {
-      icon: <Layers size={48} className="text-green-500" />,
+      icon: Layers,
       title: "Full Stack Solutions",
+      stack: "Frontend · Backend · Databases",
       description:
-        "Complete end-to-end solutions covering frontend, backend, databases, and deployment — from concept to live product.",
+        "End-to-end product development covering architecture, APIs, databases, and deployment.",
     },
     {
-      icon: <Gamepad2 size={48} className="text-indigo-500" />,
+      icon: Gamepad2,
       title: "Game Development",
+      stack: "Unity · C#",
       description:
-        "Creating immersive and interactive games using Unity and C#, focusing on engaging gameplay and smooth performance across devices.",
+        "Interactive and immersive games focused on performance, gameplay mechanics, and polish.",
     },
     {
-      icon: <CloudCog size={48} className="text-cyan-400" />,
-      title: "DevOps & Cloud Deployment",
+      icon: CloudCog,
+      title: "DevOps & Cloud",
+      stack: "Docker · CI/CD · Cloud Platforms",
       description:
-        "Automating workflows and deployments using Docker, CI/CD pipelines, and platforms like Render, Vercel, and GitHub Actions.",
+        "Automated deployments, scalable infrastructure, and production-ready DevOps workflows.",
     },
     {
-      icon: <Globe size={48} className="text-purple-500" />,
-      title: "SEO Optimization",
+      icon: Globe,
+      title: "SEO & Optimization",
+      stack: "SEO · Accessibility · Performance",
       description:
-        "Boosting your visibility and rankings through SEO strategies, performance tuning, and web best practices.",
+        "Improving search visibility, accessibility, and Core Web Vitals for better reach.",
     },
     {
-      icon: <Zap size={48} className="text-yellow-500" />,
-      title: "Performance Tuning",
+      icon: Zap,
+      title: "Performance Engineering",
+      stack: "Profiling · Caching · Optimization",
       description:
-        "Improving load times, responsiveness, and overall efficiency through code optimization and advanced caching strategies.",
+        "Reducing load times and improving responsiveness through code and runtime optimization.",
     },
     {
-      icon: <Paintbrush size={48} className="text-red-500" />,
-      title: "UI/UX Design",
+      icon: Paintbrush,
+      title: "UI / UX Design",
+      stack: "Design Systems · Usability",
       description:
-        "Designing visually appealing, intuitive, and accessible user interfaces that elevate user engagement and satisfaction.",
+        "Designing clean, intuitive, and accessible interfaces that users actually enjoy.",
     },
   ];
 
   return (
-    <section className="border-t border-[#1e293b] shadow-inner min-h-screen bg-gradient-to-b from-black via-gray-900 to-black text-white px-6 py-16">
-      <div className="max-w-7xl mx-auto text-center space-y-6">
-        <h1 className="text-4xl md:text-5xl font-bold mb-6">🚀 My Services</h1>
-        <p className="text-lg md:text-xl text-gray-300 max-w-3xl mx-auto">
-          Building impactful digital experiences — from websites and apps to
-          games and cloud solutions.
-        </p>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10 mt-12">
-          {services.map((service, index) => (
-            <div
-              key={index}
-              className="backdrop-blur-lg bg-white/5 border border-white/10 rounded-3xl p-8 shadow-[0_8px_32px_0_rgba(0,0,0,0.37)] hover:shadow-[0_10px_40px_rgba(0,0,0,0.6)] transform hover:-translate-y-2 transition-all duration-300 space-y-4"
-            >
-              <div className="flex justify-center">{service.icon}</div>
-              <h2 className="text-2xl font-bold text-white">{service.title}</h2>
-              <p className="text-gray-300 text-base">{service.description}</p>
-            </div>
-          ))}
+    <section className="border-t border-[#1e293b] min-h-screen bg-[#020617] px-6 py-20 text-white">
+      <div className="max-w-7xl mx-auto">
+        {/* Header */}
+        <div className="max-w-3xl mx-auto text-center">
+          <h1 className="text-4xl md:text-5xl font-semibold tracking-tight">
+            My Services
+          </h1>
+          <p className="mt-4 text-lg md:text-xl text-gray-400">
+            Building high-quality digital products with a focus on performance,
+            scalability, and long-term value.
+          </p>
         </div>
 
-        <div className="mt-16 space-y-4">
-          <h3 className="text-3xl md:text-4xl font-bold text-white">
-            Ready to level up your digital presence?
-          </h3>
-          <p className="text-lg md:text-xl text-gray-300 max-w-2xl mx-auto">
-            Let’s collaborate and bring your vision to life — whether it’s an
-            app, a game, or a full-stack platform.
+        {/* Services Grid */}
+        <div className="mt-16 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          {services.map((service, index) => {
+            const Icon = service.icon;
+            return (
+              <div
+                key={index}
+                className="
+                  rounded-3xl border border-white/10
+                  bg-white/5 p-8
+                  transition-all duration-300
+                  hover:border-blue-500/40 hover:bg-white/[0.06]
+                "
+              >
+                <div className="flex items-center gap-4 mb-6">
+                  <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-blue-500/10">
+                    <Icon className="h-7 w-7 text-blue-400" />
+                  </div>
+                  <div>
+                    <h2 className="text-xl font-semibold text-white">
+                      {service.title}
+                    </h2>
+                    <p className="text-sm text-gray-400">{service.stack}</p>
+                  </div>
+                </div>
+
+                <p className="text-base text-gray-300 leading-relaxed">
+                  {service.description}
+                </p>
+              </div>
+            );
+          })}
+        </div>
+
+        {/* CTA */}
+        <div className="mt-24 text-center max-w-3xl mx-auto">
+          <h3 className="text-3xl font-semibold">Ready to start a project?</h3>
+          <p className="mt-4 text-lg text-gray-400">
+            Let’s discuss your idea and turn it into a well-crafted, reliable
+            product.
           </p>
+
           <Link
             to="/contact"
-            className="inline-block bg-blue-600 hover:bg-blue-700 text-white font-semibold py-4 px-8 rounded-full text-xl transition-all duration-300 shadow-lg hover:shadow-xl"
+            className="
+              inline-flex items-center justify-center
+              mt-8 px-10 py-4
+              rounded-xl text-lg font-medium
+              bg-blue-600 text-white
+              hover:bg-blue-500
+              transition
+            "
           >
-            Contact Me 🚀
+            Contact Me
           </Link>
         </div>
       </div>
