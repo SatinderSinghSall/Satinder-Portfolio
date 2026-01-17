@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import axios from "axios";
 import AdminLayout from "../components/AdminLayout";
 import toast from "react-hot-toast";
@@ -12,6 +12,8 @@ import {
   AlertTriangle,
   Loader2,
   TagIcon,
+  Search,
+  RefreshCcw,
 } from "lucide-react";
 
 const API = import.meta.env.VITE_API_URL || "/api";
@@ -37,18 +39,26 @@ export default function Projects() {
   const [editingId, setEditingId] = useState(null);
   const [loading, setLoading] = useState(false);
   const [fetching, setFetching] = useState(false);
-  const [error, setError] = useState("");
   const token = localStorage.getItem("token");
 
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [selectedProjectId, setSelectedProjectId] = useState(null);
   const [deleteLoading, setDeleteLoading] = useState(false);
 
+  // ✅ NEW: Search + Filter + Sort
+  const [search, setSearch] = useState("");
+  const [techFilter, setTechFilter] = useState("all");
+  const [sort, setSort] = useState("latest"); // latest | oldest
+
+  const headers = useMemo(() => {
+    return { Authorization: `Bearer ${token}` };
+  }, [token]);
+
   const fetchProjects = async () => {
     setFetching(true);
     try {
       const res = await axios.get(`${API}/projects`);
-      setProjects(res.data);
+      setProjects(res.data || []);
     } catch {
       toast.error("Failed to fetch projects");
     } finally {
@@ -73,7 +83,6 @@ export default function Projects() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError("");
 
     if (
       !form.title ||
@@ -87,7 +96,6 @@ export default function Projects() {
     }
 
     setLoading(true);
-    const headers = { Authorization: `Bearer ${token}` };
 
     try {
       const formData = new FormData();
@@ -103,6 +111,7 @@ export default function Projects() {
         : await axios.post(`${API}/projects`, formData, { headers });
 
       toast.success(editingId ? "Project updated" : "Project added");
+
       setForm({
         title: "",
         description: "",
@@ -111,8 +120,10 @@ export default function Projects() {
         technologies: [],
         imageFile: null,
       });
+
       setEditingId(null);
       fetchProjects();
+      window.scrollTo({ top: 0, behavior: "smooth" });
     } catch {
       toast.error("Failed to save project");
     } finally {
@@ -138,9 +149,7 @@ export default function Projects() {
     setDeleteLoading(true);
 
     try {
-      await axios.delete(`${API}/projects/${selectedProjectId}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      await axios.delete(`${API}/projects/${selectedProjectId}`, { headers });
       toast.success("Project deleted");
       fetchProjects();
     } catch {
@@ -152,27 +161,126 @@ export default function Projects() {
     }
   };
 
+  // ✅ NEW: Unique Technologies for filter dropdown
+  const uniqueTechnologies = useMemo(() => {
+    const set = new Set();
+    projects.forEach((p) => {
+      (p.technologies || []).forEach((t) => set.add(t));
+    });
+    return Array.from(set).sort();
+  }, [projects]);
+
+  // ✅ NEW: Filter + Search + Sort (Frontend)
+  const filteredProjects = useMemo(() => {
+    let list = [...projects];
+
+    // search by title/description/tech
+    if (search.trim()) {
+      const q = search.toLowerCase().trim();
+      list = list.filter((p) => {
+        const title = (p.title || "").toLowerCase();
+        const desc = (p.description || "").toLowerCase();
+        const techs = (p.technologies || []).join(" ").toLowerCase();
+        return title.includes(q) || desc.includes(q) || techs.includes(q);
+      });
+    }
+
+    // tech filter
+    if (techFilter !== "all") {
+      list = list.filter((p) => (p.technologies || []).includes(techFilter));
+    }
+
+    // sort by createdAt (if exists) else keep order
+    if (sort === "latest") {
+      list.sort(
+        (a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0),
+      );
+    }
+    if (sort === "oldest") {
+      list.sort(
+        (a, b) => new Date(a.createdAt || 0) - new Date(b.createdAt || 0),
+      );
+    }
+
+    return list;
+  }, [projects, search, techFilter, sort]);
+
   return (
     <AdminLayout>
-      <div className="w-full max-w-[1400px] mx-auto px-6">
+      <div className="w-full max-w-[1400px] mx-auto px-6 pb-16">
         {/* HEADER */}
-        <div className="flex items-center justify-between mb-6">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
           <div className="flex items-center gap-3">
             <FolderKanban className="w-7 h-7 text-indigo-600" />
             <div>
               <h2 className="text-2xl font-semibold text-gray-800">
-                Project Management
+                Project Management CMS
               </h2>
               <p className="text-sm text-gray-500">
-                Manage your portfolio projects
+                Manage your portfolio projects.
               </p>
             </div>
           </div>
-          <span className="text-sm text-gray-500">
-            Total Projects: {projects.length}
-          </span>
+
+          {/* ✅ NEW: Refresh Button */}
+          <div className="flex items-center gap-3">
+            <span className="text-sm text-gray-500">
+              Total Projects: {projects.length}
+            </span>
+
+            <button
+              onClick={fetchProjects}
+              className="inline-flex items-center gap-2 px-3 py-2 rounded-md border bg-white hover:bg-gray-50"
+            >
+              <RefreshCcw className="w-5 h-5 text-gray-600" />
+              Refresh
+            </button>
+          </div>
         </div>
 
+        {/* ✅ NEW: Search + Filter + Sort */}
+        <div className="bg-white border border-gray-200 rounded-xl p-4 shadow-sm mb-6 flex flex-col md:flex-row md:items-center gap-3">
+          <div className="relative flex-1">
+            <Search className="w-5 h-5 absolute left-3 top-2.5 text-gray-400" />
+            <input
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder="Search projects by title, description, technologies..."
+              className="w-full pl-10 pr-3 py-2.5 border rounded-md"
+            />
+          </div>
+
+          <select
+            value={techFilter}
+            onChange={(e) => setTechFilter(e.target.value)}
+            className="px-3 py-2.5 border rounded-md"
+          >
+            <option value="all">All Tech</option>
+            {uniqueTechnologies.map((tech) => (
+              <option key={tech} value={tech}>
+                {tech}
+              </option>
+            ))}
+          </select>
+
+          <select
+            value={sort}
+            onChange={(e) => setSort(e.target.value)}
+            className="px-3 py-2.5 border rounded-md"
+          >
+            <option value="latest">Latest</option>
+            <option value="oldest">Oldest</option>
+          </select>
+
+          <button
+            onClick={fetchProjects}
+            className="px-4 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-md font-medium"
+          >
+            Apply
+          </button>
+        </div>
+
+        {/* ✅ FORM (UNCHANGED UI) */}
         <form
           onSubmit={handleSubmit}
           className="bg-white border rounded-xl p-6 shadow-sm mb-10"
@@ -284,53 +392,105 @@ export default function Projects() {
           </button>
         </form>
 
+        {/* ✅ Cards Section */}
         {fetching ? (
           <div className="flex justify-center gap-2 text-gray-600">
             <Spinner text="Loading projects..." />
           </div>
+        ) : filteredProjects.length === 0 ? (
+          <div className="text-center py-16 bg-white border rounded-xl">
+            <p className="text-gray-700 font-semibold">No projects found</p>
+            <p className="text-sm text-gray-500 mt-1">
+              Try changing filters or add a new project ✨
+            </p>
+          </div>
         ) : (
-          <div className="grid md:grid-cols-2 gap-4">
-            {projects.map((proj) => (
+          <div className="grid grid-cols-1 xl:grid-cols-2 gap-5">
+            {filteredProjects.map((proj) => (
               <div
                 key={proj._id}
-                className="bg-white border rounded-lg p-5 hover:shadow-md transition"
+                className="bg-white border rounded-xl overflow-hidden hover:shadow-md transition"
               >
-                <h3 className="font-semibold text-gray-800">{proj.title}</h3>
-                <p className="text-sm text-gray-600 mt-2">{proj.description}</p>
-
-                <div className="flex flex-wrap gap-2 mt-3">
-                  {proj.technologies.map((tech) => (
-                    <span
-                      key={tech}
-                      className="text-xs bg-gray-100 px-2 py-1 rounded"
-                    >
-                      {tech}
-                    </span>
-                  ))}
+                {/* Image */}
+                <div className="h-44 bg-gray-100 overflow-hidden">
+                  {proj.image ? (
+                    <img
+                      src={proj.image}
+                      alt={proj.title}
+                      className="w-full h-full object-cover hover:scale-105 transition-transform duration-500"
+                    />
+                  ) : (
+                    <div className="h-full flex items-center justify-center text-gray-400">
+                      No Image
+                    </div>
+                  )}
                 </div>
 
-                <div className="flex justify-between items-center mt-5">
-                  <div className="flex gap-4 text-gray-500">
-                    <a href={proj.githubLink} target="_blank">
-                      <Github className="w-5 h-5 hover:text-gray-800" />
-                    </a>
-                    <a href={proj.link} target="_blank">
-                      <ExternalLink className="w-5 h-5 hover:text-gray-800" />
-                    </a>
+                <div className="p-4">
+                  <div className="flex justify-between items-start gap-4">
+                    <div>
+                      <h3 className="font-semibold text-gray-800 text-lg">
+                        {proj.title}
+                      </h3>
+                      <p className="text-sm text-gray-600 mt-2 line-clamp-2">
+                        {proj.description}
+                      </p>
+                    </div>
+
+                    <div className="flex gap-2">
+                      <button
+                        onClick={() => handleEdit(proj)}
+                        className="p-2 hover:bg-gray-100 rounded-md"
+                        title="Edit"
+                      >
+                        <Edit className="w-5 h-5 text-indigo-600" />
+                      </button>
+
+                      <button
+                        onClick={() => {
+                          setSelectedProjectId(proj._id);
+                          setIsDeleteModalOpen(true);
+                        }}
+                        className="p-2 hover:bg-red-50 rounded-md"
+                        title="Delete"
+                      >
+                        <Trash2 className="w-5 h-5 text-red-600" />
+                      </button>
+                    </div>
                   </div>
 
-                  <div className="flex gap-3">
-                    <button onClick={() => handleEdit(proj)}>
-                      <Edit className="w-5 h-5 text-indigo-600" />
-                    </button>
-                    <button
-                      onClick={() => {
-                        setSelectedProjectId(proj._id);
-                        setIsDeleteModalOpen(true);
-                      }}
-                    >
-                      <Trash2 className="w-5 h-5 text-red-600" />
-                    </button>
+                  {/* Technologies */}
+                  <div className="flex flex-wrap gap-2 mt-4">
+                    {proj.technologies?.length > 0 ? (
+                      proj.technologies.map((tech) => (
+                        <span
+                          key={tech}
+                          className="text-xs bg-gray-100 px-2 py-1 rounded-full border"
+                        >
+                          {tech}
+                        </span>
+                      ))
+                    ) : (
+                      <span className="text-xs text-gray-400">
+                        No technologies
+                      </span>
+                    )}
+                  </div>
+
+                  {/* Links */}
+                  <div className="flex justify-between items-center mt-5">
+                    <div className="flex gap-4 text-gray-500">
+                      {proj.githubLink && (
+                        <a href={proj.githubLink} target="_blank">
+                          <Github className="w-5 h-5 hover:text-gray-800" />
+                        </a>
+                      )}
+                      {proj.link && (
+                        <a href={proj.link} target="_blank">
+                          <ExternalLink className="w-5 h-5 hover:text-gray-800" />
+                        </a>
+                      )}
+                    </div>
                   </div>
                 </div>
               </div>
@@ -338,6 +498,7 @@ export default function Projects() {
           </div>
         )}
 
+        {/* Delete Modal */}
         {isDeleteModalOpen && (
           <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
             <div className="bg-white p-6 rounded-lg w-96">
@@ -356,6 +517,7 @@ export default function Projects() {
                 >
                   Cancel
                 </button>
+
                 <button
                   onClick={handleDelete}
                   disabled={deleteLoading}
