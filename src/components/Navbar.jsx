@@ -44,7 +44,7 @@ export default function Navbar() {
               Projects
             </Link>
             <Link to="/blog" className={linkClass("/blog")}>
-              Blog
+              Blogs
             </Link>
             <Link to="/youtube" className={linkClass("/youtube")}>
               YouTube
@@ -109,7 +109,7 @@ export default function Navbar() {
           onClick={() => setIsOpen(false)}
           className={linkClass("/blog")}
         >
-          Blog
+          Blogs
         </Link>
         <Link
           to="/youtube"
