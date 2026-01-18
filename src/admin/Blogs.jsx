@@ -43,7 +43,7 @@ export default function Blogs() {
     summary: "",
 
     // ✅ NEW: choose editor
-    editorType: "editorjs", // "markdown" | "editorjs"
+    editorType: "markdown", // "markdown" | "editorjs"
 
     // markdown
     content: "",
@@ -359,7 +359,9 @@ export default function Blogs() {
           <div className="flex items-center gap-3">
             <DocumentTextIcon className="h-8 w-8 text-indigo-600" />
             <div>
-              <h2 className="text-2xl font-semibold text-gray-800">Blog Management CMS</h2>
+              <h2 className="text-2xl font-semibold text-gray-800">
+                Blog Management CMS
+              </h2>
               <p className="text-sm text-gray-500">
                 Create and manage blog content.
               </p>
