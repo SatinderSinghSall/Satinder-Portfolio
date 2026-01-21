@@ -194,10 +194,20 @@ export default function ManageYouTube() {
 
             <button
               onClick={fetchVideos}
-              className="inline-flex items-center gap-2 px-3 py-2 rounded-md border bg-white hover:bg-gray-50 transition"
+              disabled={fetching}
+              className={`inline-flex items-center gap-2 px-3 py-2 rounded-md border font-medium transition
+            ${
+              fetching
+                ? "bg-gray-100 text-gray-400 cursor-not-allowed"
+                : "bg-white hover:bg-gray-50 text-gray-700"
+            }`}
             >
-              <ArrowPathIcon className="h-5 w-5 text-gray-600" />
-              Refresh
+              <ArrowPathIcon
+                className={`h-5 w-5 ${
+                  fetching ? "animate-spin text-red-600" : "text-gray-600"
+                }`}
+              />
+              {fetching ? "Refreshing..." : "Refresh"}
             </button>
           </div>
         </div>
@@ -236,9 +246,15 @@ export default function ManageYouTube() {
 
           <button
             onClick={fetchVideos}
-            className="px-4 py-2.5 bg-red-600 hover:bg-red-700 text-white rounded-md font-medium transition"
+            disabled={fetching}
+            className={`px-4 py-2.5 rounded-md font-medium text-white transition inline-flex items-center justify-center gap-2
+          ${
+            fetching
+              ? "bg-red-400 cursor-not-allowed"
+              : "bg-red-600 hover:bg-red-700"
+          }`}
           >
-            Apply
+            {fetching ? <Spinner text="Applying..." /> : "Apply"}
           </button>
         </div>
 
