@@ -8,6 +8,10 @@ import {
   CalendarDaysIcon,
   UserGroupIcon,
   DocumentTextIcon,
+  ChevronLeftIcon,
+  ChevronRightIcon,
+  ChevronDoubleLeftIcon,
+  ChevronDoubleRightIcon,
 } from "@heroicons/react/24/outline";
 
 const API = import.meta.env.VITE_API_URL || "/api";
@@ -51,6 +55,10 @@ export default function Blog() {
   // UI
   const [search, setSearch] = useState("");
   const [sortBy, setSortBy] = useState("latest"); // latest | oldest | title
+
+  // ✅ Pagination
+  const PER_PAGE = 6;
+  const [page, setPage] = useState(1);
 
   const fetchBlogs = async () => {
     setFetching(true);
@@ -117,6 +125,29 @@ export default function Blog() {
 
     return list;
   }, [blogs, search, sortBy]);
+
+  // ✅ Reset to first page when filters change
+  useEffect(() => {
+    setPage(1);
+  }, [search, sortBy]);
+
+  // ✅ Pagination calculations
+  const totalPages = Math.ceil(filteredBlogs.length / PER_PAGE) || 1;
+
+  // If current page becomes invalid after filtering, fix it
+  useEffect(() => {
+    if (page > totalPages) setPage(totalPages);
+  }, [page, totalPages]);
+
+  // ✅ Smooth scroll to top when page changes
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }, [page]);
+
+  const paginatedBlogs = useMemo(() => {
+    const start = (page - 1) * PER_PAGE;
+    return filteredBlogs.slice(start, start + PER_PAGE);
+  }, [filteredBlogs, page]);
 
   const skeletonCount = 6;
 
@@ -245,7 +276,7 @@ export default function Blog() {
                 <SkeletonCard key={i} />
               ))}
             </div>
-          ) : filteredBlogs.length === 0 ? (
+          ) : paginatedBlogs.length === 0 ? (
             <div className="text-center mt-10">
               <p className="text-lg font-semibold text-gray-200">
                 No blog posts found
@@ -255,41 +286,143 @@ export default function Blog() {
               </p>
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {filteredBlogs.map((blog) => (
-                <Link key={blog._id} to={`/blog/${blog._id}`} className="group">
-                  <div className="relative bg-white/5 backdrop-blur-xl border border-white/10 rounded-3xl overflow-hidden shadow-xl transition-all duration-300 hover:shadow-2xl hover:-translate-y-1 hover:border-white/20">
-                    <div className="p-6 flex flex-col h-full">
-                      <h3 className="text-lg font-extrabold leading-snug group-hover:text-blue-300 transition-colors line-clamp-2">
-                        {blog.title}
-                      </h3>
+            <>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {paginatedBlogs.map((blog) => (
+                  <Link
+                    key={blog._id}
+                    to={`/blog/${blog._id}`}
+                    className="group"
+                  >
+                    <div className="relative bg-white/5 backdrop-blur-xl border border-white/10 rounded-3xl overflow-hidden shadow-xl transition-all duration-300 hover:shadow-2xl hover:-translate-y-1 hover:border-white/20">
+                      <div className="p-6 flex flex-col h-full">
+                        <h3 className="text-lg font-extrabold leading-snug group-hover:text-blue-300 transition-colors line-clamp-2">
+                          {blog.title}
+                        </h3>
 
-                      <p className="text-xs text-gray-400 mt-2">
-                        By {blog.author || "Admin"} •{" "}
-                        {blog.publishedAt
-                          ? new Date(blog.publishedAt).toLocaleDateString()
-                          : "Not published"}
-                      </p>
+                        <p className="text-xs text-gray-400 mt-2">
+                          By {blog.author || "Admin"} •{" "}
+                          {blog.publishedAt
+                            ? new Date(blog.publishedAt).toLocaleDateString()
+                            : "Not published"}
+                        </p>
 
-                      <p className="text-sm text-gray-300 mt-4 leading-relaxed line-clamp-4">
-                        {blog.content?.length > 180
-                          ? blog.content.slice(0, 180) + "..."
-                          : blog.content}
-                      </p>
+                        <p className="text-sm text-gray-300 mt-4 leading-relaxed line-clamp-4">
+                          {blog.content?.length > 180
+                            ? blog.content.slice(0, 180) + "..."
+                            : blog.content}
+                        </p>
 
-                      <div className="mt-6">
-                        <div className="w-full inline-flex items-center justify-center gap-2 font-semibold py-3 rounded-2xl bg-gradient-to-r from-blue-500 to-purple-600 hover:from-purple-500 hover:to-pink-500 transition-all text-white shadow-md">
-                          📖 Read More
+                        <div className="mt-6">
+                          <div className="w-full inline-flex items-center justify-center gap-2 font-semibold py-3 rounded-2xl bg-gradient-to-r from-blue-500 to-purple-600 hover:from-purple-500 hover:to-pink-500 transition-all text-white shadow-md">
+                            📖 Read More
+                          </div>
                         </div>
                       </div>
-                    </div>
 
-                    {/* bottom glow line */}
-                    <div className="h-[2px] w-full bg-gradient-to-r from-blue-500/40 via-indigo-500/40 to-fuchsia-500/40 opacity-0 group-hover:opacity-100 transition" />
+                      {/* bottom glow line */}
+                      <div className="h-[2px] w-full bg-gradient-to-r from-blue-500/40 via-indigo-500/40 to-fuchsia-500/40 opacity-0 group-hover:opacity-100 transition" />
+                    </div>
+                  </Link>
+                ))}
+              </div>
+
+              {/* ✅ Premium SaaS Pagination */}
+              {filteredBlogs.length > PER_PAGE && (
+                <div className="mt-10 flex flex-col sm:flex-row items-center justify-between gap-4">
+                  {/* Page Info */}
+                  <div className="flex items-center gap-2 text-sm text-gray-300">
+                    <span className="px-4 py-2 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-xl shadow-lg">
+                      Page{" "}
+                      <span className="text-white font-extrabold">{page}</span>{" "}
+                      of{" "}
+                      <span className="text-white font-extrabold">
+                        {totalPages}
+                      </span>
+                    </span>
+
+                    <span className="hidden sm:inline text-xs text-gray-400">
+                      Showing {PER_PAGE} blogs per page
+                    </span>
                   </div>
-                </Link>
-              ))}
-            </div>
+
+                  {/* Buttons */}
+                  <div className="flex items-center gap-2">
+                    {/* First */}
+                    <button
+                      onClick={() => setPage(1)}
+                      disabled={page === 1}
+                      className={`group relative inline-flex items-center justify-center rounded-2xl px-4 py-3 border transition-all duration-300 active:scale-[0.98]
+                        ${
+                          page === 1
+                            ? "bg-white/5 border-white/10 text-gray-500 cursor-not-allowed"
+                            : "bg-white/10 border-white/10 hover:bg-white/15 text-white shadow-xl"
+                        }`}
+                    >
+                      <ChevronDoubleLeftIcon className="h-5 w-5" />
+                    </button>
+
+                    {/* Prev */}
+                    <button
+                      onClick={() => setPage((p) => Math.max(1, p - 1))}
+                      disabled={page === 1}
+                      className={`group relative inline-flex items-center justify-center gap-2 rounded-2xl px-5 py-3 font-semibold border transition-all duration-300 active:scale-[0.98]
+                        ${
+                          page === 1
+                            ? "bg-white/5 border-white/10 text-gray-500 cursor-not-allowed"
+                            : "bg-gradient-to-r from-blue-500/90 to-purple-600/90 hover:from-purple-500 hover:to-pink-500 text-white shadow-xl shadow-blue-500/20"
+                        }`}
+                    >
+                      {page !== 1 && (
+                        <span className="absolute inset-0 rounded-2xl bg-gradient-to-r from-blue-500/40 to-fuchsia-500/40 blur-xl opacity-0 group-hover:opacity-100 transition" />
+                      )}
+
+                      <span className="relative flex items-center gap-2">
+                        <ChevronLeftIcon className="h-5 w-5" />
+                        <span className="hidden sm:inline">Previous</span>
+                      </span>
+                    </button>
+
+                    {/* Next */}
+                    <button
+                      onClick={() =>
+                        setPage((p) => Math.min(totalPages, p + 1))
+                      }
+                      disabled={page === totalPages}
+                      className={`group relative inline-flex items-center justify-center gap-2 rounded-2xl px-5 py-3 font-semibold border transition-all duration-300 active:scale-[0.98]
+                        ${
+                          page === totalPages
+                            ? "bg-white/5 border-white/10 text-gray-500 cursor-not-allowed"
+                            : "bg-gradient-to-r from-purple-600/90 to-blue-500/90 hover:from-pink-500 hover:to-purple-500 text-white shadow-xl shadow-purple-500/20"
+                        }`}
+                    >
+                      {page !== totalPages && (
+                        <span className="absolute inset-0 rounded-2xl bg-gradient-to-r from-purple-500/40 to-blue-500/40 blur-xl opacity-0 group-hover:opacity-100 transition" />
+                      )}
+
+                      <span className="relative flex items-center gap-2">
+                        <span className="hidden sm:inline">Next</span>
+                        <ChevronRightIcon className="h-5 w-5" />
+                      </span>
+                    </button>
+
+                    {/* Last */}
+                    <button
+                      onClick={() => setPage(totalPages)}
+                      disabled={page === totalPages}
+                      className={`group relative inline-flex items-center justify-center rounded-2xl px-4 py-3 border transition-all duration-300 active:scale-[0.98]
+                        ${
+                          page === totalPages
+                            ? "bg-white/5 border-white/10 text-gray-500 cursor-not-allowed"
+                            : "bg-white/10 border-white/10 hover:bg-white/15 text-white shadow-xl"
+                        }`}
+                    >
+                      <ChevronDoubleRightIcon className="h-5 w-5" />
+                    </button>
+                  </div>
+                </div>
+              )}
+            </>
           )}
         </div>
 
