@@ -16,6 +16,7 @@ import {
   RefreshCcw,
   Plus,
   ArrowUpRight,
+  Menu,
 } from "lucide-react";
 
 import {
@@ -78,6 +79,9 @@ export default function Dashboard() {
   const [dateTime, setDateTime] = useState(formatDateTime());
   const [refreshing, setRefreshing] = useState(false);
 
+  // ✅ Mobile sidebar drawer state
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+
   const headers = useMemo(() => {
     return token ? { Authorization: `Bearer ${token}` } : {};
   }, [token]);
@@ -128,27 +132,36 @@ export default function Dashboard() {
 
   return (
     <div className="flex min-h-screen bg-gradient-to-b from-gray-50 via-white to-gray-50 overflow-x-hidden">
-      <Sidebar />
+      {/* ✅ Sidebar (Drawer for mobile + fixed for desktop) */}
+      <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
 
-      {/* ✅ FIX: Prevent sidebar overlap (ONLY on desktop) */}
+      {/* Main Content */}
       <div className="flex-1 min-w-0 relative lg:ml-64">
-        {/* Premium background blobs */}
+        {/* Background blobs */}
         <div className="pointer-events-none absolute -top-24 -left-24 h-72 w-72 rounded-full bg-indigo-200/40 blur-3xl" />
         <div className="pointer-events-none absolute -bottom-24 -right-24 h-72 w-72 rounded-full bg-fuchsia-200/40 blur-3xl" />
 
-        {/* SaaS Topbar */}
+        {/* Topbar */}
         <div className="sticky top-0 z-40 bg-white/75 backdrop-blur-xl border-b border-gray-200">
-          <div className="w-full px-6 lg:px-8 py-5 space-y-4">
-            {/* Row 1: Title + Actions */}
+          <div className="w-full px-4 sm:px-6 lg:px-8 py-5 space-y-4">
+            {/* Row 1 */}
             <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
               {/* Left: Title */}
               <div className="flex items-start gap-3">
+                {/* ✅ Mobile Menu Button */}
+                <button
+                  onClick={() => setSidebarOpen(true)}
+                  className="lg:hidden p-2 rounded-xl border border-gray-200 bg-white shadow-sm hover:bg-gray-50"
+                >
+                  <Menu className="w-5 h-5 text-gray-700" />
+                </button>
+
                 <div className="h-11 w-11 rounded-2xl bg-indigo-50 border border-indigo-100 flex items-center justify-center shrink-0">
                   <UserCircle className="w-6 h-6 text-indigo-600" />
                 </div>
 
                 <div className="min-w-0 pt-[2px]">
-                  <h1 className="text-2xl sm:text-3xl font-black text-gray-900 leading-tight">
+                  <h1 className="text-xl sm:text-2xl lg:text-3xl font-black text-gray-900 leading-tight">
                     {getGreeting()}, Admin 👋
                   </h1>
 
@@ -186,14 +199,14 @@ export default function Dashboard() {
               </div>
             </div>
 
-            {/* Row 2: Search + DateTime */}
+            {/* Row 2 */}
             <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
               {/* Search */}
               <div className="relative w-full md:max-w-[520px]">
                 <Search className="w-4 h-4 absolute left-3 top-3 text-gray-400" />
                 <input
                   placeholder="Search projects, blogs, videos..."
-                  className="w-full pl-9 pr-14 py-2.5 rounded-xl border border-gray-200 bg-white shadow-sm outline-none focus:ring-2 focus:ring-indigo-500"
+                  className="w-full pl-9 pr-4 sm:pr-14 py-2.5 rounded-xl border border-gray-200 bg-white shadow-sm outline-none focus:ring-2 focus:ring-indigo-500"
                 />
 
                 <div className="absolute right-3 top-2.5 hidden sm:flex items-center gap-1 text-[11px] text-gray-400 border border-gray-200 bg-gray-50 px-2 py-1 rounded-lg">
@@ -209,8 +222,8 @@ export default function Dashboard() {
               </div>
             </div>
 
-            {/* Row 3: Quick Stats Pills */}
-            <div className="flex items-center justify-between gap-3">
+            {/* Row 3 */}
+            <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3">
               <div className="flex gap-2 overflow-x-auto no-scrollbar pb-1">
                 <span className="shrink-0 px-3 py-1 rounded-full bg-gray-50 border border-gray-200 text-xs text-gray-600">
                   Projects:{" "}
@@ -249,10 +262,10 @@ export default function Dashboard() {
         </div>
 
         {/* Page Content */}
-        <div className="p-6 lg:p-8">
+        <div className="p-4 sm:p-6 lg:p-8">
           {/* Quick Actions */}
           <div className="mb-8 flex flex-col lg:flex-row lg:items-center justify-between gap-4">
-            <div className="flex items-center gap-2 text-sm text-gray-500">
+            <div className="flex flex-wrap items-center gap-2 text-sm text-gray-500">
               <span className="px-3 py-1 rounded-full bg-indigo-50 text-indigo-700 border border-indigo-100 font-semibold">
                 Admin Analytics
               </span>
@@ -292,7 +305,7 @@ export default function Dashboard() {
           </div>
 
           {/* Metrics */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {!sparklineData ? (
               <>
                 <MetricCardSkeleton />
@@ -335,7 +348,8 @@ export default function Dashboard() {
                   data={sparklineData.youtube}
                 />
 
-                <div className="sm:col-span-2 lg:col-span-1">
+                {/* ✅ Responsive span */}
+                <div className="sm:col-span-2 lg:col-span-4 xl:col-span-1">
                   <ServerStatusCard />
                 </div>
               </>
@@ -343,8 +357,8 @@ export default function Dashboard() {
           </div>
 
           {/* Weekly Overview */}
-          <div className="mt-10 bg-white/80 backdrop-blur-xl border border-gray-200 rounded-2xl p-6 shadow-sm">
-            <div className="flex items-center justify-between mb-5">
+          <div className="mt-10 bg-white/80 backdrop-blur-xl border border-gray-200 rounded-2xl p-4 sm:p-6 shadow-sm">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-5">
               <div>
                 <h2 className="text-lg font-extrabold text-gray-900">
                   Weekly Overview
@@ -354,12 +368,12 @@ export default function Dashboard() {
                 </p>
               </div>
 
-              <span className="text-xs px-3 py-1 rounded-full bg-gray-100 border text-gray-700 font-semibold">
+              <span className="text-xs px-3 py-1 rounded-full bg-gray-100 border text-gray-700 font-semibold w-fit">
                 Last 7 days
               </span>
             </div>
 
-            <ResponsiveContainer width="100%" height={320}>
+            <ResponsiveContainer width="100%" height={260}>
               <LineChart data={weeklyOverview}>
                 <CartesianGrid strokeDasharray="3 3" />
                 <XAxis dataKey="day" />
