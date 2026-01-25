@@ -69,7 +69,7 @@ export default function Home() {
           <ul className="flex justify-center items-center text-gray-400">
             <div className="flex sm:hidden flex-nowrap items-center gap-3 text-[11px]">
               <li className="whitespace-nowrap">
-                <span className="text-white font-medium">3+</span> yrs exp
+                <span className="text-white font-medium">1+</span> yrs exp
               </li>
 
               <span className="opacity-40">•</span>
