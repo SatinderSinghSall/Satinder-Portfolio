@@ -9,6 +9,8 @@ import {
   SquarePlus,
   Youtube,
   X,
+  Users,
+  FileText,
 } from "lucide-react";
 import toast from "react-hot-toast";
 
@@ -69,6 +71,21 @@ export default function Sidebar({ isOpen = false, onClose = () => {} }) {
           path: "/admin/youtube",
           label: "Manage YouTube",
           icon: <BookText size={20} />,
+        },
+      ],
+    },
+    {
+      section: "Freelancing",
+      items: [
+        {
+          path: "/admin/freelance-project/new",
+          label: "Add Freelance",
+          icon: <BadgePlus size={20} />,
+        },
+        {
+          path: "/admin/freelance-projects",
+          label: "Freelance Projects",
+          icon: <FolderKanban size={20} />,
         },
       ],
     },
