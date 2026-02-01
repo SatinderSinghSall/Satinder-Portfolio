@@ -17,6 +17,7 @@ import {
   Plus,
   ArrowUpRight,
   Menu,
+  BriefcaseBusiness,
 } from "lucide-react";
 
 import {
@@ -73,6 +74,7 @@ export default function Dashboard() {
     blogs: 0,
     messages: 0,
     youtube: 0,
+    freelance: 0,
   });
 
   const [sparklineData, setSparklineData] = useState(null);
@@ -96,6 +98,7 @@ export default function Dashboard() {
         blogs: res.data.blogsCount,
         messages: res.data.messagesCount,
         youtube: res.data.youTubeCount,
+        freelance: res.data.freelanceCount,
       };
 
       setCounts(data);
@@ -105,6 +108,7 @@ export default function Dashboard() {
         blogs: generateTrendDataOnce(data.blogs),
         messages: generateTrendDataOnce(data.messages),
         youtube: generateTrendDataOnce(data.youtube),
+        freelance: generateTrendDataOnce(data.freelance),
       });
     } catch (err) {
       console.error(err);
@@ -252,6 +256,13 @@ export default function Dashboard() {
                     {counts.youtube}
                   </span>
                 </span>
+
+                <span className="shrink-0 px-3 py-1 rounded-full bg-gray-50 border border-gray-200 text-xs text-gray-600">
+                  Freelance:{" "}
+                  <span className="font-semibold text-gray-900">
+                    {counts.freelance}
+                  </span>
+                </span>
               </div>
 
               <span className="hidden lg:inline text-xs text-gray-400 whitespace-nowrap">
@@ -301,6 +312,15 @@ export default function Dashboard() {
                 Add Video
                 <ArrowUpRight className="w-4 h-4 opacity-90" />
               </button>
+
+              <button
+                onClick={() => navigate("/admin/freelance-projects")}
+                className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-green-600 hover:bg-green-700 text-white font-semibold shadow-sm transition"
+              >
+                <Plus className="w-4 h-4" />
+                Add Freelance
+                <ArrowUpRight className="w-4 h-4 opacity-90" />
+              </button>
             </div>
           </div>
 
@@ -308,6 +328,7 @@ export default function Dashboard() {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {!sparklineData ? (
               <>
+                <MetricCardSkeleton />
                 <MetricCardSkeleton />
                 <MetricCardSkeleton />
                 <MetricCardSkeleton />
@@ -345,6 +366,14 @@ export default function Dashboard() {
                   count={counts.youtube}
                   icon={<Youtube className="w-5 h-5" />}
                   badge="Videos"
+                  data={sparklineData.youtube}
+                />
+
+                <MetricCard
+                  title="Freelance Project Count"
+                  count={counts.freelance}
+                  icon={<BriefcaseBusiness className="w-5 h-5" />}
+                  badge="Freelance Work"
                   data={sparklineData.youtube}
                 />
 
