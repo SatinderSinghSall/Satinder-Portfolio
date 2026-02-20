@@ -34,6 +34,8 @@ export default function Projects() {
     githubLink: "",
     link: "",
     image: "",
+    priority: 0,
+    featured: false,
   });
 
   const [editingId, setEditingId] = useState(null);
@@ -45,7 +47,6 @@ export default function Projects() {
   const [selectedProjectId, setSelectedProjectId] = useState(null);
   const [deleteLoading, setDeleteLoading] = useState(false);
 
-  // ✅ NEW: Search + Filter + Sort
   const [search, setSearch] = useState("");
   const [techFilter, setTechFilter] = useState("all");
   const [sort, setSort] = useState("latest"); // latest | oldest
@@ -71,13 +72,18 @@ export default function Projects() {
   }, []);
 
   const handleChange = (e) => {
-    if (e.target.name === "technologies") {
+    const { name, value, type, checked } = e.target;
+
+    if (name === "technologies") {
       setForm({
         ...form,
-        technologies: e.target.value.split(",").map((t) => t.trim()),
+        technologies: value.split(",").map((t) => t.trim()),
       });
     } else {
-      setForm({ ...form, [e.target.name]: e.target.value });
+      setForm({
+        ...form,
+        [name]: type === "checkbox" ? checked : value,
+      });
     }
   };
 
@@ -104,6 +110,8 @@ export default function Projects() {
       formData.append("link", form.link);
       formData.append("githubLink", form.githubLink);
       formData.append("technologies", form.technologies.join(","));
+      formData.append("featured", form.featured);
+      formData.append("priority", form.priority);
       if (form.imageFile) formData.append("image", form.imageFile);
 
       editingId
@@ -119,6 +127,8 @@ export default function Projects() {
         githubLink: "",
         technologies: [],
         imageFile: null,
+        priority: 0,
+        featured: false,
       });
 
       setEditingId(null);
@@ -139,6 +149,8 @@ export default function Projects() {
       image: project.image,
       technologies: project.technologies,
       githubLink: project.githubLink,
+      priority: project.priority || 0,
+      featured: project.featured || false,
     });
     setEditingId(project._id);
     window.scrollTo({ top: 0, behavior: "smooth" });
@@ -161,7 +173,6 @@ export default function Projects() {
     }
   };
 
-  // ✅ NEW: Unique Technologies for filter dropdown
   const uniqueTechnologies = useMemo(() => {
     const set = new Set();
     projects.forEach((p) => {
@@ -170,7 +181,7 @@ export default function Projects() {
     return Array.from(set).sort();
   }, [projects]);
 
-  // ✅ NEW: Filter + Search + Sort (Frontend)
+  // Filter + Search + Sort
   const filteredProjects = useMemo(() => {
     let list = [...projects];
 
@@ -205,6 +216,22 @@ export default function Projects() {
     return list;
   }, [projects, search, techFilter, sort]);
 
+  const toggleFeatured = async (id) => {
+    try {
+      await axios.patch(
+        `${API}/projects/${id}/toggle-featured`,
+        {},
+        { headers },
+      );
+      setProjects((prev) =>
+        prev.map((p) => (p._id === id ? { ...p, featured: !p.featured } : p)),
+      );
+      toast.success("Updated");
+    } catch {
+      toast.error("Failed");
+    }
+  };
+
   return (
     <AdminLayout>
       <div className="w-full max-w-[1400px] mx-auto px-6 pb-16">
@@ -222,7 +249,7 @@ export default function Projects() {
             </div>
           </div>
 
-          {/* ✅ NEW: Refresh Button */}
+          {/* Refresh Button */}
           <div className="flex items-center gap-3">
             <span className="text-sm text-gray-500">
               Total Projects: {projects.length}
@@ -248,7 +275,7 @@ export default function Projects() {
           </div>
         </div>
 
-        {/* ✅ NEW: Search + Filter + Sort */}
+        {/* Search + Filter + Sort */}
         <div className="bg-white border border-gray-200 rounded-xl p-4 shadow-sm mb-6 flex flex-col md:flex-row md:items-center gap-3">
           <div className="relative flex-1">
             <Search className="w-5 h-5 absolute left-3 top-2.5 text-gray-400" />
@@ -303,7 +330,7 @@ export default function Projects() {
           </button>
         </div>
 
-        {/* ✅ FORM (UNCHANGED UI) */}
+        {/* FORM (UNCHANGED UI) */}
         <form
           onSubmit={handleSubmit}
           className="bg-white border rounded-xl p-6 shadow-sm mb-10"
@@ -362,6 +389,29 @@ export default function Projects() {
             </div>
           </div>
 
+          <div className="flex items-center gap-6 mt-2">
+            {/* Featured Toggle */}
+            <label className="flex items-center gap-2 text-sm">
+              <input
+                type="checkbox"
+                name="featured"
+                checked={form.featured}
+                onChange={handleChange}
+              />
+              Featured Project 🌟
+            </label>
+
+            {/* Priority */}
+            <input
+              type="number"
+              name="priority"
+              value={form.priority}
+              onChange={handleChange}
+              placeholder="Priority"
+              className="border rounded px-3 py-1 w-28"
+            />
+          </div>
+
           {/* Description */}
           <textarea
             name="description"
@@ -415,7 +465,7 @@ export default function Projects() {
           </button>
         </form>
 
-        {/* ✅ Cards Section */}
+        {/* Cards Section */}
         {fetching ? (
           <div className="flex justify-center gap-2 text-gray-600">
             <Spinner text="Loading projects..." />
@@ -458,6 +508,21 @@ export default function Projects() {
                       <p className="text-sm text-gray-600 mt-2 line-clamp-2">
                         {proj.description}
                       </p>
+                      {proj.featured && (
+                        <span className="text-xs bg-yellow-100 text-yellow-700 px-2 py-0.5 rounded-full">
+                          Featured
+                        </span>
+                      )}
+                      {proj.views > 50 && (
+                        <span className="text-xs bg-indigo-100 text-indigo-700 px-2 py-0.5 rounded-full">
+                          Popular
+                        </span>
+                      )}
+                      {proj.priority > 0 && (
+                        <span className="text-xs bg-gray-100 text-gray-700 px-2 py-0.5 rounded-full ml-1">
+                          Priority: {proj.priority}
+                        </span>
+                      )}
                     </div>
 
                     <div className="flex gap-2">
@@ -478,6 +543,14 @@ export default function Projects() {
                         title="Delete"
                       >
                         <Trash2 className="w-5 h-5 text-red-600" />
+                      </button>
+
+                      <button
+                        onClick={() => toggleFeatured(proj._id)}
+                        className="p-2 hover:bg-yellow-50 rounded-md"
+                        title="Toggle Featured"
+                      >
+                        ⭐
                       </button>
                     </div>
                   </div>

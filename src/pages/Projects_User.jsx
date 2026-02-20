@@ -109,23 +109,51 @@ export default function Projects() {
       });
     }
 
-    // Sort
-    if (sortBy === "latest") {
-      list.sort(
-        (a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0),
-      );
-    }
-    if (sortBy === "oldest") {
-      list.sort(
-        (a, b) => new Date(a.createdAt || 0) - new Date(b.createdAt || 0),
-      );
-    }
-    if (sortBy === "title") {
-      list.sort((a, b) => (a.title || "").localeCompare(b.title || ""));
-    }
+    // ⭐ FEATURED → PRIORITY → USER SORT
+    list.sort((a, b) => {
+      // 1️⃣ Featured first
+      if (a.featured && !b.featured) return -1;
+      if (!a.featured && b.featured) return 1;
+
+      // 2️⃣ If both featured → priority high → low
+      if (a.featured && b.featured) {
+        const priorityDiff = (b.priority || 0) - (a.priority || 0);
+        if (priorityDiff !== 0) return priorityDiff;
+      }
+
+      // 3️⃣ Apply selected sorting
+      if (sortBy === "latest") {
+        return new Date(b.createdAt || 0) - new Date(a.createdAt || 0);
+      }
+
+      if (sortBy === "oldest") {
+        return new Date(a.createdAt || 0) - new Date(b.createdAt || 0);
+      }
+
+      if (sortBy === "title") {
+        return (a.title || "").localeCompare(b.title || "");
+      }
+
+      return 0;
+    });
 
     return list;
   }, [projects, search, sortBy]);
+
+  // ⭐ FEATURED PROJECTS
+  const featuredProjects = useMemo(() => {
+    return [...projects]
+      .filter((p) => p.featured)
+      .sort((a, b) => {
+        const priorityDiff = (b.priority || 0) - (a.priority || 0);
+        if (priorityDiff !== 0) return priorityDiff;
+
+        const viewsDiff = (b.views || 0) - (a.views || 0);
+        if (viewsDiff !== 0) return viewsDiff;
+
+        return new Date(b.createdAt || 0) - new Date(a.createdAt || 0);
+      });
+  }, [projects]);
 
   // ✅ Reset to first page when filters change
   useEffect(() => {
@@ -289,43 +317,101 @@ export default function Projects() {
           ) : (
             <>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                {paginatedProjects.map((project) => (
-                  <div
-                    key={project._id}
-                    className="group relative overflow-hidden rounded-3xl bg-white/5 backdrop-blur-xl border border-white/10 shadow-xl hover:shadow-2xl transition-all duration-300 hover:-translate-y-1 hover:border-white/20"
-                  >
-                    {/* Image */}
-                    <div className="relative overflow-hidden">
-                      <img
-                        src={project.image}
-                        alt={project.title}
-                        className="w-full h-56 object-cover transition-transform duration-500 group-hover:scale-110"
+                {paginatedProjects.map((project) => {
+                  const isPopular = (project.views || 0) > 50;
+
+                  return (
+                    <div
+                      key={project._id}
+                      className={`group relative overflow-hidden rounded-3xl backdrop-blur-xl border transition-all duration-500
+      hover:-translate-y-2 hover:shadow-2xl
+
+      ${
+        project.featured
+          ? "bg-gradient-to-br from-blue-500/10 via-indigo-500/5 to-purple-500/10 border-blue-400/30 shadow-[0_0_35px_rgba(59,130,246,0.18)]"
+          : "bg-white/5 border-white/10"
+      }`}
+                    >
+                      {/* ⭐ Featured Badge */}
+                      {project.featured && (
+                        <div
+                          className="absolute top-3 left-3 z-10 flex items-center gap-1 px-2.5 py-1 text-[10px] font-bold
+        bg-gradient-to-r from-yellow-400 to-amber-500 text-black rounded-md shadow-lg animate-pulse"
+                        >
+                          ⭐ FEATURED
+                        </div>
+                      )}
+
+                      {/* 🔥 Popular Badge */}
+                      {isPopular && (
+                        <div
+                          className="absolute top-3 right-3 z-10 px-2.5 py-1 text-[10px] font-bold
+        bg-gradient-to-r from-pink-500 to-rose-500 text-white rounded-md shadow-lg"
+                        >
+                          🔥 POPULAR
+                        </div>
+                      )}
+
+                      {/* Glow Hover Overlay */}
+                      <div
+                        className="absolute inset-0 opacity-0 group-hover:opacity-100 transition duration-500
+        bg-gradient-to-br from-blue-500/20 via-indigo-500/10 to-fuchsia-500/20"
                       />
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
+
+                      {/* Image */}
+                      <div className="relative overflow-hidden">
+                        <img
+                          src={project.image}
+                          alt={project.title}
+                          className="w-full h-56 object-cover transition-transform duration-700 group-hover:scale-110"
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent" />
+                      </div>
+
+                      {/* Content */}
+                      <div className="p-6 flex flex-col h-full relative">
+                        <h3
+                          className={`text-xl font-extrabold leading-snug transition-colors line-clamp-2
+          ${project.featured ? "text-blue-300" : "group-hover:text-blue-300"}`}
+                        >
+                          {project.title}
+                        </h3>
+
+                        <p className="text-sm text-gray-300 mt-3 leading-relaxed line-clamp-3">
+                          {project.description}
+                        </p>
+
+                        {/* Meta chips */}
+                        <div className="flex items-center gap-2 mt-4 text-[11px] text-gray-300">
+                          {project.featured && (
+                            <span className="px-2 py-0.5 rounded-md bg-blue-500/20 border border-blue-400/30">
+                              ⭐ Priority {project.priority || 0}
+                            </span>
+                          )}
+
+                          {isPopular && (
+                            <span className="px-2 py-0.5 rounded-md bg-pink-500/20 border border-pink-400/30">
+                              🔥 {project.views} views
+                            </span>
+                          )}
+                        </div>
+
+                        <Link
+                          to={`/projects/${project._id}`}
+                          className="mt-6 w-full inline-flex items-center justify-center gap-2 font-semibold py-3 rounded-2xl
+          bg-gradient-to-r from-blue-500 to-purple-600
+          hover:from-purple-500 hover:to-pink-500
+          transition-all text-white shadow-md hover:shadow-lg"
+                        >
+                          🚀 View Details
+                        </Link>
+                      </div>
+
+                      {/* bottom glow line */}
+                      <div className="h-[2px] w-full bg-gradient-to-r from-blue-500/40 via-indigo-500/40 to-fuchsia-500/40 opacity-0 group-hover:opacity-100 transition" />
                     </div>
-
-                    {/* Content */}
-                    <div className="p-6 flex flex-col h-full">
-                      <h3 className="text-xl font-extrabold leading-snug group-hover:text-blue-300 transition-colors line-clamp-2">
-                        {project.title}
-                      </h3>
-
-                      <p className="text-sm text-gray-300 mt-3 leading-relaxed line-clamp-3">
-                        {project.description}
-                      </p>
-
-                      <Link
-                        to={`/projects/${project._id}`}
-                        className="mt-6 w-full inline-flex items-center justify-center gap-2 font-semibold py-3 rounded-2xl bg-gradient-to-r from-blue-500 to-purple-600 hover:from-purple-500 hover:to-pink-500 transition-all text-white shadow-md"
-                      >
-                        🚀 View Details
-                      </Link>
-                    </div>
-
-                    {/* bottom glow line */}
-                    <div className="h-[2px] w-full bg-gradient-to-r from-blue-500/40 via-indigo-500/40 to-fuchsia-500/40 opacity-0 group-hover:opacity-100 transition" />
-                  </div>
-                ))}
+                  );
+                })}
               </div>
 
               {/* ✅ Premium SaaS Pagination */}
