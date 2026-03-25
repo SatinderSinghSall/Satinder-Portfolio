@@ -34,6 +34,7 @@ import AddFreelanceProject from "./admin/AddFreelanceProject.jsx";
 import ManageFreelanceProjects from "./admin/ManageFreelanceProjects.jsx";
 import WatchMyFreelancing from "./pages/WatchMyFreelancing.jsx";
 import FreelanceDetails from "./pages/FreelanceDetails.jsx";
+import AiMl from "./pages/AiMl.jsx";
 
 //! To run the backend for DEVELOPMENT -> npm run dev
 //! To run the backend for PRODUCTION -> npm start
@@ -65,6 +66,7 @@ function App() {
         <Route path="/youtube/:id" element={<YouTubeDetails />} />
         <Route path="/freelance-projects" element={<WatchMyFreelancing />} />
         <Route path="/freelance/:id" element={<FreelanceDetails />} />
+        <Route path="/ai-ml" element={<AiMl />} />
 
         {/* Admin Routes */}
         <Route

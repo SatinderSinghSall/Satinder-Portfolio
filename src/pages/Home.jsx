@@ -59,6 +59,13 @@ export default function Home() {
             </a>
 
             <a
+              href="/ai-ml"
+              className="inline-flex items-center justify-center px-7 sm:px-8 py-3.5 sm:py-4 rounded-xl bg-purple-600 hover:bg-purple-500 transition-all duration-200 font-medium shadow-lg shadow-purple-500/25 active:scale-95"
+            >
+              Explore AI / ML
+            </a>
+
+            <a
               href="/contact"
               className="inline-flex items-center justify-center px-7 sm:px-8 py-3.5 sm:py-4 rounded-xl border border-white/20 hover:bg-white/5 transition-all duration-200 font-medium active:scale-95"
             >

@@ -49,6 +49,9 @@ export default function Navbar() {
             <Link to="/projects" className={linkClass("/projects")}>
               Projects
             </Link>
+            <Link to="/ai-ml" className={linkClass("/ai-ml")}>
+              AI / ML
+            </Link>
             <Link to="/blog" className={linkClass("/blog")}>
               Blogs
             </Link>
@@ -116,6 +119,13 @@ export default function Navbar() {
           className={linkClass("/projects")}
         >
           Projects
+        </Link>
+        <Link
+          to="/ai-ml"
+          onClick={() => setIsOpen(false)}
+          className={linkClass("/ai-ml")}
+        >
+          AI / ML
         </Link>
         <Link
           to="/blog"
