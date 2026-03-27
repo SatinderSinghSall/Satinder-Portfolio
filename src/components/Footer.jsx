@@ -14,6 +14,8 @@ export default function Footer() {
     { name: "Experience", path: "/experience" },
     { name: "YouTube", path: "/youtube" },
     { name: "Contact", path: "/contact" },
+
+    { name: "AI / ML", path: "/ai-ml" },
   ];
 
   const socials = [

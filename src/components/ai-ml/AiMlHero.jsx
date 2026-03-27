@@ -1,5 +1,6 @@
 import { ArrowRight, Mail } from "lucide-react";
 import { Link } from "react-router-dom";
+import { Typewriter } from "react-simple-typewriter";
 
 export default function AiHero() {
   return (
@@ -50,7 +51,20 @@ export default function AiHero() {
         >
           Building Intelligent Systems with{" "}
           <span className="bg-gradient-to-r from-purple-400 via-pink-400 to-blue-400 bg-clip-text text-transparent">
-            AI & Machine Learning
+            <Typewriter
+              words={[
+                "AI & Machine Learning",
+                "Deep Learning Systems",
+                "Computer Vision Models",
+                "NLP Applications",
+              ]}
+              loop
+              cursor
+              cursorStyle="|"
+              typeSpeed={60}
+              deleteSpeed={40}
+              delaySpeed={1800}
+            />
           </span>
         </h1>
 
@@ -66,6 +80,34 @@ export default function AiHero() {
           I design and develop AI-powered applications using deep learning,
           computer vision, and NLP to solve real-world problems.
         </p>
+
+        <div className="mt-2 font-mono text-xs sm:text-sm tracking-wide">
+          <div className="relative inline-block px-4 py-2 rounded-lg bg-white/5 border border-blue-500/20 backdrop-blur-md shadow-[0_0_25px_rgba(59,130,246,0.15)]">
+            {/* subtle glow */}
+            <div className="absolute inset-0 rounded-lg bg-blue-500/10 blur-lg opacity-40" />
+
+            {/* typing text */}
+            <span className="relative text-blue-300">
+              <Typewriter
+                words={[
+                  "Initializing neural networks...",
+                  "Loading training datasets...",
+                  "Optimizing model weights...",
+                  "Deploying intelligent systems...",
+                ]}
+                loop
+                cursor
+                cursorStyle="▋"
+                typeSpeed={50}
+                deleteSpeed={28}
+                delaySpeed={1700}
+              />
+            </span>
+
+            {/* blinking dot (system alive feel) */}
+            <span className="ml-2 inline-block w-2 h-2 rounded-full bg-blue-400 animate-pulse" />
+          </div>
+        </div>
 
         {/* Buttons */}
         <div className="flex flex-col sm:flex-row justify-center gap-3 sm:gap-4 mt-2">
