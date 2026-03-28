@@ -14,6 +14,7 @@ import {
   ArrowPathIcon,
   MagnifyingGlassIcon,
 } from "@heroicons/react/24/outline";
+import { EyeIcon } from "@heroicons/react/24/outline";
 
 const API = import.meta.env.VITE_API_URL || "/api";
 
@@ -51,6 +52,8 @@ export default function ManageYouTube() {
   const [editingId, setEditingId] = useState(null);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [deletingId, setDeletingId] = useState(null);
+  const [viewModal, setViewModal] = useState(false);
+  const [selectedVideo, setSelectedVideo] = useState(null);
 
   // ✅ Filters (Project.jsx style)
   const [search, setSearch] = useState("");
@@ -99,6 +102,11 @@ export default function ManageYouTube() {
 
   const handleChange = (e) =>
     setForm({ ...form, [e.target.name]: e.target.value });
+
+  const handleView = (video) => {
+    setSelectedVideo(video);
+    setViewModal(true);
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -435,24 +443,34 @@ export default function ManageYouTube() {
                     </div>
 
                     <div className="flex gap-2">
-                      <button
-                        onClick={() => handleEdit(video)}
-                        className="p-2 hover:bg-gray-100 rounded-md"
-                        title="Edit"
-                      >
-                        <PencilSquareIcon className="h-5 w-5 text-indigo-600" />
-                      </button>
+                      <div className="flex gap-2">
+                        <button
+                          onClick={() => handleView(video)}
+                          className="p-2 hover:bg-blue-50 rounded-md"
+                          title="View Video"
+                        >
+                          <EyeIcon className="h-5 w-5 text-blue-600" />
+                        </button>
 
-                      <button
-                        onClick={() => {
-                          setDeletingId(video._id);
-                          setShowDeleteModal(true);
-                        }}
-                        className="p-2 hover:bg-red-50 rounded-md"
-                        title="Delete"
-                      >
-                        <TrashIcon className="h-5 w-5 text-red-600" />
-                      </button>
+                        <button
+                          onClick={() => handleEdit(video)}
+                          className="p-2 hover:bg-gray-100 rounded-md"
+                          title="Edit"
+                        >
+                          <PencilSquareIcon className="h-5 w-5 text-indigo-600" />
+                        </button>
+
+                        <button
+                          onClick={() => {
+                            setDeletingId(video._id);
+                            setShowDeleteModal(true);
+                          }}
+                          className="p-2 hover:bg-red-50 rounded-md"
+                          title="Delete"
+                        >
+                          <TrashIcon className="h-5 w-5 text-red-600" />
+                        </button>
+                      </div>
                     </div>
                   </div>
 
@@ -510,6 +528,124 @@ export default function ManageYouTube() {
                 >
                   {deleting ? <Spinner text="Deleting..." /> : "Delete"}
                 </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {viewModal && selectedVideo && (
+          <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4 overflow-y-auto">
+            <div className="bg-white rounded-2xl shadow-2xl w-full max-w-3xl max-h-[90vh] flex flex-col">
+              {/* HEADER */}
+              <div className="flex justify-between items-center px-6 py-4 border-b">
+                <h3 className="text-xl font-bold">{selectedVideo.title}</h3>
+
+                <button
+                  onClick={() => setViewModal(false)}
+                  className="text-gray-500 hover:text-black text-xl"
+                >
+                  ✕
+                </button>
+              </div>
+
+              {/* BODY */}
+              <div className="p-6 space-y-6 overflow-y-auto">
+                {/* VIDEO PLAYER */}
+                {selectedVideo.videoUrl && (
+                  <div className="aspect-video rounded-lg overflow-hidden border">
+                    <iframe
+                      src={selectedVideo.videoUrl.replace("watch?v=", "embed/")}
+                      className="w-full h-full"
+                      allowFullScreen
+                      title={selectedVideo.title}
+                    />
+                  </div>
+                )}
+
+                {/* INFO GRID */}
+                <div className="grid md:grid-cols-2 gap-4 text-sm">
+                  <p>
+                    <b>Author:</b> {selectedVideo.author}
+                  </p>
+
+                  <p>
+                    <b>Status:</b>{" "}
+                    {selectedVideo.status === "published"
+                      ? "Published"
+                      : "Draft"}
+                  </p>
+
+                  <p>
+                    <b>Published At:</b>{" "}
+                    {new Date(selectedVideo.publishedAt).toLocaleString()}
+                  </p>
+
+                  <p>
+                    <b>Created At:</b>{" "}
+                    {new Date(selectedVideo.createdAt).toLocaleString()}
+                  </p>
+
+                  <p>
+                    <b>Updated At:</b>{" "}
+                    {new Date(selectedVideo.updatedAt).toLocaleString()}
+                  </p>
+                </div>
+
+                {/* DESCRIPTION */}
+                <div>
+                  <h4 className="font-semibold mb-1">Description</h4>
+
+                  <p className="text-gray-600 text-sm whitespace-pre-line">
+                    {selectedVideo.description || "No description"}
+                  </p>
+                </div>
+
+                {/* TAGS */}
+                <div>
+                  <h4 className="font-semibold mb-2">Tags</h4>
+
+                  <div className="flex flex-wrap gap-2">
+                    {selectedVideo.tags?.length > 0 ? (
+                      selectedVideo.tags.map((tag) => (
+                        <span
+                          key={tag}
+                          className="text-xs bg-gray-100 px-2 py-1 rounded-full border"
+                        >
+                          #{tag}
+                        </span>
+                      ))
+                    ) : (
+                      <span className="text-xs text-gray-400">No tags</span>
+                    )}
+                  </div>
+                </div>
+
+                {/* THUMBNAIL */}
+                {selectedVideo.thumbnail && (
+                  <div>
+                    <h4 className="font-semibold mb-2">Thumbnail</h4>
+
+                    <img
+                      src={selectedVideo.thumbnail}
+                      alt="Thumbnail"
+                      className="rounded-lg border w-full"
+                    />
+                  </div>
+                )}
+
+                {/* RAW VIDEO URL */}
+                <div>
+                  <h4 className="font-semibold mb-1">Video URL</h4>
+
+                  <a
+                    href={selectedVideo.videoUrl}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="text-blue-600 text-sm break-all hover:underline"
+                  >
+                    {selectedVideo.videoUrl}
+                  </a>
+                </div>
               </div>
             </div>
           </div>

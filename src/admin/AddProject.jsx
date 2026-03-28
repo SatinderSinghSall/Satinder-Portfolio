@@ -12,7 +12,7 @@ export default function AddProject() {
     technologies: [],
     githubLink: "",
     link: "",
-    imageFile: null,
+    imageFiles: [],
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -38,7 +38,7 @@ export default function AddProject() {
       !form.description ||
       !form.githubLink ||
       !form.technologies.length ||
-      !form.imageFile ||
+      !form.imageFiles.length ||
       !form.link
     ) {
       toast.error("All fields are required.");
@@ -56,7 +56,11 @@ export default function AddProject() {
       formData.append("link", form.link);
       formData.append("githubLink", form.githubLink);
       formData.append("technologies", form.technologies.join(","));
-      if (form.imageFile) formData.append("image", form.imageFile);
+      if (form.imageFiles?.length) {
+        form.imageFiles.forEach((file) => {
+          formData.append("images", file);
+        });
+      }
 
       await axios.post(`${API}/projects`, formData, { headers });
 
@@ -66,7 +70,7 @@ export default function AddProject() {
         link: "",
         githubLink: "",
         technologies: [],
-        imageFile: null,
+        imageFiles: [],
       });
 
       toast.success("Project added successfully!");
@@ -204,14 +208,17 @@ export default function AddProject() {
                 />
               </svg>
               <span className="text-sm text-gray-600">
-                {form.imageFile ? form.imageFile.name : "Click to upload image"}
+                {form.imageFiles.length
+                  ? `${form.imageFiles.length} images selected`
+                  : "Click to upload images"}
               </span>
               <input
                 type="file"
                 accept="image/*"
+                multiple
                 hidden
                 onChange={(e) =>
-                  setForm({ ...form, imageFile: e.target.files[0] })
+                  setForm({ ...form, imageFiles: Array.from(e.target.files) })
                 }
               />
             </label>

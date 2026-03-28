@@ -361,7 +361,7 @@ export default function Projects() {
                       {/* Image */}
                       <div className="relative overflow-hidden">
                         <img
-                          src={project.image}
+                          src={project.images?.[0]}
                           alt={project.title}
                           className="w-full h-56 object-cover transition-transform duration-700 group-hover:scale-110"
                         />

@@ -21,6 +21,19 @@ export default function ProjectDetail() {
   const [project, setProject] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [currentImage, setCurrentImage] = useState(0);
+
+  const nextImage = () => {
+    if (!project?.images?.length) return;
+    setCurrentImage((prev) => (prev + 1) % project.images.length);
+  };
+
+  const prevImage = () => {
+    if (!project?.images?.length) return;
+    setCurrentImage((prev) =>
+      prev === 0 ? project.images.length - 1 : prev - 1,
+    );
+  };
 
   // ✅ Image Preview Modal
   const [isImageOpen, setIsImageOpen] = useState(false);
@@ -151,18 +164,69 @@ export default function ProjectDetail() {
         {/* Main Card */}
         <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-3xl shadow-2xl overflow-hidden">
           {/* Hero Image */}
-          {project.image && (
+          {project.images?.length > 0 && (
             <button
               type="button"
               onClick={() => setIsImageOpen(true)}
               className="relative w-full text-left group"
               title="Click to view full image"
             >
-              <img
-                src={project.image}
-                alt={project.title}
-                className="w-full h-[200px] sm:h-[260px] md:h-[320px] object-cover"
-              />
+              {project.images?.length > 0 && (
+                <div className="relative w-full group">
+                  <img
+                    src={project.images[currentImage]}
+                    alt={project.title}
+                    className="w-full h-[200px] sm:h-[260px] md:h-[320px] object-cover transition-all duration-500"
+                  />
+
+                  {/* gradient overlay */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
+
+                  {/* LEFT BUTTON */}
+                  {project.images.length > 1 && (
+                    <button
+                      onClick={prevImage}
+                      className="absolute left-3 top-1/2 -translate-y-1/2
+        bg-black/40 hover:bg-black/60 backdrop-blur-md
+        border border-white/20
+        w-10 h-10 rounded-full flex items-center justify-center
+        opacity-0 group-hover:opacity-100 transition"
+                    >
+                      ←
+                    </button>
+                  )}
+
+                  {/* RIGHT BUTTON */}
+                  {project.images.length > 1 && (
+                    <button
+                      onClick={nextImage}
+                      className="absolute right-3 top-1/2 -translate-y-1/2
+        bg-black/40 hover:bg-black/60 backdrop-blur-md
+        border border-white/20
+        w-10 h-10 rounded-full flex items-center justify-center
+        opacity-0 group-hover:opacity-100 transition"
+                    >
+                      →
+                    </button>
+                  )}
+
+                  {/* Image indicator dots */}
+                  {project.images.length > 1 && (
+                    <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-2">
+                      {project.images.map((_, index) => (
+                        <div
+                          key={index}
+                          className={`h-2 rounded-full transition-all ${
+                            index === currentImage
+                              ? "w-6 bg-white"
+                              : "w-2 bg-white/40"
+                          }`}
+                        />
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )}
 
               {/* overlay */}
               <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/20 to-transparent" />
@@ -307,11 +371,74 @@ export default function ProjectDetail() {
               <XMarkIcon className="h-6 w-6 text-white" />
             </button>
 
-            <img
-              src={project.image}
-              alt={project.title}
-              className="w-full max-h-[75vh] sm:max-h-[85vh] object-contain rounded-2xl border border-white/10 shadow-2xl"
-            />
+            {isImageOpen && (
+              <div
+                className="fixed inset-0 bg-black/80 z-[99999] flex items-center justify-center p-4"
+                onClick={() => setIsImageOpen(false)}
+              >
+                <div
+                  className="relative max-w-6xl w-full flex items-center justify-center"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  {/* CLOSE BUTTON */}
+                  <button
+                    onClick={() => setIsImageOpen(false)}
+                    className="absolute -top-4 -right-4 bg-white/10 hover:bg-white/20 border border-white/10 rounded-full p-2 transition"
+                  >
+                    <XMarkIcon className="h-6 w-6 text-white" />
+                  </button>
+
+                  {/* LEFT BUTTON */}
+                  {project.images.length > 1 && (
+                    <button
+                      onClick={prevImage}
+                      className="absolute left-4 top-1/2 -translate-y-1/2
+          bg-black/50 hover:bg-black/70
+          backdrop-blur-md
+          border border-white/20
+          w-12 h-12 rounded-full
+          flex items-center justify-center
+          text-white text-xl transition"
+                    >
+                      ←
+                    </button>
+                  )}
+
+                  {/* IMAGE */}
+                  <img
+                    src={project.images[currentImage]}
+                    alt={project.title}
+                    className="w-full max-h-[75vh] sm:max-h-[85vh] object-contain rounded-2xl border border-white/10 shadow-2xl"
+                  />
+
+                  {/* RIGHT BUTTON */}
+                  {project.images.length > 1 && (
+                    <button
+                      onClick={nextImage}
+                      className="absolute right-4 top-1/2 -translate-y-1/2
+          bg-black/50 hover:bg-black/70
+          backdrop-blur-md
+          border border-white/20
+          w-12 h-12 rounded-full
+          flex items-center justify-center
+          text-white text-xl transition"
+                    >
+                      →
+                    </button>
+                  )}
+
+                  {/* IMAGE COUNTER */}
+                  <div
+                    className="absolute bottom-4 left-1/2 -translate-x-1/2
+        bg-black/40 backdrop-blur-md
+        border border-white/20
+        px-3 py-1 rounded-full text-sm text-white"
+                  >
+                    {currentImage + 1} / {project.images.length}
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       )}

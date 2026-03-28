@@ -3,6 +3,7 @@ import axios from "axios";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import remarkBreaks from "remark-breaks";
+import { EyeIcon } from "@heroicons/react/24/outline";
 
 import AdminLayout from "../components/AdminLayout";
 import toast from "react-hot-toast";
@@ -74,6 +75,9 @@ export default function Blogs() {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [deletingId, setDeletingId] = useState(null);
   const [deleting, setDeleting] = useState(false);
+  const [viewBlogModal, setViewBlogModal] = useState(false);
+  const [selectedBlog, setSelectedBlog] = useState(null);
+  const [modalTab, setModalTab] = useState("overview");
 
   // SaaS filters
   const [search, setSearch] = useState("");
@@ -85,6 +89,17 @@ export default function Blogs() {
   const headers = useMemo(() => {
     return { Authorization: `Bearer ${token}` };
   }, [token]);
+
+  const handleViewBlog = async (id) => {
+    try {
+      const res = await axios.get(`${API}/blogs/${id}`);
+      setSelectedBlog(res.data);
+      setViewBlogModal(true);
+      setModalTab("overview");
+    } catch {
+      toast.error("Failed to fetch blog");
+    }
+  };
 
   const Spinner = ({ size = "5" }) => (
     <svg
@@ -835,6 +850,14 @@ export default function Blogs() {
                       </button>
 
                       <button
+                        onClick={() => handleViewBlog(blog._id)}
+                        className="p-2 hover:bg-blue-50 rounded-md"
+                        title="View Blog"
+                      >
+                        <EyeIcon className="h-5 w-5 text-blue-600" />
+                      </button>
+
+                      <button
                         onClick={() => handleEdit(blog)}
                         className="p-2 hover:bg-gray-100 rounded-md"
                         title="Edit"
@@ -923,6 +946,175 @@ export default function Blogs() {
           </div>
         )}
       </div>
+
+      {viewBlogModal && selectedBlog && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-white w-full max-w-5xl rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
+            {/* HEADER */}
+            <div className="flex justify-between items-center px-6 py-4 border-b">
+              <h2 className="text-xl font-bold">{selectedBlog.title}</h2>
+
+              <button
+                onClick={() => setViewBlogModal(false)}
+                className="text-gray-500 hover:text-black text-xl"
+              >
+                ✕
+              </button>
+            </div>
+
+            {/* TABS */}
+            <div className="flex gap-2 border-b px-4 py-2 bg-gray-50 flex-wrap">
+              {["overview", "content", "seo", "metadata", "json"].map((tab) => (
+                <button
+                  key={tab}
+                  onClick={() => setModalTab(tab)}
+                  className={`px-4 py-2 rounded-md text-sm font-medium transition
+${
+  modalTab === tab
+    ? "bg-indigo-600 text-white"
+    : "bg-white border hover:bg-gray-50"
+}
+`}
+                >
+                  {tab.toUpperCase()}
+                </button>
+              ))}
+            </div>
+
+            {/* BODY */}
+            <div className="overflow-y-auto p-6 space-y-6">
+              {/* OVERVIEW */}
+              {modalTab === "overview" && (
+                <div className="grid md:grid-cols-2 gap-6">
+                  <div className="space-y-4">
+                    <p>
+                      <b>Slug:</b> {selectedBlog.slug}
+                    </p>
+
+                    <p>
+                      <b>Summary:</b> {selectedBlog.summary}
+                    </p>
+
+                    <p>
+                      <b>Author:</b> {selectedBlog.author}
+                    </p>
+
+                    <p>
+                      <b>Category:</b> {selectedBlog.category}
+                    </p>
+
+                    <p>
+                      <b>Status:</b> {selectedBlog.status}
+                    </p>
+
+                    <p>
+                      <b>Editor:</b> {selectedBlog.editorType}
+                    </p>
+
+                    <p>
+                      <b>Featured:</b> {selectedBlog.featured ? "Yes ⭐" : "No"}
+                    </p>
+
+                    <p>
+                      <b>Views:</b> {selectedBlog.views}
+                    </p>
+
+                    <p>
+                      <b>Tags:</b> {selectedBlog.tags?.join(", ") || "None"}
+                    </p>
+                  </div>
+
+                  <div>
+                    {selectedBlog.image && (
+                      <img
+                        src={selectedBlog.image}
+                        className="rounded-lg shadow w-full"
+                      />
+                    )}
+
+                    {selectedBlog.ogImage && (
+                      <>
+                        <p className="mt-4 font-semibold">OG Image</p>
+                        <img
+                          src={selectedBlog.ogImage}
+                          className="rounded-lg shadow w-full"
+                        />
+                      </>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {/* CONTENT */}
+              {modalTab === "content" && (
+                <div>
+                  {selectedBlog.editorType === "markdown" ? (
+                    <div className="prose max-w-none">
+                      <ReactMarkdown remarkPlugins={[remarkGfm, remarkBreaks]}>
+                        {selectedBlog.content || "No markdown content"}
+                      </ReactMarkdown>
+                    </div>
+                  ) : (
+                    <pre className="bg-gray-100 p-4 rounded text-xs overflow-x-auto">
+                      {JSON.stringify(selectedBlog.contentBlocks, null, 2)}
+                    </pre>
+                  )}
+                </div>
+              )}
+
+              {/* SEO */}
+              {modalTab === "seo" && (
+                <div className="space-y-4">
+                  <p>
+                    <b>Meta Title:</b> {selectedBlog.metaTitle || "None"}
+                  </p>
+
+                  <p>
+                    <b>Meta Description:</b>{" "}
+                    {selectedBlog.metaDescription || "None"}
+                  </p>
+                </div>
+              )}
+
+              {/* METADATA */}
+              {modalTab === "metadata" && (
+                <div className="space-y-3">
+                  <p>
+                    <b>Scheduled At:</b>{" "}
+                    {selectedBlog.scheduledAt
+                      ? new Date(selectedBlog.scheduledAt).toLocaleString()
+                      : "Not Scheduled"}
+                  </p>
+
+                  <p>
+                    <b>Published At:</b>{" "}
+                    {selectedBlog.publishedAt
+                      ? new Date(selectedBlog.publishedAt).toLocaleString()
+                      : "Not Published"}
+                  </p>
+
+                  <p>
+                    <b>Created At:</b>{" "}
+                    {new Date(selectedBlog.createdAt).toLocaleString()}
+                  </p>
+
+                  <p>
+                    <b>Updated At:</b>{" "}
+                    {new Date(selectedBlog.updatedAt).toLocaleString()}
+                  </p>
+                </div>
+              )}
+
+              {/* JSON VIEW */}
+              {modalTab === "json" && (
+                <pre className="bg-black text-green-400 text-xs p-4 rounded overflow-x-auto">
+                  {JSON.stringify(selectedBlog, null, 2)}
+                </pre>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </AdminLayout>
   );
 }

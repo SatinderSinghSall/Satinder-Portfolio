@@ -14,6 +14,7 @@ import {
   TagIcon,
   Search,
   RefreshCcw,
+  Eye,
 } from "lucide-react";
 
 const API = import.meta.env.VITE_API_URL || "/api";
@@ -33,7 +34,7 @@ export default function Projects() {
     technologies: [],
     githubLink: "",
     link: "",
-    image: "",
+    imageFiles: [],
     priority: 0,
     featured: false,
   });
@@ -46,10 +47,22 @@ export default function Projects() {
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [selectedProjectId, setSelectedProjectId] = useState(null);
   const [deleteLoading, setDeleteLoading] = useState(false);
+  const [isViewModalOpen, setIsViewModalOpen] = useState(false);
+  const [selectedProject, setSelectedProject] = useState(null);
 
   const [search, setSearch] = useState("");
   const [techFilter, setTechFilter] = useState("all");
   const [sort, setSort] = useState("latest"); // latest | oldest
+
+  const handleViewProject = async (id) => {
+    try {
+      const res = await axios.get(`${API}/projects/${id}`);
+      setSelectedProject(res.data);
+      setIsViewModalOpen(true);
+    } catch {
+      toast.error("Failed to fetch project");
+    }
+  };
 
   const headers = useMemo(() => {
     return { Authorization: `Bearer ${token}` };
@@ -112,7 +125,11 @@ export default function Projects() {
       formData.append("technologies", form.technologies.join(","));
       formData.append("featured", form.featured);
       formData.append("priority", form.priority);
-      if (form.imageFile) formData.append("image", form.imageFile);
+      if (form.imageFiles?.length) {
+        form.imageFiles.forEach((file) => {
+          formData.append("images", file);
+        });
+      }
 
       editingId
         ? await axios.put(`${API}/projects/${editingId}`, formData, { headers })
@@ -126,7 +143,7 @@ export default function Projects() {
         link: "",
         githubLink: "",
         technologies: [],
-        imageFile: null,
+        imageFiles: [],
         priority: 0,
         featured: false,
       });
@@ -146,11 +163,11 @@ export default function Projects() {
       title: project.title,
       description: project.description,
       link: project.link,
-      image: project.image,
       technologies: project.technologies,
       githubLink: project.githubLink,
       priority: project.priority || 0,
       featured: project.featured || false,
+      imageFiles: [],
     });
     setEditingId(project._id);
     window.scrollTo({ top: 0, behavior: "smooth" });
@@ -429,14 +446,15 @@ export default function Projects() {
             <input
               type="file"
               accept="image/*"
+              multiple
               onChange={(e) =>
-                setForm({ ...form, imageFile: e.target.files[0] })
+                setForm({ ...form, imageFiles: Array.from(e.target.files) })
               }
               className="block w-full text-sm text-gray-600
-                file:mr-4 file:py-2 file:px-4
-                file:rounded-md file:border-0
-                file:bg-gray-100 file:text-gray-700
-                hover:file:bg-gray-200"
+              file:mr-4 file:py-2 file:px-4
+              file:rounded-md file:border-0
+              file:bg-gray-100 file:text-gray-700
+              hover:file:bg-gray-200"
             />
           </div>
 
@@ -486,9 +504,9 @@ export default function Projects() {
               >
                 {/* Image */}
                 <div className="h-44 bg-gray-100 overflow-hidden">
-                  {proj.image ? (
+                  {proj.images?.length ? (
                     <img
-                      src={proj.image}
+                      src={proj.images[0]}
                       alt={proj.title}
                       className="w-full h-full object-cover hover:scale-105 transition-transform duration-500"
                     />
@@ -526,6 +544,14 @@ export default function Projects() {
                     </div>
 
                     <div className="flex gap-2">
+                      <button
+                        onClick={() => handleViewProject(proj._id)}
+                        className="p-2 hover:bg-blue-50 rounded-md"
+                        title="View Project Data"
+                      >
+                        <Eye className="w-5 h-5 text-blue-600" />
+                      </button>
+
                       <button
                         onClick={() => handleEdit(proj)}
                         className="p-2 hover:bg-gray-100 rounded-md"
@@ -628,6 +654,90 @@ export default function Projects() {
           </div>
         )}
       </div>
+
+      {isViewModalOpen && selectedProject && (
+        <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50">
+          <div className="bg-white rounded-2xl shadow-2xl max-w-2xl w-full p-6 relative">
+            {/* Close */}
+            <button
+              onClick={() => setIsViewModalOpen(false)}
+              className="absolute top-3 right-3 text-gray-500 hover:text-black"
+            >
+              ✕
+            </button>
+
+            <h3 className="text-xl font-bold mb-4">{selectedProject.title}</h3>
+
+            {/* Image */}
+            {selectedProject.images?.length > 0 && (
+              <img
+                src={selectedProject.images[0]}
+                className="w-full h-56 object-cover rounded-lg mb-4"
+              />
+            )}
+
+            <div className="space-y-3 text-sm">
+              <p>
+                <strong>Description:</strong> {selectedProject.description}
+              </p>
+
+              <p>
+                <strong>GitHub:</strong>{" "}
+                <a
+                  href={selectedProject.githubLink}
+                  target="_blank"
+                  className="text-blue-600"
+                >
+                  {selectedProject.githubLink}
+                </a>
+              </p>
+
+              <p>
+                <strong>Live Link:</strong>{" "}
+                <a
+                  href={selectedProject.link}
+                  target="_blank"
+                  className="text-blue-600"
+                >
+                  {selectedProject.link}
+                </a>
+              </p>
+
+              <p>
+                <strong>Technologies:</strong>{" "}
+                {selectedProject.technologies?.join(", ")}
+              </p>
+
+              <p>
+                <strong>Featured:</strong>{" "}
+                {selectedProject.featured ? "Yes ⭐" : "No"}
+              </p>
+
+              <p>
+                <strong>Priority:</strong> {selectedProject.priority}
+              </p>
+
+              <p>
+                <strong>Views:</strong> {selectedProject.views}
+              </p>
+
+              <p>
+                <strong>Likes:</strong> {selectedProject.likes}
+              </p>
+
+              <p>
+                <strong>Created At:</strong>{" "}
+                {new Date(selectedProject.createdAt).toLocaleString()}
+              </p>
+
+              <p>
+                <strong>Updated At:</strong>{" "}
+                {new Date(selectedProject.updatedAt).toLocaleString()}
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
     </AdminLayout>
   );
 }
