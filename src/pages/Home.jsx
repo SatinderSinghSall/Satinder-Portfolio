@@ -5,6 +5,8 @@ import Experience from "../components/Experience";
 import Services from "./Services";
 
 import { Typewriter } from "react-simple-typewriter";
+import FeaturedProjects from "@/components/FeaturedProjects";
+import FeatureYouTube from "@/components/FeatureYouTube";
 
 export default function Home() {
   return (
@@ -128,6 +130,8 @@ export default function Home() {
 
       <main>
         <About />
+        <FeaturedProjects />
+        <FeatureYouTube />
         <Services />
         <Experience />
         <Skills />

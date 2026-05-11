@@ -8,6 +8,7 @@ import {
   Gamepad2,
   CloudCog,
 } from "lucide-react";
+
 import { Link } from "react-router-dom";
 
 export default function MyServices() {
@@ -71,74 +72,286 @@ export default function MyServices() {
   ];
 
   return (
-    <section className="border-t border-[#1e293b] min-h-screen bg-[#020617] px-6 py-20 text-white">
-      <div className="max-w-7xl mx-auto">
+    <section
+      className="
+        relative overflow-hidden
+        border-t border-white/5
+        bg-[#030712]
+        px-6 py-24
+        text-white
+      "
+    >
+      {/* Background Glow */}
+      <div className="absolute top-0 left-[-120px] h-[320px] w-[320px] rounded-full bg-cyan-500/10 blur-[140px]" />
+      <div className="absolute bottom-0 right-[-120px] h-[320px] w-[320px] rounded-full bg-blue-600/10 blur-[140px]" />
+
+      <div className="relative z-10 max-w-7xl mx-auto">
         {/* Header */}
         <div className="max-w-3xl mx-auto text-center">
-          <h1 className="text-4xl md:text-5xl font-semibold tracking-tight">
-            My Services
+          <div
+            className="
+              inline-flex items-center gap-2
+              rounded-full
+              border border-cyan-400/20
+              bg-cyan-400/10
+              px-4 py-2
+              text-sm font-medium text-cyan-300
+              backdrop-blur-xl
+            "
+          >
+            ✦ Premium Digital Services
+          </div>
+
+          <h1
+            className="
+              mt-7
+              text-5xl md:text-6xl
+              font-black
+              tracking-tight
+              leading-tight
+            "
+          >
+            My
+            <span
+              className="
+                ml-3
+                bg-gradient-to-r
+                from-cyan-400
+                via-blue-500
+                to-indigo-500
+                bg-clip-text
+                text-transparent
+              "
+            >
+              Services
+            </span>
           </h1>
-          <p className="mt-4 text-lg md:text-xl text-gray-400">
-            Building high-quality digital products with a focus on performance,
-            scalability, and long-term value.
+
+          <p
+            className="
+              mt-6
+              text-lg md:text-xl
+              leading-relaxed
+              text-gray-400
+            "
+          >
+            Building premium digital experiences focused on scalability,
+            performance, modern UI/UX, and long-term product quality.
           </p>
         </div>
 
         {/* Services Grid */}
-        <div className="mt-16 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div className="mt-20 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {services.map((service, index) => {
             const Icon = service.icon;
+
             return (
               <div
                 key={index}
                 className="
-                  rounded-3xl border border-white/10
-                  bg-white/5 p-8
-                  transition-all duration-300
-                  hover:border-blue-500/40 hover:bg-white/[0.06]
+                  group relative overflow-hidden
+
+                  rounded-[32px]
+                  border border-white/10
+
+                  bg-gradient-to-b
+                  from-white/[0.07]
+                  to-white/[0.03]
+
+                  backdrop-blur-3xl
+
+                  p-8
+
+                  transition-all duration-500
+
+                  hover:-translate-y-2
+                  hover:border-cyan-400/20
+
+                  hover:shadow-[0_20px_60px_rgba(6,182,212,0.12)]
                 "
               >
-                <div className="flex items-center gap-4 mb-6">
-                  <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-blue-500/10">
-                    <Icon className="h-7 w-7 text-blue-400" />
+                {/* Glow */}
+                <div
+                  className="
+                    absolute inset-0
+                    opacity-0
+                    group-hover:opacity-100
+                    transition duration-500
+
+                    bg-gradient-to-br
+                    from-cyan-500/10
+                    to-blue-600/10
+                  "
+                />
+
+                {/* Top Light */}
+                <div className="absolute inset-x-0 top-0 h-[1px] bg-gradient-to-r from-transparent via-cyan-400/50 to-transparent" />
+
+                <div className="relative z-10">
+                  {/* Header */}
+                  <div className="flex items-start gap-5">
+                    {/* Icon */}
+                    <div
+                      className="
+                        relative
+
+                        flex h-16 w-16
+                        items-center justify-center
+
+                        rounded-3xl
+
+                        bg-gradient-to-br
+                        from-cyan-500/20
+                        to-blue-600/20
+
+                        border border-white/10
+
+                        shadow-[0_10px_30px_rgba(6,182,212,0.15)]
+                      "
+                    >
+                      <div className="absolute inset-0 rounded-3xl bg-white/5" />
+
+                      <Icon className="relative h-7 w-7 text-cyan-300" />
+                    </div>
+
+                    {/* Title */}
+                    <div>
+                      <h2
+                        className="
+                          text-2xl
+                          font-semibold
+                          tracking-tight
+                          text-white
+                        "
+                      >
+                        {service.title}
+                      </h2>
+
+                      <p
+                        className="
+                          mt-2
+                          text-sm
+                          text-cyan-300/80
+                        "
+                      >
+                        {service.stack}
+                      </p>
+                    </div>
                   </div>
-                  <div>
-                    <h2 className="text-xl font-semibold text-white">
-                      {service.title}
-                    </h2>
-                    <p className="text-sm text-gray-400">{service.stack}</p>
+
+                  {/* Description */}
+                  <p
+                    className="
+                      mt-7
+                      text-base
+                      leading-relaxed
+                      text-gray-400
+                    "
+                  >
+                    {service.description}
+                  </p>
+
+                  {/* Bottom Accent */}
+                  <div
+                    className="
+                      mt-8
+                      flex items-center gap-2
+                    "
+                  >
+                    <div className="h-2 w-2 rounded-full bg-cyan-400 shadow-[0_0_12px_rgba(34,211,238,0.9)]" />
+
+                    <span className="text-sm text-gray-500">
+                      Premium Quality Delivery
+                    </span>
                   </div>
                 </div>
-
-                <p className="text-base text-gray-300 leading-relaxed">
-                  {service.description}
-                </p>
               </div>
             );
           })}
         </div>
 
         {/* CTA */}
-        <div className="mt-24 text-center max-w-3xl mx-auto">
-          <h3 className="text-3xl font-semibold">Ready to start a project?</h3>
-          <p className="mt-4 text-lg text-gray-400">
-            Let’s discuss your idea and turn it into a well-crafted, reliable
-            product.
-          </p>
-
-          <Link
-            to="/contact"
+        <div className="mt-28 max-w-4xl mx-auto">
+          <div
             className="
-              inline-flex items-center justify-center
-              mt-8 px-10 py-4
-              rounded-xl text-lg font-medium
-              bg-blue-600 text-white
-              hover:bg-blue-500
-              transition
+              relative overflow-hidden
+
+              rounded-[40px]
+              border border-white/10
+
+              bg-gradient-to-b
+              from-white/[0.07]
+              to-white/[0.03]
+
+              backdrop-blur-3xl
+
+              px-8 py-14 md:px-14
+
+              text-center
+
+              shadow-[0_20px_80px_rgba(0,0,0,0.35)]
             "
           >
-            Contact Me
-          </Link>
+            {/* Glow */}
+            <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/10 to-blue-600/10" />
+
+            {/* Top Line */}
+            <div className="absolute inset-x-0 top-0 h-[1px] bg-gradient-to-r from-transparent via-cyan-400/50 to-transparent" />
+
+            <div className="relative z-10">
+              <h3
+                className="
+                  text-4xl md:text-5xl
+                  font-black
+                  tracking-tight
+                  text-white
+                "
+              >
+                Ready to build something amazing?
+              </h3>
+
+              <p
+                className="
+                  mt-6
+                  text-lg md:text-xl
+                  leading-relaxed
+                  text-gray-400
+                "
+              >
+                Let’s turn your ideas into premium digital products with
+                scalable architecture, beautiful interfaces, and reliable
+                performance.
+              </p>
+
+              <Link
+                to="/contact"
+                className="
+                  group inline-flex items-center justify-center
+
+                  mt-10
+
+                  rounded-2xl
+
+                  bg-gradient-to-r
+                  from-cyan-500
+                  to-blue-600
+
+                  px-10 py-4
+
+                  text-lg font-semibold
+                  text-white
+
+                  shadow-[0_10px_40px_rgba(6,182,212,0.35)]
+
+                  transition-all duration-300
+
+                  hover:scale-105
+                "
+              >
+                Contact Me
+              </Link>
+            </div>
+          </div>
         </div>
       </div>
     </section>
