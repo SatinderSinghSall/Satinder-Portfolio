@@ -12,6 +12,7 @@ import {
   FaPython,
   FaCuttlefish,
 } from "react-icons/fa";
+
 import {
   SiC,
   SiCplusplus,
@@ -30,6 +31,7 @@ import {
   SiNextdotjs,
   SiJenkins,
   SiUnity,
+  SiSupabase,
 } from "react-icons/si";
 
 export default function Skills() {
@@ -43,9 +45,10 @@ export default function Skills() {
         { name: "Python", icon: <FaPython className="text-yellow-400" /> },
         { name: "Kotlin", icon: <SiKotlin className="text-purple-400" /> },
         { name: "C#", icon: <FaCuttlefish className="text-green-400" /> },
-        { name: "JavaScript", icon: <FaJs className="text-yellow-400" /> },
+        { name: "JavaScript", icon: <FaJs className="text-yellow-300" /> },
       ],
     },
+
     {
       category: "Frontend Development",
       items: [
@@ -56,10 +59,10 @@ export default function Skills() {
           icon: <FaReact className="text-cyan-400" />,
         },
         { name: "Next.js", icon: <SiNextdotjs className="text-white" /> },
-        { name: "Redux", icon: <SiRedux className="text-purple-500" /> },
+        { name: "Redux", icon: <SiRedux className="text-purple-400" /> },
         {
           name: "Tailwind CSS",
-          icon: <SiTailwindcss className="text-teal-300" />,
+          icon: <SiTailwindcss className="text-cyan-300" />,
         },
         {
           name: "TypeScript",
@@ -67,6 +70,7 @@ export default function Skills() {
         },
       ],
     },
+
     {
       category: "Backend Development",
       items: [
@@ -74,22 +78,25 @@ export default function Skills() {
         { name: "Express.js", icon: <SiExpress className="text-gray-300" /> },
       ],
     },
+
     {
       category: "Databases",
       items: [
         { name: "MongoDB", icon: <SiMongodb className="text-green-400" /> },
-        { name: "MySQL", icon: <SiMysql className="text-blue-500" /> },
+        { name: "MySQL", icon: <SiMysql className="text-blue-400" /> },
         {
           name: "PostgreSQL",
           icon: <SiPostgresql className="text-indigo-400" />,
         },
-        { name: "Firebase", icon: <SiFirebase className="text-yellow-500" /> },
+        { name: "Firebase", icon: <SiFirebase className="text-yellow-400" /> },
+        { name: "Supabase", icon: <SiSupabase className="text-green-300" /> },
       ],
     },
+
     {
       category: "DevOps & Platforms",
       items: [
-        { name: "Git", icon: <FaGitAlt className="text-orange-600" /> },
+        { name: "Git", icon: <FaGitAlt className="text-orange-500" /> },
         { name: "GitHub", icon: <FaGithub className="text-white" /> },
         { name: "Docker", icon: <FaDocker className="text-blue-400" /> },
         {
@@ -97,9 +104,10 @@ export default function Skills() {
           icon: <SiJenkins className="text-red-400" />,
         },
         { name: "Vercel", icon: <SiVercel className="text-white" /> },
-        { name: "Render", icon: <SiRender className="text-blue-400" /> },
+        { name: "Render", icon: <SiRender className="text-blue-300" /> },
       ],
     },
+
     {
       category: "Mobile Development",
       items: [
@@ -113,55 +121,100 @@ export default function Skills() {
         },
       ],
     },
+
     {
       category: "Game Development",
       items: [
-        { name: "Unity", icon: <SiUnity className="text-gray-300" /> },
+        { name: "Unity", icon: <SiUnity className="text-gray-200" /> },
         { name: "C#", icon: <FaCuttlefish className="text-green-400" /> },
       ],
     },
   ];
 
   return (
-    <section className="border-t border-[#1e293b] bg-[#020617] text-white px-6 py-24">
-      <div className="max-w-7xl mx-auto">
+    <section className="relative border-t border-[#111827] bg-[#020617] text-white px-5 sm:px-6 lg:px-8 py-24 sm:py-28 overflow-hidden">
+      {/* subtle background */}
+      <div className="absolute inset-0 opacity-[0.03] bg-[radial-gradient(circle_at_top,white_0%,transparent_55%)]" />
+
+      <div className="max-w-7xl mx-auto relative z-10">
         {/* HEADER */}
         <div className="max-w-3xl mx-auto text-center">
-          <h1 className="text-4xl md:text-5xl font-semibold tracking-tight">
+          <p className="text-sm tracking-[0.25em] uppercase text-cyan-400 font-medium mb-5">
+            Expertise
+          </p>
+
+          <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight leading-tight">
             Skills & Technologies
           </h1>
-          <p className="mt-4 text-lg text-gray-400">
-            A practical toolkit built through real-world projects and
-            production-grade development.
+
+          <p className="mt-6 text-base sm:text-lg text-slate-400 leading-relaxed">
+            A refined engineering toolkit built through production-grade
+            applications, scalable systems, and real-world development
+            experience.
           </p>
         </div>
 
         {/* GRID */}
-        <div className="mt-16 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div className="mt-20 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
           {skills.map((section, index) => (
             <div
               key={index}
               className="
-                rounded-2xl border border-white/10 bg-white/5
-                p-8 transition-all
-                hover:border-blue-500/40
+                group
+                relative
+                rounded-3xl
+                border border-white/[0.06]
+                bg-[#081121]
+                p-7 sm:p-8
+                transition-all duration-300
+                hover:border-cyan-500/20
+                hover:-translate-y-1
+                hover:shadow-[0_10px_50px_rgba(8,112,184,0.12)]
               "
             >
-              <h3 className="text-sm font-semibold text-gray-200 uppercase tracking-wide mb-6">
-                {section.category}
-              </h3>
+              {/* soft glow */}
+              <div className="absolute inset-0 rounded-3xl bg-gradient-to-br from-cyan-500/[0.03] to-transparent opacity-0 group-hover:opacity-100 transition duration-500" />
 
-              <ul className="space-y-4">
-                {section.items.map((skill, i) => (
-                  <li
-                    key={i}
-                    className="flex items-center gap-4 text-base text-gray-300"
-                  >
-                    <span className="text-xl">{skill.icon}</span>
-                    <span>{skill.name}</span>
-                  </li>
-                ))}
-              </ul>
+              <div className="relative z-10">
+                <h3 className="text-sm font-semibold uppercase tracking-[0.18em] text-slate-300 mb-7">
+                  {section.category}
+                </h3>
+
+                <ul className="space-y-4">
+                  {section.items.map((skill, i) => (
+                    <li
+                      key={i}
+                      className="
+                        flex items-center gap-4
+                        text-[15px] sm:text-base
+                        text-slate-300
+                        transition-all duration-200
+                        group/item
+                      "
+                    >
+                      <span
+                        className="
+                          flex items-center justify-center
+                          w-10 h-10
+                          rounded-xl
+                          bg-white/[0.03]
+                          border border-white/[0.05]
+                          text-lg
+                          transition-all duration-300
+                          group-hover/item:border-cyan-500/20
+                          group-hover/item:bg-cyan-500/[0.04]
+                        "
+                      >
+                        {skill.icon}
+                      </span>
+
+                      <span className="group-hover/item:text-white transition-colors duration-200">
+                        {skill.name}
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
             </div>
           ))}
         </div>

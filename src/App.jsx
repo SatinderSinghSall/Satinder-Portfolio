@@ -35,6 +35,7 @@ import ManageFreelanceProjects from "./admin/ManageFreelanceProjects.jsx";
 import WatchMyFreelancing from "./pages/WatchMyFreelancing.jsx";
 import FreelanceDetails from "./pages/FreelanceDetails.jsx";
 import AiMl from "./pages/AiMl.jsx";
+import ScrollTopButton from "./components/ScrollTopButton";
 
 //! To run the backend for DEVELOPMENT -> npm run dev
 //! To run the backend for PRODUCTION -> npm start
@@ -153,6 +154,7 @@ function App() {
         <Route path="*" element={<NotFound />} />
       </Routes>
 
+      {!isAdminPage && <ScrollTopButton />}
       {!isAdminPage && <Footer />}
     </>
   );

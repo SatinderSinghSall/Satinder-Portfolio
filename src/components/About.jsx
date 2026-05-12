@@ -17,6 +17,39 @@ export default function About() {
       <div className="absolute top-[-120px] left-[-100px] w-[350px] h-[350px] bg-cyan-500/20 blur-[140px] rounded-full" />
       <div className="absolute bottom-[-120px] right-[-100px] w-[350px] h-[350px] bg-blue-600/20 blur-[140px] rounded-full" />
 
+      <div className="relative z-10 max-w-5xl mx-auto text-center mb-15">
+        <p
+          className="
+          text-sm uppercase tracking-[0.35em]
+          text-cyan-300 font-medium
+          mb-5
+        "
+        >
+          GET TO KNOW ME
+        </p>
+
+        <h1
+          className="
+          text-5xl sm:text-6xl lg:text-7xl
+          font-semibold tracking-tight
+          leading-[1]
+        "
+        >
+          About Me.
+        </h1>
+
+        <p
+          className="
+          mt-6 max-w-2xl mx-auto
+          text-lg text-slate-400
+          leading-relaxed
+        "
+        >
+          Full-stack engineer focused on scalable architecture, premium frontend
+          experiences, and production-ready digital products.
+        </p>
+      </div>
+
       <div className="relative z-10 max-w-7xl mx-auto grid lg:grid-cols-2 gap-20 items-center">
         {/* LEFT */}
         <div>
