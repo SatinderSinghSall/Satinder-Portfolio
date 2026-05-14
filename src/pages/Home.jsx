@@ -7,6 +7,7 @@ import Services from "./Services";
 import { Typewriter } from "react-simple-typewriter";
 import FeaturedProjects from "@/components/FeaturedProjects";
 import FeatureYouTube from "@/components/FeatureYouTube";
+import AppsShowcase from "@/components/AppsShowcase";
 
 export default function Home() {
   return (
@@ -131,6 +132,7 @@ export default function Home() {
       <main>
         <About />
         <FeaturedProjects />
+        <AppsShowcase />
         <FeatureYouTube />
         <Services />
         <Experience />
