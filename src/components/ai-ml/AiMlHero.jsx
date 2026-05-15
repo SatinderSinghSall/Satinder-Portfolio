@@ -1,181 +1,306 @@
-import { ArrowRight, Mail } from "lucide-react";
+import { ArrowRight, Mail, Sparkles } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Typewriter } from "react-simple-typewriter";
 
 export default function AiHero() {
   return (
-    <section className="relative min-h-[calc(100vh-70px)] flex items-center justify-center overflow-hidden bg-black text-white">
-      {/* 🌌 BACKGROUND */}
-      <div className="absolute inset-0 bg-black" />
+    <section
+      className="
+        relative overflow-hidden
+        bg-[#020617] text-white
+        flex items-center justify-center
+        min-h-[88vh] sm:min-h-screen
+      "
+    >
+      {/* ================= BACKGROUND ================= */}
 
-      {/* LIGHT */}
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_80%_30%,rgba(59,130,246,0.65),transparent_55%)]" />
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_70%_25%,rgba(59,130,246,0.35),transparent_65%)]" />
+      <div className="absolute inset-0 bg-gradient-to-b from-[#020617] via-[#030712] to-black" />
 
-      {/* LIGHT RAYS */}
-      <div className="absolute inset-0 bg-[linear-gradient(120deg,transparent_35%,rgba(59,130,246,0.25),transparent_65%)]" />
+      {/* Main glow */}
+      <div className="absolute top-[-20%] left-1/2 -translate-x-1/2 w-[700px] h-[700px] bg-cyan-500/10 blur-[150px] rounded-full" />
 
-      {/* GRID */}
+      {/* Secondary glow */}
+      <div className="absolute bottom-[-20%] right-[-10%] w-[450px] h-[450px] bg-purple-600/10 blur-[130px] rounded-full" />
+
+      {/* Grid */}
       <div
         className="
-        absolute inset-0 opacity-40 
-        bg-[linear-gradient(rgba(255,255,255,0.15)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.15)_1px,transparent_1px)]
-        [background-size:50px_50px]
-        sm:[background-size:60px_60px]
-        md:[background-size:70px_70px]
-        lg:[background-size:80px_80px]
-      "
+          absolute inset-0
+          bg-[linear-gradient(rgba(255,255,255,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.03)_1px,transparent_1px)]
+          bg-[size:42px_42px]
+          sm:bg-[size:56px_56px]
+        "
       />
 
-      {/* CENTER FOCUS */}
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_40%,rgba(0,0,0,0.9))]" />
+      {/* Radial overlay */}
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(59,130,246,0.16),transparent_45%)]" />
 
-      {/* CONTENT */}
-      <div className="relative z-10 w-full max-w-6xl px-4 sm:px-6 md:px-8 text-center flex flex-col items-center justify-center gap-6 sm:gap-8">
-        {/* Badge */}
-        <div className="px-3 sm:px-4 py-1 rounded-full border border-blue-500/30 bg-blue-500/10 text-blue-300 text-[10px] sm:text-xs tracking-widest uppercase">
-          AI / ML Engineer
-        </div>
+      {/* ================= CONTENT ================= */}
 
-        {/* Heading */}
-        <h1
-          className="
-          font-bold leading-[1.15]
-          text-[28px] 
-          sm:text-[34px] 
-          md:text-[48px] 
-          lg:text-[64px] 
-          xl:text-[72px]
-          drop-shadow-[0_0_25px_rgba(59,130,246,0.35)]
+      <div
+        className="
+          relative z-10
+          w-full max-w-6xl
+          mx-auto
+          px-5 sm:px-8
+          pt-20 sm:pt-28
+          pb-16 sm:pb-20
         "
-        >
-          Building Intelligent Systems with{" "}
-          <span className="bg-gradient-to-r from-purple-400 via-pink-400 to-blue-400 bg-clip-text text-transparent">
-            <Typewriter
-              words={[
-                "AI & Machine Learning",
-                "Deep Learning Systems",
-                "Computer Vision Models",
-                "NLP Applications",
-              ]}
-              loop
-              cursor
-              cursorStyle="|"
-              typeSpeed={60}
-              deleteSpeed={40}
-              delaySpeed={1800}
-            />
-          </span>
-        </h1>
+      >
+        <div className="flex flex-col items-center text-center">
+          {/* Badge */}
+          <div
+            className="
+              mb-6
+              inline-flex items-center gap-2
+              px-4 py-2
+              rounded-full
+              border border-cyan-400/20
+              bg-cyan-400/10
+              backdrop-blur-xl
+              text-cyan-300
+              text-[11px] sm:text-xs
+              uppercase
+              tracking-[0.28em]
+            "
+          >
+            <Sparkles size={14} />
+            AI / ML Engineer
+          </div>
 
-        {/* Description */}
-        <p
-          className="
-          text-gray-400 
-          max-w-md sm:max-w-lg md:max-w-xl 
-          text-[14px] sm:text-[15px] md:text-[17px] lg:text-[18px]
-          leading-relaxed
-        "
-        >
-          I design and develop AI-powered applications using deep learning,
-          computer vision, and NLP to solve real-world problems.
-        </p>
+          {/* Heading */}
+          <h1
+            className="
+              font-black
+              tracking-[-0.05em]
+              leading-[0.95]
+              mb-6
+              max-w-[1000px]
 
-        <div className="mt-2 font-mono text-xs sm:text-sm tracking-wide">
-          <div className="relative inline-block px-4 py-2 rounded-lg bg-white/5 border border-blue-500/20 backdrop-blur-md shadow-[0_0_25px_rgba(59,130,246,0.15)]">
-            {/* subtle glow */}
-            <div className="absolute inset-0 rounded-lg bg-blue-500/10 blur-lg opacity-40" />
+              text-[2.4rem]
+              sm:text-6xl
+              md:text-7xl
+              lg:text-8xl
+            "
+          >
+            <span className="block text-white">Building Intelligent</span>
 
-            {/* typing text */}
-            <span className="relative text-blue-300">
+            <span
+              className="
+                block mt-2
+                bg-gradient-to-r
+                from-cyan-300
+                via-blue-300
+                to-fuchsia-400
+                bg-clip-text
+                text-transparent
+              "
+            >
               <Typewriter
                 words={[
-                  "Initializing neural networks...",
-                  "Loading training datasets...",
-                  "Optimizing model weights...",
-                  "Deploying intelligent systems...",
+                  "AI & Machine Learning",
+                  "Deep Learning Systems",
+                  "Computer Vision Models",
+                  "NLP Applications",
                 ]}
                 loop
                 cursor
-                cursorStyle="▋"
-                typeSpeed={50}
-                deleteSpeed={28}
-                delaySpeed={1700}
+                cursorStyle="_"
+                typeSpeed={55}
+                deleteSpeed={35}
+                delaySpeed={1800}
               />
             </span>
+          </h1>
 
-            {/* blinking dot (system alive feel) */}
-            <span className="ml-2 inline-block w-2 h-2 rounded-full bg-blue-400 animate-pulse" />
-          </div>
-        </div>
-
-        {/* Buttons */}
-        <div className="flex flex-col sm:flex-row justify-center gap-3 sm:gap-4 mt-2">
-          {/* Primary */}
-          <Link to="/ai-ml">
-            <button
-              className="
-              w-full sm:w-auto
-              group flex items-center justify-center gap-2
-              bg-gradient-to-r from-purple-600 to-blue-600
-              hover:scale-[1.04]
-              hover:shadow-[0_0_40px_rgba(59,130,246,0.6)]
-              transition-all duration-300
-              text-white 
-              px-6 sm:px-8 
-              py-3.5 sm:py-4.5
-              text-[14px] sm:text-[15px] md:text-[16px]
-              rounded-xl font-medium
+          {/* Description */}
+          <p
+            className="
+              max-w-xl sm:max-w-2xl
+              text-[15px] sm:text-lg md:text-xl
+              leading-relaxed
+              text-slate-400
+              mb-8 sm:mb-10
             "
-            >
-              View AI Projects
-              <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5 group-hover:translate-x-1 transition" />
-            </button>
-          </Link>
+          >
+            I design and develop AI-powered applications using deep learning,
+            computer vision, and NLP to solve real-world problems with scalable
+            intelligent systems.
+          </p>
 
-          {/* Contact */}
-          <Link to="/contact">
-            <button
+          {/* Terminal typing */}
+          <div className="mb-10 sm:mb-12 w-full flex justify-center">
+            <div
               className="
-              w-full sm:w-auto
-              group flex items-center justify-center gap-2
-              border border-white/20
-              bg-white/5 backdrop-blur-md
-              hover:bg-white/10
-              hover:border-white/40
-              transition-all duration-300
-              text-white 
-              px-6 sm:px-8 
-              py-3.5 sm:py-4.5
-              text-[14px] sm:text-[15px] md:text-[16px]
-              rounded-xl font-medium
-            "
+                relative overflow-hidden
+                max-w-[90vw] sm:max-w-none
+                px-4 sm:px-5
+                py-3
+                rounded-2xl
+                border border-cyan-400/15
+                bg-white/[0.03]
+                backdrop-blur-xl
+                shadow-[0_10px_40px_rgba(37,99,235,0.15)]
+              "
             >
-              Contact Me
-              <Mail className="w-4 h-4 sm:w-5 sm:h-5 opacity-80 group-hover:opacity-100" />
-            </button>
-          </Link>
-        </div>
+              {/* glow */}
+              <div className="absolute inset-0 bg-cyan-400/5 blur-2xl" />
 
-        {/* Stats */}
-        <div className="flex justify-center gap-6 sm:gap-10 text-gray-400 text-[11px] sm:text-sm pt-2">
-          <div>
-            <span className="text-white text-[14px] sm:text-base md:text-lg font-semibold">
-              5+
-            </span>
-            <p>AI Projects</p>
+              <div className="relative flex items-center gap-3">
+                <span className="w-2 h-2 rounded-full bg-cyan-400 animate-pulse" />
+
+                <span
+                  className="
+                    text-cyan-300
+                    font-mono
+                    text-[11px]
+                    sm:text-sm
+                    tracking-wide
+                  "
+                >
+                  <Typewriter
+                    words={[
+                      "Initializing neural networks...",
+                      "Training computer vision models...",
+                      "Optimizing transformer pipelines...",
+                      "Deploying intelligent systems...",
+                    ]}
+                    loop
+                    cursor
+                    cursorStyle="▋"
+                    typeSpeed={50}
+                    deleteSpeed={30}
+                    delaySpeed={1800}
+                  />
+                </span>
+              </div>
+            </div>
           </div>
-          <div>
-            <span className="text-white text-[14px] sm:text-base md:text-lg font-semibold">
-              3+
-            </span>
-            <p>Domains</p>
+
+          {/* Buttons */}
+          <div
+            className="
+              flex flex-col
+              sm:flex-row
+              items-stretch sm:items-center
+              justify-center
+              gap-3 sm:gap-4
+              w-full
+              max-w-md
+              sm:max-w-none
+              mb-10 sm:mb-14
+            "
+          >
+            {/* Primary */}
+            <Link to="/ai-ml" className="w-full sm:w-auto">
+              <button
+                className="
+                  group relative overflow-hidden
+                  w-full
+                  inline-flex items-center justify-center gap-2
+                  px-7 py-4
+                  rounded-2xl
+                  bg-gradient-to-r from-blue-600 to-cyan-500
+                  hover:from-blue-500 hover:to-cyan-400
+                  transition-all duration-300
+                  font-semibold
+                  shadow-[0_10px_40px_rgba(37,99,235,0.35)]
+                  hover:scale-[1.02]
+                  active:scale-95
+                "
+              >
+                <span className="relative z-10">View AI Projects</span>
+
+                <ArrowRight
+                  size={18}
+                  className="
+                    relative z-10
+                    transition-transform duration-300
+                    group-hover:translate-x-1
+                  "
+                />
+
+                <div className="absolute inset-0 opacity-0 group-hover:opacity-100 bg-white/10 transition-opacity duration-300" />
+              </button>
+            </Link>
+
+            {/* Secondary */}
+            <Link to="/contact" className="w-full sm:w-auto">
+              <button
+                className="
+                  group
+                  w-full
+                  inline-flex items-center justify-center gap-2
+                  px-7 py-4
+                  rounded-2xl
+                  border border-white/10
+                  bg-white/[0.03]
+                  backdrop-blur-xl
+                  hover:bg-white/[0.06]
+                  hover:border-white/20
+                  transition-all duration-300
+                  font-semibold
+                  hover:scale-[1.02]
+                  active:scale-95
+                "
+              >
+                Contact Me
+                <Mail
+                  size={18}
+                  className="opacity-80 group-hover:opacity-100"
+                />
+              </button>
+            </Link>
           </div>
-          <div>
-            <span className="text-white text-[14px] sm:text-base md:text-lg font-semibold">
-              1+
-            </span>
-            <p>Years</p>
+
+          {/* Stats */}
+          <div className="w-full">
+            {/* Mobile */}
+            <div className="flex sm:hidden items-center justify-center gap-3 text-[11px] text-slate-400 flex-wrap">
+              <div className="flex items-center gap-1 whitespace-nowrap">
+                <span className="text-white font-semibold">5+</span>
+                AI Projects
+              </div>
+
+              <span className="opacity-30">•</span>
+
+              <div className="flex items-center gap-1 whitespace-nowrap">
+                <span className="text-white font-semibold">3+</span>
+                Domains
+              </div>
+
+              <span className="opacity-30">•</span>
+
+              <div className="flex items-center gap-1 whitespace-nowrap">
+                <span className="text-white font-semibold">1+</span>
+                Years
+              </div>
+            </div>
+
+            {/* Desktop */}
+            <div className="hidden sm:flex items-center justify-center gap-10 md:gap-14 text-sm text-slate-400">
+              <div className="flex items-center gap-2">
+                <span className="text-white font-semibold text-base">5+</span>
+
+                <span>AI projects built</span>
+              </div>
+
+              <div className="w-1 h-1 rounded-full bg-white/20" />
+
+              <div className="flex items-center gap-2">
+                <span className="text-white font-semibold text-base">3+</span>
+
+                <span>AI domains explored</span>
+              </div>
+
+              <div className="w-1 h-1 rounded-full bg-white/20" />
+
+              <div className="flex items-center gap-2">
+                <span className="text-white font-semibold text-base">1+</span>
+
+                <span>years experience</span>
+              </div>
+            </div>
           </div>
         </div>
       </div>

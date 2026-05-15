@@ -160,7 +160,6 @@ export default function Navbar() {
       </nav>
 
       {/* MOBILE MENU */}
-      {/* MOBILE MENU */}
       <div
         className={`
           fixed inset-0 z-[100] lg:hidden

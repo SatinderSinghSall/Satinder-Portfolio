@@ -75,7 +75,7 @@ export default function Contact() {
           "
         >
           <h1 className="text-2xl sm:text-3xl lg:text-4xl font-semibold tracking-tight">
-            Let’s build something together
+            Let’s build something together.
           </h1>
 
           <p className="mt-4 text-gray-400 leading-relaxed">
