@@ -341,73 +341,117 @@ export default function AppsShowcase() {
                   </div>
 
                   {/* BUTTONS */}
-                  <div className="mt-12 flex flex-col gap-4 sm:flex-row">
-                    {/* <a
-                      href={app.playstore}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className={`
-                        group
-                        inline-flex items-center justify-center gap-3
-                        rounded-2xl
-                        bg-gradient-to-r ${app.gradient}
-                        px-8 py-4
-                        text-sm font-bold text-white
-                        shadow-[0_10px_40px_rgba(16,185,129,0.25)]
-                        transition-all duration-300
-                        hover:scale-[1.03]
-                      `}
-                    >
-                      <span>View on Play Store</span>
+                  <div className="mt-12 flex flex-col gap-4">
+                    {/* TOP BUTTON ROW */}
+                    <div className="flex flex-col gap-4 sm:flex-row">
+                      {app.id === 1 ? (
+                        <AppStatusModal>
+                          <button
+                            className={`
+                              group
+                              inline-flex items-center justify-center gap-3
+                              rounded-2xl
+                              bg-gradient-to-r ${app.gradient}
+                              px-8 py-4
+                              text-sm font-bold text-white
+                              shadow-[0_10px_40px_rgba(16,185,129,0.25)]
+                              transition-all duration-300
+                              hover:scale-[1.03]
+                            `}
+                          >
+                            <span>View on Play Store</span>
 
-                      <ArrowTopRightOnSquareIcon className="h-5 w-5 transition-transform duration-300 group-hover:translate-x-1 group-hover:-translate-y-1" />
-                    </a> */}
-
-                    {app.id === 1 ? (
-                      <AppStatusModal>
-                        <button
+                            <ArrowTopRightOnSquareIcon
+                              className="
+                                h-5 w-5
+                                transition-transform duration-300
+                                group-hover:translate-x-1
+                                group-hover:-translate-y-1
+                              "
+                            />
+                          </button>
+                        </AppStatusModal>
+                      ) : (
+                        <a
+                          href={app.playstore}
+                          target="_blank"
+                          rel="noopener noreferrer"
                           className={`
-                          group
-                          inline-flex items-center justify-center gap-3
-                          rounded-2xl
-                          bg-gradient-to-r ${app.gradient}
-                          px-8 py-4
-                          text-sm font-bold text-white
-                          shadow-[0_10px_40px_rgba(16,185,129,0.25)]
-                          transition-all duration-300
-                          hover:scale-[1.03]
-                        `}
+                            group
+                            inline-flex items-center justify-center gap-3
+                            rounded-2xl
+                            bg-gradient-to-r ${app.gradient}
+                            px-8 py-4
+                            text-sm font-bold text-white
+                            shadow-[0_10px_40px_rgba(16,185,129,0.25)]
+                            transition-all duration-300
+                            hover:scale-[1.03]
+                          `}
                         >
                           <span>View on Play Store</span>
 
                           <ArrowTopRightOnSquareIcon
                             className="
-                            h-5 w-5
-                            transition-transform duration-300
-                            group-hover:translate-x-1
-                            group-hover:-translate-y-1
-                          "
+                              h-5 w-5
+                              transition-transform duration-300
+                              group-hover:translate-x-1
+                              group-hover:-translate-y-1
+                            "
                           />
-                        </button>
-                      </AppStatusModal>
-                    ) : (
+                        </a>
+                      )}
+
                       <a
-                        href={app.playstore}
+                        href={app.github}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className={`
-                        group
-                        inline-flex items-center justify-center gap-3
-                        rounded-2xl
-                        bg-gradient-to-r ${app.gradient}
-                        px-8 py-4
-                        text-sm font-bold text-white
-                        shadow-[0_10px_40px_rgba(16,185,129,0.25)]
-                        transition-all duration-300
-                        hover:scale-[1.03]
-                      `}
+                        className="
+                          group
+                          inline-flex items-center justify-center gap-3
+                          rounded-2xl
+                          border border-white/10
+                          bg-white/5
+                          px-8 py-4
+                          text-sm font-bold text-white
+                          backdrop-blur-xl
+                          transition-all duration-300
+                          hover:border-white/20
+                          hover:bg-white/10
+                        "
                       >
-                        <span>View on Play Store</span>
+                        <CodeBracketIcon className="h-5 w-5" />
+
+                        <span>GitHub Repository</span>
+                      </a>
+                    </div>
+
+                    {/* FINTRACK LANDING PAGE */}
+                    {app.id === 1 && (
+                      <a
+                        href="https://fintrack-app-satinder.vercel.app"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="
+                          group
+                          inline-flex w-full items-center justify-center gap-3
+                          rounded-2xl
+                          border border-emerald-400/20
+                          bg-gradient-to-r
+                          from-emerald-500/10
+                          via-cyan-500/10
+                          to-teal-500/10
+                          px-8 py-4
+                          text-sm font-bold text-white
+                          backdrop-blur-xl
+                          transition-all duration-300
+                          hover:scale-[1.01]
+                          hover:border-emerald-400/40
+                          hover:bg-emerald-500/10
+                        "
+                      >
+                        <RocketLaunchIcon className="h-5 w-5 text-emerald-300" />
+
+                        <span>Visit FinTrack Landing Page</span>
 
                         <ArrowTopRightOnSquareIcon
                           className="
@@ -419,29 +463,6 @@ export default function AppsShowcase() {
                         />
                       </a>
                     )}
-
-                    <a
-                      href={app.github}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="
-                        group
-                        inline-flex items-center justify-center gap-3
-                        rounded-2xl
-                        border border-white/10
-                        bg-white/5
-                        px-8 py-4
-                        text-sm font-bold text-white
-                        backdrop-blur-xl
-                        transition-all duration-300
-                        hover:border-white/20
-                        hover:bg-white/10
-                      "
-                    >
-                      <CodeBracketIcon className="h-5 w-5" />
-
-                      <span>GitHub Repository</span>
-                    </a>
                   </div>
                 </div>
 
@@ -612,7 +633,7 @@ export default function AppsShowcase() {
         </div>
 
         {/* HEADER */}
-        <div className="mx-auto max-w-4xl text-center mt-23">
+        <div className="mx-auto max-w-4xl text-center mt-26">
           <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-5 py-2 text-sm font-semibold text-white/80 backdrop-blur-xl">
             <RocketLaunchIcon className="h-4 w-4 text-emerald-400" />
 

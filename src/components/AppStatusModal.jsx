@@ -75,15 +75,45 @@ export default function AppStatusModal({ children }) {
 
         <div className="my-6 h-px bg-black/5" />
 
-        <div className="flex flex-col gap-3 sm:flex-row sm:justify-center">
+        <div className="flex flex-col gap-3">
+          {/* Landing Page */}
           <a
-            href="https://satinder-portfolio.vercel.app/contact"
+            href="https://fintrack-app-satinder.vercel.app"
             target="_blank"
             rel="noopener noreferrer"
             className="w-full"
           >
             <Button
               className="
+              h-11
+              w-full
+              rounded-full
+              bg-gradient-to-r
+              from-emerald-500
+              to-cyan-500
+              text-sm
+              font-medium
+              text-white
+              shadow-lg
+              hover:opacity-90
+              transition-all
+            "
+            >
+              Visit FinTrack Landing Page
+              <ExternalLink className="ml-2" size={16} />
+            </Button>
+          </a>
+
+          {/* Existing buttons */}
+          <div className="flex flex-col gap-3 sm:flex-row sm:justify-center">
+            <a
+              href="https://satinder-portfolio.vercel.app/contact"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="w-full"
+            >
+              <Button
+                className="
                 h-11
                 w-full
                 rounded-full
@@ -93,30 +123,31 @@ export default function AppStatusModal({ children }) {
                 text-white
                 hover:bg-gray-900
               "
-            >
-              Contact Developer
-              <ExternalLink className="ml-2" size={16} />
-            </Button>
-          </a>
+              >
+                Contact Developer
+                <ExternalLink className="ml-2" size={16} />
+              </Button>
+            </a>
 
-          <DialogTrigger asChild>
-            <Button
-              variant="outline"
-              className="
-                h-11
-                rounded-full
-                border-black/10
-                bg-white
-                px-6
-                text-sm
-                font-medium
-                hover:bg-gray-50
-                sm:w-auto
-              "
-            >
-              Maybe later
-            </Button>
-          </DialogTrigger>
+            <DialogTrigger asChild>
+              <Button
+                variant="outline"
+                className="
+                  h-11
+                  rounded-full
+                  border-black/10
+                  bg-white
+                  px-6
+                  text-sm
+                  font-medium
+                  hover:bg-gray-50
+                  sm:w-auto
+                "
+              >
+                Maybe later
+              </Button>
+            </DialogTrigger>
+          </div>
         </div>
 
         <p className="mt-4 text-center text-sm text-gray-400">
