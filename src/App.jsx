@@ -37,6 +37,7 @@ import FreelanceDetails from "./pages/FreelanceDetails.jsx";
 import AiMl from "./pages/AiMl.jsx";
 import ScrollTopButton from "./components/ScrollTopButton";
 import AppsShowcase from "./components/AppsShowcase";
+import AppPromoModal from "./components/AppPromoModal";
 
 //! To run the backend for DEVELOPMENT -> npm run dev
 //! To run the backend for PRODUCTION -> npm start
@@ -166,6 +167,7 @@ export default function AppWrapper() {
   return (
     <Router>
       <ScrollToTop />
+      <AppPromoModal />
       <App />
     </Router>
   );
