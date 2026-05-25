@@ -10,6 +10,7 @@ import {
 } from "@heroicons/react/24/solid";
 
 import { FaGithub, FaLinkedinIn, FaXTwitter, FaYoutube } from "react-icons/fa6";
+import { FaInstagram } from "react-icons/fa";
 
 export default function AppPromoModal() {
   const [open, setOpen] = useState(false);
@@ -43,6 +44,11 @@ export default function AppPromoModal() {
     const nextShow = Date.now() + 10 * 60 * 1000;
 
     localStorage.setItem("satinder-app-modal-dismissed", nextShow.toString());
+
+    localStorage.setItem(
+      "satinder-poetry-modal-trigger",
+      Date.now().toString(),
+    );
 
     setOpen(false);
   };
@@ -92,6 +98,14 @@ export default function AppPromoModal() {
   ];
 
   const socialLinks = [
+    {
+      name: "Instagram",
+
+      href: "https://www.instagram.com/satindersinghsall",
+
+      icon: <FaInstagram />,
+    },
+
     {
       name: "LinkedIn",
 
