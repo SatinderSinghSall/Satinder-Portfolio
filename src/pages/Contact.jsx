@@ -158,7 +158,7 @@ export default function Contact() {
         </div>
       ),
       {
-        duration: 7000,
+        duration: 10000,
         position: "top-right",
       },
     );

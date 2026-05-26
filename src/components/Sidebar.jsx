@@ -1,4 +1,5 @@
 import { Link, useLocation, useNavigate } from "react-router-dom";
+import { useState } from "react";
 import {
   LayoutDashboard,
   FolderKanban,
@@ -14,9 +15,19 @@ import {
 } from "lucide-react";
 import toast from "react-hot-toast";
 
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "./ui/dialog";
+
 export default function Sidebar({ isOpen = false, onClose = () => {} }) {
   const location = useLocation();
   const navigate = useNavigate();
+  const [logoutModalOpen, setLogoutModalOpen] = useState(false);
 
   const navItems = [
     {
@@ -193,16 +204,90 @@ export default function Sidebar({ isOpen = false, onClose = () => {} }) {
         {/* Logout */}
         <div className="px-4 py-5 border-t border-white/10">
           <button
-            onClick={handleLogout}
+            onClick={() => setLogoutModalOpen(true)}
             className="flex items-center justify-center gap-3 w-full px-4 py-3 
               rounded-xl bg-red-600 hover:bg-red-700 
-              text-white font-semibold transition-all shadow-md"
+              text-white font-semibold transition-all shadow-md cursor-pointer"
           >
             <LogOut size={20} />
             Logout
           </button>
         </div>
       </aside>
+
+      {/* Premium Logout Modal */}
+      <Dialog
+        open={logoutModalOpen}
+        onOpenChange={(open) => {
+          if (!open) return;
+          setLogoutModalOpen(open);
+        }}
+      >
+        <DialogContent
+          showCloseButton={false}
+          onPointerDownOutside={(e) => e.preventDefault()}
+          onEscapeKeyDown={(e) => e.preventDefault()}
+          className="sm:max-w-md border-0 bg-white/95 backdrop-blur-2xl rounded-[2rem] shadow-[0_25px_80px_rgba(0,0,0,0.25)] overflow-hidden"
+        >
+          {/* Close Button */}
+          <button
+            type="button"
+            aria-label="Close logout modal"
+            onClick={() => setLogoutModalOpen(false)}
+            className="
+              absolute right-5 top-5 z-50
+              h-10 w-10
+              rounded-2xl
+              bg-white/80
+              backdrop-blur-xl
+              border border-gray-200
+              shadow-md
+              flex items-center justify-center
+              text-gray-500
+              hover:text-red-500
+              hover:border-red-200
+              hover:bg-red-50
+              hover:rotate-90
+              transition-all duration-300
+              cursor-pointer
+            "
+          >
+            <span className="text-xl font-semibold leading-none">×</span>
+          </button>
+
+          <DialogHeader className="relative z-10">
+            {/* Icon */}
+            <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-3xl bg-gradient-to-br from-red-500 to-orange-500 shadow-lg mb-5">
+              <LogOut className="h-10 w-10 text-white" />
+            </div>
+
+            <DialogTitle className="text-center text-2xl font-black text-gray-900">
+              Logout Confirmation
+            </DialogTitle>
+
+            <DialogDescription className="text-center text-gray-500 mt-2 leading-relaxed">
+              Are you sure you want to logout from the admin dashboard? You’ll
+              need to login again to access secure admin features.
+            </DialogDescription>
+          </DialogHeader>
+
+          <DialogFooter className="mt-6 flex flex-col sm:flex-row gap-3">
+            <button
+              onClick={() => setLogoutModalOpen(false)}
+              className="w-full sm:flex-1 px-5 py-3 rounded-2xl border border-gray-200 bg-white hover:bg-gray-50 font-semibold transition cursor-pointer"
+            >
+              Cancel
+            </button>
+
+            <button
+              onClick={handleLogout}
+              className="w-full sm:flex-1 px-5 py-3 rounded-2xl bg-gradient-to-r from-red-600 to-orange-500 hover:opacity-90 text-white font-bold shadow-lg transition cursor-pointer"
+            >
+              Yes, Logout
+            </button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </>
   );
 }
