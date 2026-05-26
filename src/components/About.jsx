@@ -190,7 +190,8 @@ export default function About() {
           <div className="mt-12 flex flex-wrap gap-5">
             <a
               href={resumePDF}
-              download="Satinder_Resume.pdf"
+              target="_blank"
+              rel="noopener noreferrer"
               className="
                 group inline-flex items-center gap-3
                 px-8 py-4 rounded-2xl

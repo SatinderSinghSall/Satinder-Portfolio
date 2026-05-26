@@ -11,6 +11,8 @@ import {
   Code2,
 } from "lucide-react";
 
+import InternshipCompletionLetterSatinder from "../assets/InternshipCompletionLetterSatinder.pdf";
+
 const highlights = [
   {
     icon: <Code2 size={18} />,
@@ -161,10 +163,22 @@ export default function Experience() {
                     </p>
 
                     <div className="mt-4 flex flex-wrap items-center gap-4 text-sm text-slate-500">
-                      <span className="flex items-center gap-2">
-                        <Calendar size={15} />
-                        Jan 2025 – May 2025
-                      </span>
+                      <div className="flex flex-wrap items-center gap-3 text-sm text-slate-500">
+                        <span className="flex items-center gap-2">
+                          <Calendar size={15} />
+                          Jan 2024 – May 2025
+                        </span>
+
+                        {/* Dot */}
+                        <span className="hidden sm:block text-slate-300">
+                          •
+                        </span>
+
+                        {/* Duration */}
+                        <span className="font-medium text-slate-600">
+                          1 yr 5 mos
+                        </span>
+                      </div>
 
                       <span className="flex items-center gap-2">
                         <MapPin size={15} />
@@ -287,6 +301,43 @@ export default function Experience() {
                     skills while building confidence as a developer ready for
                     larger engineering challenges.
                   </p>
+                </div>
+              </div>
+
+              {/* Internship Completion Letter */}
+              <div className="mt-14 border-t border-slate-200 pt-10">
+                <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
+                  <div>
+                    <h4 className="text-2xl font-bold text-slate-900">
+                      Internship Completion Letter
+                    </h4>
+
+                    <p className="mt-3 text-slate-600 leading-relaxed max-w-2xl">
+                      View my official internship completion certificate issued
+                      after successfully completing my Full-Stack Engineering
+                      Internship at VEHO Study.
+                    </p>
+                  </div>
+
+                  {/* Button */}
+                  <a
+                    href={InternshipCompletionLetterSatinder}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center justify-center gap-3 px-6 py-4 rounded-2xl bg-gradient-to-r from-blue-600 to-cyan-500 text-white font-semibold shadow-lg hover:scale-[1.03] hover:shadow-blue-200 transition-all duration-300 w-full sm:w-fit"
+                  >
+                    <Briefcase size={20} />
+                    View Internship Letter
+                  </a>
+                </div>
+
+                {/* Responsive PDF Preview */}
+                <div className="mt-8 rounded-3xl overflow-hidden border border-slate-200 shadow-lg bg-white">
+                  <iframe
+                    src={InternshipCompletionLetterSatinder}
+                    title="Internship Completion Letter"
+                    className="w-full h-[500px] sm:h-[650px] lg:h-[800px]"
+                  />
                 </div>
               </div>
             </div>
