@@ -9,6 +9,7 @@ import { Link } from "react-router-dom";
 
 import profileImage from "../assets/Satinder_Image.jpg";
 import resumePDF from "../assets/Satinder_Resume.pdf";
+import AboutMeCTA from "./AboutMeCTA";
 
 export default function About() {
   return (
@@ -415,6 +416,8 @@ export default function About() {
           </div>
         </div>
       </div>
+
+      <AboutMeCTA />
     </section>
   );
 }
