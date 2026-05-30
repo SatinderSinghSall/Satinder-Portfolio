@@ -1,10 +1,22 @@
 import { Link, useLocation } from "react-router-dom";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Menu, X, ChevronRight, ArrowUpRight } from "lucide-react";
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
   const { pathname } = useLocation();
+
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "auto";
+    }
+
+    return () => {
+      document.body.style.overflow = "auto";
+    };
+  }, [isOpen]);
 
   const navItems = [
     { name: "Home", path: "/" },
@@ -200,7 +212,7 @@ export default function Navbar() {
           </div>
 
           {/* CONTENT */}
-          <div className="relative z-10 flex flex-col h-full">
+          <div className="relative z-10 flex flex-col h-full overflow-hidden">
             {/* TOP */}
             <div className="flex items-center justify-between px-5 h-20 border-b border-white/[0.06] shrink-0">
               {/* LOGO */}
@@ -248,7 +260,7 @@ export default function Navbar() {
             </div>
 
             {/* SCROLLABLE AREA */}
-            <div className="flex-1 overflow-y-auto px-4 py-5">
+            <div className="flex-1 overflow-y-auto overscroll-contain px-4 py-5">
               {/* NAVIGATION */}
               <div className="flex flex-col gap-2">
                 {navItems.map((item, index) => (
@@ -299,6 +311,43 @@ export default function Navbar() {
                     />
                   </Link>
                 ))}
+
+                {/* ADMIN LOGIN */}
+                <Link
+                  to="/login"
+                  onClick={() => setIsOpen(false)}
+                  className="
+                    group
+                    relative
+                    overflow-hidden
+                    flex items-center justify-between
+                    rounded-2xl
+                    px-4 py-4
+                    transition-all duration-300
+                    text-slate-400 hover:bg-white/[0.04] hover:text-white
+                  "
+                >
+                  <div className="absolute inset-0 opacity-0 group-hover:opacity-100 bg-gradient-to-r from-cyan-400/[0.03] to-transparent transition duration-300" />
+
+                  <div className="relative z-10 flex items-center gap-4">
+                    <span className="text-[11px] font-mono text-slate-600 w-6">
+                      09
+                    </span>
+
+                    <span className="text-[15px] font-medium">Admin Login</span>
+                  </div>
+
+                  <ChevronRight
+                    size={18}
+                    className="
+                    relative z-10
+                    text-slate-600
+                    transition-all duration-300
+                    group-hover:text-cyan-300
+                    group-hover:translate-x-1
+                  "
+                  />
+                </Link>
               </div>
 
               {/* CTA */}

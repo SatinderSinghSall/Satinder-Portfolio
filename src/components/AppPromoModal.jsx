@@ -221,6 +221,8 @@ export default function AppPromoModal() {
                   transition-all duration-300
 
                   hover:bg-zinc-200
+
+                  cursor-pointer
                 "
               >
                 <XMarkIcon className="h-5 w-5" />

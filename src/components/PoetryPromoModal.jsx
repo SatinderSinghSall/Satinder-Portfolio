@@ -233,6 +233,8 @@ export default function PoetryPromoModal() {
                     hover:bg-black/30
 
                     active:scale-95
+
+                    cursor-pointer
                 "
                 >
                   <XMarkIcon className="h-5 w-5" />
