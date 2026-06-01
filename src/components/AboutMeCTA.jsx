@@ -85,7 +85,7 @@ export default function AboutMeCTA() {
             {/* BUTTON */}
             <div className="mt-10">
               <Link
-                to="https://satinderpoetry.com"
+                to="https://satinderpoetry.com/about-me"
                 target="_blank"
                 className="
                   group

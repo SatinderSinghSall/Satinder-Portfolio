@@ -156,6 +156,7 @@ export default function CallToAction() {
                   transition-all duration-300
                   hover:scale-[1.02]
                   hover:shadow-[0_10px_40px_rgba(255,255,255,0.15)]
+                  cursor-pointer
                 "
               >
                 <span className="relative z-10">Start a conversation</span>
@@ -179,6 +180,7 @@ export default function CallToAction() {
                   hover:bg-white/[0.06]
                   hover:border-white/[0.14]
                   hover:text-white
+                  cursor-pointer
                 "
               >
                 View services

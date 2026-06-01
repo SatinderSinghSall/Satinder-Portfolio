@@ -45,6 +45,7 @@ export default function ScrollTopButton() {
             ? "translate-y-0 opacity-100"
             : "translate-y-10 opacity-0 pointer-events-none"
         }
+        cursor-pointer
       `}
     >
       {/* glow */}

@@ -3,7 +3,9 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import toast from "react-hot-toast";
 import { Eye, EyeOff, Loader2, ArrowLeft } from "lucide-react";
+
 import AdminAuthLayout from "../components/AdminAuthLayout";
+import SecurityAlertModal from "../components/SecurityAlertModal";
 
 function Login() {
   const [email, setEmail] = useState("");
@@ -11,6 +13,7 @@ function Login() {
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [showSecurityModal, setShowSecurityModal] = useState(false);
 
   const navigate = useNavigate();
 
@@ -27,7 +30,12 @@ function Login() {
     setError("");
 
     if (!email.trim() || !password.trim()) {
-      setError("Email and password are required.");
+      const msg = "Email and password are required.";
+
+      setError(msg);
+      toast.error(msg);
+      setShowSecurityModal(true);
+
       return;
     }
 
@@ -45,12 +53,17 @@ function Login() {
         toast.success("Administrator authenticated");
         navigate("/admin/dashboard");
       } else {
-        setError("Unauthorized access. Administrator privileges required.");
+        const msg = "Unauthorized access. Administrator privileges required.";
+
+        setError(msg);
+        toast.error(msg);
+        setShowSecurityModal(true);
       }
     } catch (err) {
       const msg = err.response?.data?.message || "Authentication failed";
       toast.error(msg);
       setError(msg);
+      setShowSecurityModal(true);
     } finally {
       setLoading(false);
     }
@@ -63,7 +76,7 @@ function Login() {
         <button
           type="button"
           onClick={handleBack}
-          className="inline-flex items-center gap-2 rounded-full border border-gray-800 bg-[#0f0f0f] px-3 py-1.5 text-sm font-medium text-gray-400 hover:text-blue-400 hover:border-blue-500/40 hover:bg-blue-500/5 active:scale-95 transition-all"
+          className="inline-flex items-center gap-2 rounded-full border border-gray-800 bg-[#0f0f0f] px-3 py-1.5 text-sm font-medium text-gray-400 hover:text-blue-400 hover:border-blue-500/40 hover:bg-blue-500/5 active:scale-95 transition-all cursor-pointer"
         >
           <ArrowLeft size={16} />
           <span>Back</span>
@@ -111,7 +124,11 @@ function Login() {
               className="absolute inset-y-0 right-0 px-3 flex items-center text-gray-400 hover:text-blue-400 transition"
               tabIndex={-1}
             >
-              {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+              {showPassword ? (
+                <EyeOff size={18} className="cursor-pointer" />
+              ) : (
+                <Eye size={18} className="cursor-pointer" />
+              )}
             </button>
           </div>
         </div>
@@ -119,7 +136,7 @@ function Login() {
         <button
           type="submit"
           disabled={loading}
-          className={`w-full py-2 rounded-lg text-sm font-medium transition-all flex items-center justify-center gap-2 ${
+          className={`w-full py-2 rounded-lg text-sm font-medium transition-all flex items-center justify-center gap-2 cursor-pointer ${
             loading
               ? "bg-blue-400 cursor-not-allowed"
               : "bg-blue-600 hover:bg-blue-700 active:scale-[0.98]"
@@ -129,6 +146,12 @@ function Login() {
           {loading ? "Authenticating..." : "Login"}
         </button>
       </form>
+
+      <SecurityAlertModal
+        open={showSecurityModal}
+        onClose={() => setShowSecurityModal(false)}
+        message={error}
+      />
     </AdminAuthLayout>
   );
 }

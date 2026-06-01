@@ -160,7 +160,7 @@ export default function SectionNavigator() {
             <button
               key={section.id}
               onClick={() => scrollToSection(section.id)}
-              className="group relative flex items-center justify-end"
+              className="group relative flex items-center justify-end cursor-pointer"
             >
               {/* Label */}
               <div

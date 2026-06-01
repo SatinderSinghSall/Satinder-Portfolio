@@ -3,8 +3,12 @@ import {
   FaGithub,
   FaXTwitter,
   FaYoutube,
+  FaFacebookF,
+  FaInstagram,
   FaDownload,
 } from "react-icons/fa6";
+
+import { MdEmail } from "react-icons/md";
 import { Link } from "react-router-dom";
 
 import profileImage from "../assets/Satinder_Image.jpg";
@@ -319,11 +323,18 @@ export default function About() {
 
                 {/* TECH STACK */}
                 <div className="mt-6 flex flex-wrap gap-3">
-                  {["React", "Node.js", "TypeScript", "MongoDB"].map(
-                    (tech, index) => (
-                      <div
-                        key={index}
-                        className="
+                  {[
+                    "React",
+                    "Next.js",
+                    "Node.js",
+                    "TypeScript",
+                    "MongoDB",
+                    "PostgreSQL",
+                    "Mobile Apps",
+                  ].map((tech, index) => (
+                    <div
+                      key={index}
+                      className="
                           px-4 py-2 rounded-xl
                           border border-white/10
                           bg-white/[0.03]
@@ -332,17 +343,28 @@ export default function About() {
                           hover:text-cyan-300
                           transition-all duration-300
                         "
-                      >
-                        {tech}
-                      </div>
-                    ),
-                  )}
+                    >
+                      {tech}
+                    </div>
+                  ))}
                 </div>
 
                 {/* SOCIALS */}
-                <div className="mt-8 flex items-center justify-between">
+                <div className="mt-8">
+                  <div className="flex items-center gap-3 mb-5">
+                    <div className="h-px w-10 bg-cyan-400/50" />
+
+                    <p className="text-sm uppercase tracking-[0.25em] text-cyan-300">
+                      Let's Connect
+                    </p>
+                  </div>
+
+                  <p className="text-sm text-gray-400 mb-5">
+                    Connect, collaborate, or follow my journey.
+                  </p>
+
                   {/* SOCIAL ICONS */}
-                  <div className="flex items-center gap-4">
+                  <div className="flex flex-wrap gap-4 place-items-center">
                     {[
                       {
                         href: "https://www.linkedin.com/in/satinder-singh-sall-b62049204/",
@@ -359,6 +381,18 @@ export default function About() {
                       {
                         href: "https://www.youtube.com/@satindersinghsall.3841/featured",
                         icon: <FaYoutube />,
+                      },
+                      {
+                        href: "https://www.facebook.com/satinder.singhsall",
+                        icon: <FaFacebookF />,
+                      },
+                      {
+                        href: "https://www.instagram.com/satindersinghsall",
+                        icon: <FaInstagram />,
+                      },
+                      {
+                        href: "mailto:satindersinghsall111@gmail.com",
+                        icon: <MdEmail />,
                       },
                     ].map((item, index) => (
                       <a
