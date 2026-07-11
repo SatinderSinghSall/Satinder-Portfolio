@@ -38,17 +38,17 @@ export default function Contact() {
     const newErrors = {};
 
     if (!form.name.trim()) {
-      newErrors.name = "Name is required";
+      newErrors.name = "Name is required.";
     }
 
     if (!form.email.trim()) {
-      newErrors.email = "Email is required";
+      newErrors.email = "Email is required.";
     } else if (!/\S+@\S+\.\S+/.test(form.email)) {
-      newErrors.email = "Invalid email address";
+      newErrors.email = "Invalid email address.";
     }
 
     if (!form.message.trim()) {
-      newErrors.message = "Message is required";
+      newErrors.message = "Message is required.";
     }
 
     return newErrors;
@@ -59,106 +59,135 @@ export default function Contact() {
       (t) => (
         <div
           className={`
-            ${
-              t.visible
-                ? "translate-y-0 opacity-100"
-                : "translate-y-2 opacity-0"
-            }
-            pointer-events-auto
-            w-[calc(100vw-32px)]
-            sm:w-[420px]
-            rounded-3xl
-            border
-            border-white/10
-            bg-[#0B1120]/95
-            p-5
-            shadow-[0_10px_80px_rgba(59,130,246,0.25)]
-            backdrop-blur-2xl
-            transition-all
-            duration-500
-          `}
+          ${
+            t.visible
+              ? "translate-y-0 opacity-100 scale-100"
+              : "-translate-y-3 opacity-0 scale-95"
+          }
+          pointer-events-auto
+          relative
+          w-[calc(100vw-32px)]
+          sm:w-[430px]
+          overflow-hidden
+          rounded-[28px]
+          border
+          border-white/10
+          bg-[#090F1F]/90
+          backdrop-blur-3xl
+          shadow-[0_25px_80px_rgba(0,0,0,0.45)]
+          transition-all
+          duration-500
+        `}
         >
-          <div className="flex items-start gap-4">
-            {/* ICON */}
-            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-emerald-500/10">
-              <CheckCircle2 size={24} className="text-emerald-400" />
-            </div>
+          {/* Top Accent */}
+          <div className="absolute inset-x-0 top-0 h-[3px] bg-gradient-to-r from-emerald-400 via-cyan-400 to-blue-500" />
 
-            {/* CONTENT */}
-            <div className="flex-1">
-              <h3 className="text-base font-semibold text-white">
-                Message Sent Successfully
-              </h3>
+          <div className="p-6">
+            <div className="flex items-start gap-5">
+              {/* Icon */}
+              <div className="relative shrink-0">
+                <div className="absolute inset-0 rounded-2xl bg-emerald-400/20 blur-xl" />
 
-              <p className="mt-1 text-sm leading-relaxed text-white/55">
-                Thanks for reaching out. I’ll get back to you within 24 hours.
-              </p>
+                <div className="relative flex h-14 w-14 items-center justify-center rounded-2xl border border-emerald-400/20 bg-emerald-500/10">
+                  <CheckCircle2 size={28} className="text-emerald-400" />
+                </div>
+              </div>
 
-              <div className="mt-4 flex items-center gap-3">
-                <button
-                  onClick={() => toast.dismiss(t.id)}
-                  className="
+              {/* Content */}
+              <div className="flex-1">
+                <div className="inline-flex items-center gap-2 rounded-full border border-emerald-400/15 bg-emerald-500/10 px-3 py-1 text-[11px] font-medium tracking-wide text-emerald-300">
+                  ✓ Message Delivered
+                </div>
+
+                <h3 className="mt-4 text-lg font-semibold tracking-tight text-white">
+                  Thanks for reaching out.
+                </h3>
+
+                <p className="mt-2 text-sm leading-7 text-white/60">
+                  Your message has been successfully delivered. A confirmation
+                  email has also been sent to your inbox.
+                </p>
+
+                <div className="mt-5 rounded-2xl border border-white/8 bg-white/[0.03] p-4">
+                  <p className="text-sm text-white/70">
+                    I usually reply within
+                    <span className="font-semibold text-white"> 24 hours</span>.
+                    Looking forward to connecting with you.
+                  </p>
+                </div>
+
+                <div className="mt-6 flex items-center gap-3">
+                  <button
+                    onClick={() => toast.dismiss(t.id)}
+                    className="
                     rounded-xl
-                    bg-blue-600
-                    px-4
-                    py-2
+                    bg-gradient-to-r
+                    from-blue-600
+                    to-cyan-500
+                    px-5
+                    py-2.5
                     text-sm
                     font-medium
                     text-white
                     transition-all
                     duration-300
-                    hover:bg-blue-500
-                    hover:shadow-[0_0_30px_rgba(59,130,246,0.5)]
+                    hover:scale-[1.03]
+                    hover:shadow-[0_0_35px_rgba(59,130,246,0.45)]
+                    cursor-pointer
                   "
-                >
-                  Awesome
-                </button>
+                  >
+                    Perfect
+                  </button>
 
-                <button
-                  onClick={() => toast.dismiss(t.id)}
-                  className="
+                  <button
+                    onClick={() => toast.dismiss(t.id)}
+                    className="
                     rounded-xl
                     border
                     border-white/10
-                    bg-white/[0.03]
-                    px-4
-                    py-2
+                    bg-white/[0.04]
+                    px-5
+                    py-2.5
                     text-sm
-                    text-white/70
+                    text-white/60
                     transition-all
                     duration-300
-                    hover:bg-white/[0.06]
+                    hover:bg-white/[0.07]
+                    hover:text-white
+                    cursor-pointer
                   "
-                >
-                  Close
-                </button>
+                  >
+                    Dismiss
+                  </button>
+                </div>
               </div>
-            </div>
 
-            {/* CLOSE */}
-            <button
-              onClick={() => toast.dismiss(t.id)}
-              className="
+              {/* Close */}
+              <button
+                onClick={() => toast.dismiss(t.id)}
+                className="
                 flex
-                h-8
-                w-8
+                h-9
+                w-9
                 items-center
                 justify-center
-                rounded-lg
-                text-white/40
+                rounded-xl
+                text-white/35
                 transition-all
                 duration-300
                 hover:bg-white/5
                 hover:text-white
+                cursor-pointer
               "
-            >
-              <X size={16} />
-            </button>
+              >
+                <X size={16} />
+              </button>
+            </div>
           </div>
         </div>
       ),
       {
-        duration: 10000,
+        duration: 15000,
         position: "top-right",
       },
     );
@@ -776,8 +805,13 @@ export default function Contact() {
                       duration-500
                       ${
                         loading
-                          ? "cursor-not-allowed bg-blue-500/40"
+                          ? `
+                            cursor-not-allowed
+                            pointer-events-none
+                            bg-blue-500/40
+                          `
                           : `
+                            cursor-pointer
                             bg-gradient-to-r
                             from-blue-600
                             via-blue-500
@@ -788,7 +822,6 @@ export default function Contact() {
                       }
                     `}
                   >
-                    {/* SHINE */}
                     {!loading && (
                       <div
                         className="
