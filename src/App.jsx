@@ -1,3 +1,4 @@
+import React, { useState } from "react";
 import {
   BrowserRouter as Router,
   Routes,
@@ -39,11 +40,12 @@ import ScrollTopButton from "./components/ScrollTopButton";
 import AppsShowcase from "./components/AppsShowcase";
 import AppPromoModal from "./components/AppPromoModal";
 import PoetryPromoModal from "./components/PoetryPromoModal";
+import SectionNavigatorModal from "./components/SectionNavigatorModal";
 
 //! To run the backend for DEVELOPMENT -> npm run dev
 //! To run the backend for PRODUCTION -> npm start
 
-function App() {
+function App({ isNavModalOpen, setIsNavModalOpen, onOpenNavModal }) {
   const location = useLocation();
 
   const isAdminPage =
@@ -51,7 +53,13 @@ function App() {
 
   return (
     <>
-      {!isAdminPage && <Navbar />}
+      {!isAdminPage && (
+        <Navbar
+          isNavModalOpen={isNavModalOpen}
+          setIsNavModalOpen={setIsNavModalOpen}
+          onOpenNavModal={onOpenNavModal}
+        />
+      )}
 
       <Routes>
         <Route path="/login" element={<Login />} />
@@ -165,6 +173,8 @@ function App() {
 }
 
 export default function AppWrapper() {
+  const [isNavModalOpen, setIsNavModalOpen] = useState(false);
+
   return (
     <Router>
       <ScrollToTop />
@@ -172,7 +182,17 @@ export default function AppWrapper() {
       <AppPromoModal />
       <PoetryPromoModal />
 
-      <App />
+      <SectionNavigatorModal
+        isOpen={isNavModalOpen}
+        onClose={() => setIsNavModalOpen(false)}
+        onOpen={() => setIsNavModalOpen(true)}
+      />
+
+      <App
+        isNavModalOpen={isNavModalOpen}
+        setIsNavModalOpen={setIsNavModalOpen}
+        onOpenNavModal={() => setIsNavModalOpen(true)}
+      />
     </Router>
   );
 }

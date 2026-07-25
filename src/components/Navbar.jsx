@@ -1,13 +1,15 @@
 import { Link, useLocation } from "react-router-dom";
 import { useEffect, useState } from "react";
-import { Menu, X, ChevronRight, ArrowUpRight } from "lucide-react";
+import { Menu, X, ChevronRight, ArrowUpRight, Compass } from "lucide-react";
+import SectionNavigatorModal from "./SectionNavigatorModal";
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
+  const [isNavigatorOpen, setIsNavigatorOpen] = useState(false);
   const { pathname } = useLocation();
 
   useEffect(() => {
-    if (isOpen) {
+    if (isOpen || isNavigatorOpen) {
       document.body.style.overflow = "hidden";
     } else {
       document.body.style.overflow = "auto";
@@ -16,7 +18,7 @@ export default function Navbar() {
     return () => {
       document.body.style.overflow = "auto";
     };
-  }, [isOpen]);
+  }, [isOpen, isNavigatorOpen]);
 
   const navItems = [
     { name: "Home", path: "/" },
@@ -124,8 +126,16 @@ export default function Navbar() {
               })}
             </div>
 
-            {/* RIGHT CTA */}
-            <div className="hidden lg:flex items-center gap-3">
+            {/* RIGHT CTA & NAVIGATOR BUTTON */}
+            <div className="hidden lg:flex items-center gap-4">
+              <button
+                onClick={() => setIsNavigatorOpen(true)}
+                className="flex items-center gap-1.5 text-sm text-cyan-400 hover:text-cyan-300 transition-colors duration-300 cursor-pointer"
+              >
+                <Compass size={16} />
+                <span>Navigator</span>
+              </button>
+
               <Link
                 to="/login"
                 className="
@@ -253,6 +263,7 @@ export default function Navbar() {
                   hover:border-red-500/30
                   hover:text-red-200
                   hover:shadow-[0_0_25px_rgba(239,68,68,0.18)]
+                  cursor-pointer
                 "
               >
                 <X size={18} />
@@ -263,51 +274,65 @@ export default function Navbar() {
             <div className="flex-1 overflow-y-auto overscroll-contain px-4 py-5">
               {/* NAVIGATION */}
               <div className="flex flex-col gap-2">
+                {/* NAVIGATOR BUTTON FOR MOBILE */}
+                <button
+                  onClick={() => {
+                    setIsOpen(false);
+                    setIsNavigatorOpen(true);
+                  }}
+                  className="
+                    flex items-center justify-between
+                    rounded-2xl px-4 py-4 text-cyan-400 hover:bg-white/[0.04]
+                    transition-all duration-300 font-medium cursor-pointer
+                  "
+                >
+                  <span className="flex items-center gap-2">
+                    <Compass size={18} /> Navigator
+                  </span>
+                  <ChevronRight size={18} className="text-slate-600" />
+                </button>
+
                 {navItems.map((item, index) => (
                   <Link
                     key={item.path}
                     to={item.path}
                     onClick={() => setIsOpen(false)}
                     className={`
-                    group
-                    relative
-                    overflow-hidden
-                    flex items-center justify-between
-                    rounded-2xl
-                    px-4 py-4
-                    transition-all duration-300
-                    ${
-                      pathname === item.path
-                        ? "bg-white/[0.06] text-white"
-                        : "text-slate-400 hover:bg-white/[0.04] hover:text-white"
-                    }
-                  `}
+                      group
+                      relative
+                      overflow-hidden
+                      flex items-center justify-between
+                      rounded-2xl
+                      px-4 py-4
+                      transition-all duration-300
+                      ${
+                        pathname === item.path
+                          ? "bg-white/[0.06] text-white"
+                          : "text-slate-400 hover:bg-white/[0.04] hover:text-white"
+                      }
+                    `}
                   >
-                    {/* glow */}
                     <div className="absolute inset-0 opacity-0 group-hover:opacity-100 bg-gradient-to-r from-cyan-400/[0.03] to-transparent transition duration-300" />
 
                     <div className="relative z-10 flex items-center gap-4">
-                      {/* NUMBER */}
                       <span className="text-[11px] font-mono text-slate-600 w-6">
                         0{index + 1}
                       </span>
 
-                      {/* NAME */}
                       <span className="text-[15px] font-medium">
                         {item.name}
                       </span>
                     </div>
 
-                    {/* ICON */}
                     <ChevronRight
                       size={18}
                       className="
-                      relative z-10
-                      text-slate-600
-                      transition-all duration-300
-                      group-hover:text-cyan-300
-                      group-hover:translate-x-1
-                    "
+                        relative z-10
+                        text-slate-600
+                        transition-all duration-300
+                        group-hover:text-cyan-300
+                        group-hover:translate-x-1
+                      "
                     />
                   </Link>
                 ))}
@@ -340,12 +365,12 @@ export default function Navbar() {
                   <ChevronRight
                     size={18}
                     className="
-                    relative z-10
-                    text-slate-600
-                    transition-all duration-300
-                    group-hover:text-cyan-300
-                    group-hover:translate-x-1
-                  "
+                      relative z-10
+                      text-slate-600
+                      transition-all duration-300
+                      group-hover:text-cyan-300
+                      group-hover:translate-x-1
+                    "
                   />
                 </Link>
               </div>
@@ -356,17 +381,17 @@ export default function Navbar() {
                   to="/contact"
                   onClick={() => setIsOpen(false)}
                   className="
-                  group
-                  flex items-center justify-center gap-2
-                  w-full
-                  rounded-2xl
-                  bg-white
-                  px-6 py-4
-                  text-black font-medium
-                  transition-all duration-300
-                  hover:scale-[1.01]
-                  hover:shadow-[0_8px_30px_rgba(255,255,255,0.12)]
-                "
+                    group
+                    flex items-center justify-center gap-2
+                    w-full
+                    rounded-2xl
+                    bg-white
+                    px-6 py-4
+                    text-black font-medium
+                    transition-all duration-300
+                    hover:scale-[1.01]
+                    hover:shadow-[0_8px_30px_rgba(255,255,255,0.12)]
+                  "
                 >
                   Let&apos;s Talk
                   <ArrowUpRight
@@ -389,6 +414,12 @@ export default function Navbar() {
           </div>
         </div>
       </div>
+
+      {/* SECTION NAVIGATOR MODAL */}
+      <SectionNavigatorModal
+        isOpen={isNavigatorOpen}
+        onClose={() => setIsNavigatorOpen(false)}
+      />
     </>
   );
 }
