@@ -10,8 +10,9 @@ import {
 } from "lucide-react";
 
 import { Link } from "react-router-dom";
+import { Helmet } from "react-helmet-async";
 
-export default function MyServices() {
+export default function MyServices({ isPage = true }) {
   const services = [
     {
       icon: Code,
@@ -71,289 +72,346 @@ export default function MyServices() {
     },
   ];
 
+  /* JSON-LD Schema for Search Engines (Rich Results) */
+  const servicesSchema = {
+    "@context": "https://schema.org",
+    "@type": "Service",
+    serviceType: "Software Development & Digital Solutions",
+    provider: {
+      "@type": "Person",
+      name: "Satinder Singh Sall",
+      url: "https://satinder-portfolio.vercel.app",
+    },
+    areaServed: "Worldwide",
+    hasOfferCatalog: {
+      "@type": "OfferCatalog",
+      name: "Digital Product Services",
+      itemListElement: services.map((service, index) => ({
+        "@type": "Offer",
+        itemOffered: {
+          "@type": "Service",
+          name: service.title,
+          description: service.description,
+        },
+        position: index + 1,
+      })),
+    },
+  };
+
   return (
-    <section
-      className="
-        relative overflow-hidden
-        border-t border-white/5
-        bg-[#030712]
-        px-6 py-24
-        text-white
-      "
-    >
-      {/* Background Glow */}
-      <div className="absolute top-0 left-[-120px] h-[320px] w-[320px] rounded-full bg-cyan-500/10 blur-[140px]" />
-      <div className="absolute bottom-0 right-[-120px] h-[320px] w-[320px] rounded-full bg-blue-600/10 blur-[140px]" />
+    <>
+      {/* Helmet is ONLY injected if this component is rendered as its own PAGE */}
+      {isPage && (
+        <Helmet>
+          <title>Premium Digital Services | Satinder Singh Sall</title>
+          <meta
+            name="title"
+            content="Premium Digital Services | Satinder Singh Sall"
+          />
+          <meta
+            name="description"
+            content="Explore my full range of software engineering services: Full Stack Web Development, Mobile Apps, Game Development, Cloud/DevOps, UI/UX, and Performance Optimization."
+          />
+          <meta
+            name="keywords"
+            content="Web Development, React, Next.js, Mobile App Development, React Native, Full Stack Solutions, DevOps, Cloud Infrastructure, UI UX Design, SEO Optimization, Game Development Unity"
+          />
+          <meta name="author" content="Satinder Singh Sall" />
+          <meta name="robots" content="index, follow" />
+          <link
+            rel="canonical"
+            href="https://satinder-portfolio.vercel.app/services"
+          />
 
-      <div className="relative z-10 max-w-7xl mx-auto">
-        {/* Header */}
-        <div className="max-w-3xl mx-auto text-center">
-          <div
-            className="
-              inline-flex items-center gap-2
-              rounded-full
-              border border-cyan-400/20
-              bg-cyan-400/10
-              px-4 py-2
-              text-sm font-medium text-cyan-300
-              backdrop-blur-xl
-            "
-          >
-            ✦ Premium Digital Services
-          </div>
+          {/* Open Graph / Facebook */}
+          <meta property="og:type" content="website" />
+          <meta
+            property="og:url"
+            content="https://satinder-portfolio.vercel.app/services"
+          />
+          <meta
+            property="og:title"
+            content="Premium Digital Services | Satinder Singh Sall"
+          />
+          <meta
+            property="og:description"
+            content="Building modern, scalable, and high-performance digital products tailored for your business needs."
+          />
+          <meta
+            property="og:image"
+            content="https://satinder-portfolio.vercel.app/icon.png"
+          />
 
-          <h1
-            className="
-              mt-7
-              text-5xl md:text-6xl
-              font-black
-              tracking-tight
-              leading-tight
-            "
-          >
-            My
-            <span
+          {/* Twitter */}
+          <meta name="twitter:card" content="summary_large_image" />
+          <meta
+            name="twitter:url"
+            content="https://satinder-portfolio.vercel.app/services"
+          />
+          <meta
+            name="twitter:title"
+            content="Premium Digital Services | Satinder Singh Sall"
+          />
+          <meta
+            name="twitter:description"
+            content="Building modern, scalable, and high-performance digital products tailored for your business needs."
+          />
+          <meta
+            name="twitter:image"
+            content="https://satinder-portfolio.vercel.app/icon.png"
+          />
+
+          {/* Structured Data (JSON-LD) */}
+          <script type="application/ld+json">
+            {JSON.stringify(servicesSchema)}
+          </script>
+        </Helmet>
+      )}
+
+      <section
+        className="
+          relative overflow-hidden
+          border-t border-white/5
+          bg-[#030712]
+          px-6 py-24
+          text-white
+        "
+      >
+        {/* Background Glow */}
+        <div className="absolute top-0 left-[-120px] h-[320px] w-[320px] rounded-full bg-cyan-500/10 blur-[140px]" />
+        <div className="absolute bottom-0 right-[-120px] h-[320px] w-[320px] rounded-full bg-blue-600/10 blur-[140px]" />
+
+        <div className="relative z-10 max-w-7xl mx-auto">
+          {/* Header */}
+          <header className="max-w-3xl mx-auto text-center">
+            <div
               className="
-                ml-3
-                bg-gradient-to-r
-                from-cyan-400
-                via-blue-500
-                to-indigo-500
-                bg-clip-text
-                text-transparent
+                inline-flex items-center gap-2
+                rounded-full
+                border border-cyan-400/20
+                bg-cyan-400/10
+                px-4 py-2
+                text-sm font-medium text-cyan-300
+                backdrop-blur-xl
               "
             >
-              Services
-            </span>
-          </h1>
+              ✦ Premium Digital Services
+            </div>
 
-          <p
-            className="
-              mt-6
-              text-lg md:text-xl
-              leading-relaxed
-              text-gray-400
-            "
-          >
-            Building premium digital experiences focused on scalability,
-            performance, modern UI/UX, and long-term product quality.
-          </p>
-        </div>
-
-        {/* Services Grid */}
-        <div className="mt-20 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {services.map((service, index) => {
-            const Icon = service.icon;
-
-            return (
-              <div
-                key={index}
-                className="
-                  group relative overflow-hidden
-
-                  rounded-[32px]
-                  border border-white/10
-
-                  bg-gradient-to-b
-                  from-white/[0.07]
-                  to-white/[0.03]
-
-                  backdrop-blur-3xl
-
-                  p-8
-
-                  transition-all duration-500
-
-                  hover:-translate-y-2
-                  hover:border-cyan-400/20
-
-                  hover:shadow-[0_20px_60px_rgba(6,182,212,0.12)]
-                "
+            {/* FIXED TITLE RENDERING HERE */}
+            <h1 className="mt-7 text-5xl md:text-6xl font-black tracking-tight leading-tight text-white">
+              My{" "}
+              <span
+                className="inline-block bg-gradient-to-r from-cyan-400 via-blue-500 to-indigo-500 bg-clip-text text-transparent"
+                style={{
+                  WebkitBackgroundClip: "text",
+                  WebkitTextFillColor: "transparent",
+                }}
               >
-                {/* Glow */}
-                <div
+                Services
+              </span>
+            </h1>
+
+            <p
+              className="
+                mt-6
+                text-lg md:text-xl
+                leading-relaxed
+                text-gray-400
+              "
+            >
+              Building premium digital experiences focused on scalability,
+              performance, modern UI/UX, and long-term product quality.
+            </p>
+          </header>
+
+          {/* Services Grid */}
+          <div className="mt-20 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {services.map((service, index) => {
+              const Icon = service.icon;
+
+              return (
+                <article
+                  key={index}
                   className="
-                    absolute inset-0
-                    opacity-0
-                    group-hover:opacity-100
-                    transition duration-500
-
-                    bg-gradient-to-br
-                    from-cyan-500/10
-                    to-blue-600/10
+                    group relative overflow-hidden
+                    rounded-[32px]
+                    border border-white/10
+                    bg-gradient-to-b
+                    from-white/[0.07]
+                    to-white/[0.03]
+                    backdrop-blur-3xl
+                    p-8
+                    transition-all duration-500
+                    hover:-translate-y-2
+                    hover:border-cyan-400/20
+                    hover:shadow-[0_20px_60px_rgba(6,182,212,0.12)]
                   "
-                />
-
-                {/* Top Light */}
-                <div className="absolute inset-x-0 top-0 h-[1px] bg-gradient-to-r from-transparent via-cyan-400/50 to-transparent" />
-
-                <div className="relative z-10">
-                  {/* Header */}
-                  <div className="flex items-start gap-5">
-                    {/* Icon */}
-                    <div
-                      className="
-                        relative
-
-                        flex h-16 w-16
-                        items-center justify-center
-
-                        rounded-3xl
-
-                        bg-gradient-to-br
-                        from-cyan-500/20
-                        to-blue-600/20
-
-                        border border-white/10
-
-                        shadow-[0_10px_30px_rgba(6,182,212,0.15)]
-                      "
-                    >
-                      <div className="absolute inset-0 rounded-3xl bg-white/5" />
-
-                      <Icon className="relative h-7 w-7 text-cyan-300" />
-                    </div>
-
-                    {/* Title */}
-                    <div>
-                      <h2
-                        className="
-                          text-2xl
-                          font-semibold
-                          tracking-tight
-                          text-white
-                        "
-                      >
-                        {service.title}
-                      </h2>
-
-                      <p
-                        className="
-                          mt-2
-                          text-sm
-                          text-cyan-300/80
-                        "
-                      >
-                        {service.stack}
-                      </p>
-                    </div>
-                  </div>
-
-                  {/* Description */}
-                  <p
-                    className="
-                      mt-7
-                      text-base
-                      leading-relaxed
-                      text-gray-400
-                    "
-                  >
-                    {service.description}
-                  </p>
-
-                  {/* Bottom Accent */}
+                >
+                  {/* Glow */}
                   <div
                     className="
-                      mt-8
-                      flex items-center gap-2
+                      absolute inset-0
+                      opacity-0
+                      group-hover:opacity-100
+                      transition duration-500
+                      bg-gradient-to-br
+                      from-cyan-500/10
+                      to-blue-600/10
                     "
-                  >
-                    <div className="h-2 w-2 rounded-full bg-cyan-400 shadow-[0_0_12px_rgba(34,211,238,0.9)]" />
+                  />
 
-                    <span className="text-sm text-gray-500">
-                      Premium Quality Delivery
-                    </span>
+                  {/* Top Light */}
+                  <div className="absolute inset-x-0 top-0 h-[1px] bg-gradient-to-r from-transparent via-cyan-400/50 to-transparent" />
+
+                  <div className="relative z-10">
+                    {/* Header */}
+                    <div className="flex items-start gap-5">
+                      {/* Icon */}
+                      <div
+                        className="
+                          relative
+                          flex h-16 w-16
+                          items-center justify-center
+                          rounded-3xl
+                          bg-gradient-to-br
+                          from-cyan-500/20
+                          to-blue-600/20
+                          border border-white/10
+                          shadow-[0_10px_30px_rgba(6,182,212,0.15)]
+                        "
+                      >
+                        <div className="absolute inset-0 rounded-3xl bg-white/5" />
+                        <Icon className="relative h-7 w-7 text-cyan-300" />
+                      </div>
+
+                      {/* Title */}
+                      <div>
+                        <h2
+                          className="
+                            text-2xl
+                            font-semibold
+                            tracking-tight
+                            text-white
+                          "
+                        >
+                          {service.title}
+                        </h2>
+
+                        <p
+                          className="
+                            mt-2
+                            text-sm
+                            text-cyan-300/80
+                          "
+                        >
+                          {service.stack}
+                        </p>
+                      </div>
+                    </div>
+
+                    {/* Description */}
+                    <p
+                      className="
+                        mt-7
+                        text-base
+                        leading-relaxed
+                        text-gray-400
+                      "
+                    >
+                      {service.description}
+                    </p>
+
+                    {/* Bottom Accent */}
+                    <div
+                      className="
+                        mt-8
+                        flex items-center gap-2
+                      "
+                    >
+                      <div className="h-2 w-2 rounded-full bg-cyan-400 shadow-[0_0_12px_rgba(34,211,238,0.9)]" />
+
+                      <span className="text-sm text-gray-500">
+                        Premium Quality Delivery
+                      </span>
+                    </div>
                   </div>
-                </div>
+                </article>
+              );
+            })}
+          </div>
+
+          {/* CTA */}
+          <div className="mt-28 max-w-4xl mx-auto">
+            <div
+              className="
+                relative overflow-hidden
+                rounded-[40px]
+                border border-white/10
+                bg-gradient-to-b
+                from-white/[0.07]
+                to-white/[0.03]
+                backdrop-blur-3xl
+                px-8 py-14 md:px-14
+                text-center
+                shadow-[0_20px_80px_rgba(0,0,0,0.35)]
+              "
+            >
+              {/* Glow */}
+              <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/10 to-blue-600/10" />
+
+              {/* Top Line */}
+              <div className="absolute inset-x-0 top-0 h-[1px] bg-gradient-to-r from-transparent via-cyan-400/50 to-transparent" />
+
+              <div className="relative z-10">
+                <h3
+                  className="
+                    text-4xl md:text-5xl
+                    font-black
+                    tracking-tight
+                    text-white
+                  "
+                >
+                  Ready to build something amazing?
+                </h3>
+
+                <p
+                  className="
+                    mt-6
+                    text-lg md:text-xl
+                    leading-relaxed
+                    text-gray-400
+                  "
+                >
+                  Let’s turn your ideas into premium digital products with
+                  scalable architecture, beautiful interfaces, and reliable
+                  performance.
+                </p>
+
+                <Link
+                  to="/contact"
+                  className="
+                    group inline-flex items-center justify-center
+                    mt-10
+                    rounded-2xl
+                    bg-gradient-to-r
+                    from-cyan-500
+                    to-blue-600
+                    px-10 py-4
+                    text-lg font-semibold
+                    text-white
+                    shadow-[0_10px_40px_rgba(6,182,212,0.35)]
+                    transition-all duration-300
+                    hover:scale-105
+                  "
+                >
+                  Contact Me
+                </Link>
               </div>
-            );
-          })}
-        </div>
-
-        {/* CTA */}
-        <div className="mt-28 max-w-4xl mx-auto">
-          <div
-            className="
-              relative overflow-hidden
-
-              rounded-[40px]
-              border border-white/10
-
-              bg-gradient-to-b
-              from-white/[0.07]
-              to-white/[0.03]
-
-              backdrop-blur-3xl
-
-              px-8 py-14 md:px-14
-
-              text-center
-
-              shadow-[0_20px_80px_rgba(0,0,0,0.35)]
-            "
-          >
-            {/* Glow */}
-            <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/10 to-blue-600/10" />
-
-            {/* Top Line */}
-            <div className="absolute inset-x-0 top-0 h-[1px] bg-gradient-to-r from-transparent via-cyan-400/50 to-transparent" />
-
-            <div className="relative z-10">
-              <h3
-                className="
-                  text-4xl md:text-5xl
-                  font-black
-                  tracking-tight
-                  text-white
-                "
-              >
-                Ready to build something amazing?
-              </h3>
-
-              <p
-                className="
-                  mt-6
-                  text-lg md:text-xl
-                  leading-relaxed
-                  text-gray-400
-                "
-              >
-                Let’s turn your ideas into premium digital products with
-                scalable architecture, beautiful interfaces, and reliable
-                performance.
-              </p>
-
-              <Link
-                to="/contact"
-                className="
-                  group inline-flex items-center justify-center
-
-                  mt-10
-
-                  rounded-2xl
-
-                  bg-gradient-to-r
-                  from-cyan-500
-                  to-blue-600
-
-                  px-10 py-4
-
-                  text-lg font-semibold
-                  text-white
-
-                  shadow-[0_10px_40px_rgba(6,182,212,0.35)]
-
-                  transition-all duration-300
-
-                  hover:scale-105
-                "
-              >
-                Contact Me
-              </Link>
             </div>
           </div>
         </div>
-      </div>
-    </section>
+      </section>
+    </>
   );
 }

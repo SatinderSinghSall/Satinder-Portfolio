@@ -1,6 +1,7 @@
 import { useState } from "react";
 import axios from "axios";
 import toast, { Toaster } from "react-hot-toast";
+import { Helmet } from "react-helmet-async";
 import {
   ArrowUpRight,
   Sparkles,
@@ -224,8 +225,82 @@ export default function Contact() {
     }
   };
 
+  /* SEO Structured Data (JSON-LD) */
+  const contactSchema = {
+    "@context": "https://schema.org",
+    "@type": "ContactPage",
+    name: "Contact Me - Digital Product Development & Collaboration",
+    description:
+      "Reach out to discuss tech, startups, freelancing, software engineering, and web development opportunities.",
+    mainEntity: {
+      "@type": "Person",
+      name: "Developer & Creator",
+      jobTitle: "Full Stack Engineer & UI/UX Specialist",
+      knowsAbout: [
+        "Web Development",
+        "React",
+        "Software Engineering",
+        "UI/UX Design",
+        "Startups",
+      ],
+    },
+  };
+
   return (
     <>
+      {/* SEO META HEAD TAGS */}
+      <Helmet>
+        <title>
+          Contact Me | Web / Mobile App Development & Collaboration Opportunities | By - Satinder Singh Sall
+        </title>
+        <meta
+          name="description"
+          content="Reach out to discuss product ideas, startup collaborations, full-stack development opportunities, freelancing, or tech discussions. Response time within 24 hours."
+        />
+        <meta
+          name="keywords"
+          content="Contact Developer, Freelance Web Developer, React Developer, Full Stack Engineer, Tech Collaboration, Hire Developer, Startup Tech Consultant"
+        />
+        <meta name="robots" content="index, follow" />
+        <link rel="canonical" href="https://yourwebsite.com/contact" />
+
+        {/* Open Graph / Facebook */}
+        <meta property="og:type" content="website" />
+        <meta
+          property="og:title"
+          content="Contact Me | Web Development & Collaboration"
+        />
+        <meta
+          property="og:description"
+          content="Let’s build something iconic. Reach out for development opportunities, freelancing, startups, and product design."
+        />
+        <meta property="og:url" content="https://yourwebsite.com/contact" />
+        <meta
+          property="og:image"
+          content="https://yourwebsite.com/og-contact.jpg"
+        />
+
+        {/* Twitter */}
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta
+          name="twitter:title"
+          content="Contact Me | Web Development & Collaboration"
+        />
+        <meta
+          name="twitter:description"
+          content="Let’s build something iconic. Reach out for development opportunities, freelancing, startups, and product design."
+        />
+        <meta
+          name="twitter:image"
+          content="https://yourwebsite.com/og-contact.jpg"
+        />
+
+        {/* Structured Data (JSON-LD) */}
+        <script type="application/ld+json">
+          {JSON.stringify(contactSchema)}
+        </script>
+      </Helmet>
+
       {/* PREMIUM TOASTER */}
       <Toaster
         position="top-right"
@@ -239,7 +314,7 @@ export default function Contact() {
 
       <section className="relative min-h-screen overflow-hidden bg-[#030712] text-white">
         {/* BACKGROUND */}
-        <div className="absolute inset-0 overflow-hidden">
+        <div className="absolute inset-0 overflow-hidden" aria-hidden="true">
           {/* GLOW ORBS */}
           <div className="absolute left-[10%] top-[10%] h-[420px] w-[420px] rounded-full bg-blue-500/20 blur-[120px]" />
 
@@ -255,7 +330,7 @@ export default function Contact() {
         </div>
 
         {/* HERO TOP CENTER */}
-        <div
+        <header
           className="
           relative
           mx-auto
@@ -281,6 +356,7 @@ export default function Contact() {
             bg-cyan-500/12
             blur-[140px]
           "
+            aria-hidden="true"
           />
 
           {/* SECONDARY GLOW */}
@@ -296,6 +372,7 @@ export default function Contact() {
             bg-violet-500/10
             blur-[120px]
           "
+            aria-hidden="true"
           />
 
           {/* TOP LABEL */}
@@ -414,7 +491,7 @@ export default function Contact() {
               </div>
             ))}
           </div>
-        </div>
+        </header>
 
         {/* CONTAINER */}
         <div
@@ -468,7 +545,7 @@ export default function Contact() {
               </div>
 
               {/* TITLE */}
-              <h1
+              <h2
                 className="
                   max-w-xl
                   text-4xl
@@ -483,7 +560,7 @@ export default function Contact() {
               >
                 Let’s build
                 <span className="block text-white/45">something iconic.</span>
-              </h1>
+              </h2>
 
               {/* DESCRIPTION */}
               <p
@@ -620,7 +697,10 @@ export default function Contact() {
             {/* RIGHT SIDE */}
             <div className="relative flex items-center">
               {/* GLOW */}
-              <div className="absolute -inset-[1px] rounded-[36px] bg-gradient-to-b from-white/20 via-white/5 to-transparent opacity-50 blur-xl" />
+              <div
+                className="absolute -inset-[1px] rounded-[36px] bg-gradient-to-b from-white/20 via-white/5 to-transparent opacity-50 blur-xl"
+                aria-hidden="true"
+              />
 
               {/* CARD */}
               <div
@@ -645,9 +725,9 @@ export default function Contact() {
                       Start a conversation
                     </p>
 
-                    <h2 className="mt-2 text-2xl font-semibold text-white">
+                    <h3 className="mt-2 text-2xl font-semibold text-white">
                       Contact Form
-                    </h2>
+                    </h3>
                   </div>
 
                   <div
@@ -668,19 +748,24 @@ export default function Contact() {
                 </div>
 
                 {/* FORM */}
-                <form onSubmit={handleSubmit} className="space-y-5">
+                <form onSubmit={handleSubmit} className="space-y-5" noValidate>
                   {/* NAME */}
                   <div>
-                    <label className="mb-2 block text-sm text-white/50">
+                    <label
+                      htmlFor="name"
+                      className="mb-2 block text-sm text-white/50"
+                    >
                       Full Name
                     </label>
 
                     <input
+                      id="name"
                       type="text"
                       name="name"
                       value={form.name}
                       onChange={handleChange}
                       placeholder="John Doe"
+                      autoComplete="name"
                       className="
                         h-14
                         w-full
@@ -707,16 +792,21 @@ export default function Contact() {
 
                   {/* EMAIL */}
                   <div>
-                    <label className="mb-2 block text-sm text-white/50">
+                    <label
+                      htmlFor="email"
+                      className="mb-2 block text-sm text-white/50"
+                    >
                       Email Address
                     </label>
 
                     <input
+                      id="email"
                       type="email"
                       name="email"
                       value={form.email}
                       onChange={handleChange}
                       placeholder="you@main.com"
+                      autoComplete="email"
                       className="
                         h-14
                         w-full
@@ -745,11 +835,15 @@ export default function Contact() {
 
                   {/* MESSAGE */}
                   <div>
-                    <label className="mb-2 block text-sm text-white/50">
+                    <label
+                      htmlFor="message"
+                      className="mb-2 block text-sm text-white/50"
+                    >
                       Message
                     </label>
 
                     <textarea
+                      id="message"
                       rows="6"
                       name="message"
                       value={form.message}

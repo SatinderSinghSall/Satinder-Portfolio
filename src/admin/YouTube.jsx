@@ -13,6 +13,8 @@ import {
   LinkIcon,
   ArrowPathIcon,
   MagnifyingGlassIcon,
+  ChevronLeftIcon,
+  ChevronRightIcon,
 } from "@heroicons/react/24/outline";
 import { EyeIcon } from "@heroicons/react/24/outline";
 
@@ -55,10 +57,16 @@ export default function ManageYouTube() {
   const [viewModal, setViewModal] = useState(false);
   const [selectedVideo, setSelectedVideo] = useState(null);
 
-  // ✅ Filters (Project.jsx style)
+  // Filters
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [sort, setSort] = useState("latest");
+
+  // ✅ Pagination State
+  const [page, setPage] = useState(1);
+  const [limit, setLimit] = useState(6);
+  const [totalPages, setTotalPages] = useState(1);
+  const [totalVideos, setTotalVideos] = useState(0);
 
   const [form, setForm] = useState({
     title: "",
@@ -78,16 +86,36 @@ export default function ManageYouTube() {
     };
   }, [token]);
 
-  const fetchVideos = async () => {
+  const fetchVideos = async (overridePage) => {
     setFetching(true);
+    const currentPage = overridePage ?? page;
+
     try {
-      const params = {};
+      const params = {
+        page: currentPage,
+        limit: limit,
+      };
       if (statusFilter !== "all") params.status = statusFilter;
       if (search.trim()) params.search = search.trim();
       if (sort) params.sort = sort;
 
       const res = await axios.get(`${API}/youtube`, { params });
-      setVideos(res.data);
+
+      // Support both paginated API response structures and array responses
+      if (res.data && Array.isArray(res.data.videos)) {
+        setVideos(res.data.videos);
+        setTotalPages(res.data.totalPages || 1);
+        setTotalVideos(
+          res.data.totalVideos || res.data.total || res.data.videos.length,
+        );
+      } else if (Array.isArray(res.data)) {
+        // Client-side pagination fallback if backend returns flat array
+        const start = (currentPage - 1) * limit;
+        const end = start + limit;
+        setVideos(res.data.slice(start, end));
+        setTotalPages(Math.ceil(res.data.length / limit) || 1);
+        setTotalVideos(res.data.length);
+      }
     } catch {
       toast.error("Failed to fetch videos");
     } finally {
@@ -98,7 +126,12 @@ export default function ManageYouTube() {
   useEffect(() => {
     fetchVideos();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [statusFilter, sort]);
+  }, [page, statusFilter, sort, limit]);
+
+  const handleApplyFilters = () => {
+    setPage(1);
+    fetchVideos(1);
+  };
 
   const handleChange = (e) =>
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -197,11 +230,11 @@ export default function ManageYouTube() {
 
           <div className="flex items-center gap-3">
             <span className="text-sm text-gray-500">
-              Total Videos: {videos.length}
+              Total Videos: {totalVideos}
             </span>
 
             <button
-              onClick={fetchVideos}
+              onClick={() => fetchVideos()}
               disabled={fetching}
               className={`inline-flex items-center gap-2 px-3 py-2 rounded-md border font-medium transition
             ${
@@ -220,14 +253,14 @@ export default function ManageYouTube() {
           </div>
         </div>
 
-        {/* ✅ Filters Bar (like Projects.jsx) */}
+        {/* Filters Bar */}
         <div className="bg-white border border-gray-200 rounded-xl p-4 shadow-sm mb-6 flex flex-col md:flex-row md:items-center gap-3">
           <div className="relative flex-1">
             <MagnifyingGlassIcon className="h-5 w-5 absolute left-3 top-2.5 text-gray-400" />
             <input
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              onKeyDown={(e) => e.key === "Enter" && fetchVideos()}
+              onKeyDown={(e) => e.key === "Enter" && handleApplyFilters()}
               placeholder="Search videos by title, tags, author..."
               className="w-full pl-10 pr-3 py-2.5 border rounded-md"
             />
@@ -235,7 +268,10 @@ export default function ManageYouTube() {
 
           <select
             value={statusFilter}
-            onChange={(e) => setStatusFilter(e.target.value)}
+            onChange={(e) => {
+              setStatusFilter(e.target.value);
+              setPage(1);
+            }}
             className="px-3 py-2.5 border rounded-md"
           >
             <option value="all">All</option>
@@ -245,15 +281,33 @@ export default function ManageYouTube() {
 
           <select
             value={sort}
-            onChange={(e) => setSort(e.target.value)}
+            onChange={(e) => {
+              setSort(e.target.value);
+              setPage(1);
+            }}
             className="px-3 py-2.5 border rounded-md"
           >
             <option value="latest">Latest</option>
             <option value="oldest">Oldest</option>
           </select>
 
+          <select
+            value={limit}
+            onChange={(e) => {
+              setLimit(Number(e.target.value));
+              setPage(1);
+            }}
+            className="px-3 py-2.5 border rounded-md"
+            title="Items per page"
+          >
+            <option value={4}>4 per page</option>
+            <option value={6}>6 per page</option>
+            <option value={10}>10 per page</option>
+            <option value={20}>20 per page</option>
+          </select>
+
           <button
-            onClick={fetchVideos}
+            onClick={handleApplyFilters}
             disabled={fetching}
             className={`px-4 py-2.5 rounded-md font-medium text-white transition inline-flex items-center justify-center gap-2
           ${
@@ -266,7 +320,7 @@ export default function ManageYouTube() {
           </button>
         </div>
 
-        {/* FORM (UNCHANGED UI) */}
+        {/* FORM */}
         <form
           onSubmit={handleSubmit}
           className="bg-white border rounded-xl p-6 shadow-sm mb-10"
@@ -377,7 +431,7 @@ export default function ManageYouTube() {
 
         {/* LIST */}
         {fetching ? (
-          <div className="flex justify-center text-gray-600">
+          <div className="flex justify-center text-gray-600 py-16">
             <Spinner text="Loading videos..." />
           </div>
         ) : videos.length === 0 ? (
@@ -388,61 +442,61 @@ export default function ManageYouTube() {
             </p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 xl:grid-cols-2 gap-5">
-            {videos.map((video) => (
-              <div
-                key={video._id}
-                className="bg-white border rounded-xl overflow-hidden hover:shadow-md transition"
-              >
-                {/* Thumbnail */}
-                <div className="h-44 bg-gray-100 overflow-hidden">
-                  {video.thumbnail ? (
-                    <img
-                      src={video.thumbnail}
-                      alt={video.title}
-                      className="w-full h-full object-cover hover:scale-105 transition-transform duration-500"
-                    />
-                  ) : (
-                    <div className="h-full flex items-center justify-center text-gray-400">
-                      No Thumbnail
-                    </div>
-                  )}
-                </div>
+          <>
+            <div className="grid grid-cols-1 xl:grid-cols-2 gap-5">
+              {videos.map((video) => (
+                <div
+                  key={video._id}
+                  className="bg-white border rounded-xl overflow-hidden hover:shadow-md transition"
+                >
+                  {/* Thumbnail */}
+                  <div className="h-44 bg-gray-100 overflow-hidden">
+                    {video.thumbnail ? (
+                      <img
+                        src={video.thumbnail}
+                        alt={video.title}
+                        className="w-full h-full object-cover hover:scale-105 transition-transform duration-500"
+                      />
+                    ) : (
+                      <div className="h-full flex items-center justify-center text-gray-400">
+                        No Thumbnail
+                      </div>
+                    )}
+                  </div>
 
-                <div className="p-4">
-                  <div className="flex justify-between items-start gap-4">
-                    <div className="min-w-0">
-                      <h3 className="font-semibold text-gray-800 text-lg truncate">
-                        {video.title}
-                      </h3>
+                  <div className="p-4">
+                    <div className="flex justify-between items-start gap-4">
+                      <div className="min-w-0">
+                        <h3 className="font-semibold text-gray-800 text-lg truncate">
+                          {video.title}
+                        </h3>
 
-                      <p className="text-xs text-gray-500 mt-1">
-                        {video.author || "Admin"} •{" "}
-                        {video.status === "published" ? (
-                          <span className="text-green-600 font-semibold">
-                            PUBLISHED
-                          </span>
-                        ) : (
-                          <span className="text-yellow-600 font-semibold">
-                            DRAFT
-                          </span>
+                        <p className="text-xs text-gray-500 mt-1">
+                          {video.author || "Admin"} •{" "}
+                          {video.status === "published" ? (
+                            <span className="text-green-600 font-semibold">
+                              PUBLISHED
+                            </span>
+                          ) : (
+                            <span className="text-yellow-600 font-semibold">
+                              DRAFT
+                            </span>
+                          )}
+                        </p>
+
+                        {video.videoUrl && (
+                          <a
+                            href={video.videoUrl}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="inline-flex items-center gap-1 text-xs mt-2 px-2 py-1 rounded-full bg-red-50 text-red-700 border border-red-200 hover:bg-red-100 transition"
+                          >
+                            <LinkIcon className="h-4 w-4" />
+                            Open Video
+                          </a>
                         )}
-                      </p>
+                      </div>
 
-                      {video.videoUrl && (
-                        <a
-                          href={video.videoUrl}
-                          target="_blank"
-                          rel="noreferrer"
-                          className="inline-flex items-center gap-1 text-xs mt-2 px-2 py-1 rounded-full bg-red-50 text-red-700 border border-red-200 hover:bg-red-100 transition"
-                        >
-                          <LinkIcon className="h-4 w-4" />
-                          Open Video
-                        </a>
-                      )}
-                    </div>
-
-                    <div className="flex gap-2">
                       <div className="flex gap-2">
                         <button
                           onClick={() => handleView(video)}
@@ -472,30 +526,81 @@ export default function ManageYouTube() {
                         </button>
                       </div>
                     </div>
-                  </div>
 
-                  <p className="text-sm text-gray-600 mt-3 line-clamp-2">
-                    {video.description || "No description added yet."}
-                  </p>
+                    <p className="text-sm text-gray-600 mt-3 line-clamp-2">
+                      {video.description || "No description added yet."}
+                    </p>
 
-                  <div className="flex flex-wrap gap-2 mt-4">
-                    {video.tags?.length > 0 ? (
-                      video.tags.map((tag) => (
-                        <span
-                          key={tag}
-                          className="text-xs bg-gray-100 px-2 py-1 rounded-full border"
-                        >
-                          #{tag}
-                        </span>
-                      ))
-                    ) : (
-                      <span className="text-xs text-gray-400">No tags</span>
-                    )}
+                    <div className="flex flex-wrap gap-2 mt-4">
+                      {video.tags?.length > 0 ? (
+                        video.tags.map((tag) => (
+                          <span
+                            key={tag}
+                            className="text-xs bg-gray-100 px-2 py-1 rounded-full border"
+                          >
+                            #{tag}
+                          </span>
+                        ))
+                      ) : (
+                        <span className="text-xs text-gray-400">No tags</span>
+                      )}
+                    </div>
                   </div>
                 </div>
+              ))}
+            </div>
+
+            {/* ✅ PAGINATION CONTROLS */}
+            {totalPages > 1 && (
+              <div className="bg-white border rounded-xl p-4 shadow-sm mt-6 flex flex-col sm:flex-row items-center justify-between gap-4">
+                <span className="text-sm text-gray-600">
+                  Page <span className="font-semibold">{page}</span> of{" "}
+                  <span className="font-semibold">{totalPages}</span>
+                </span>
+
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={() => setPage((prev) => Math.max(prev - 1, 1))}
+                    disabled={page === 1 || fetching}
+                    className="inline-flex items-center gap-1 px-3 py-2 border rounded-md text-sm font-medium transition text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    <ChevronLeftIcon className="h-4 w-4" />
+                    Previous
+                  </button>
+
+                  <div className="flex items-center gap-1">
+                    {Array.from({ length: totalPages }, (_, i) => i + 1).map(
+                      (p) => (
+                        <button
+                          key={p}
+                          onClick={() => setPage(p)}
+                          disabled={fetching}
+                          className={`px-3 py-1.5 rounded-md text-sm font-medium transition ${
+                            page === p
+                              ? "bg-red-600 text-white"
+                              : "bg-white text-gray-700 border hover:bg-gray-50"
+                          }`}
+                        >
+                          {p}
+                        </button>
+                      ),
+                    )}
+                  </div>
+
+                  <button
+                    onClick={() =>
+                      setPage((prev) => Math.min(prev + 1, totalPages))
+                    }
+                    disabled={page === totalPages || fetching}
+                    className="inline-flex items-center gap-1 px-3 py-2 border rounded-md text-sm font-medium transition text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    Next
+                    <ChevronRightIcon className="h-4 w-4" />
+                  </button>
+                </div>
               </div>
-            ))}
-          </div>
+            )}
+          </>
         )}
 
         {/* Delete Modal */}
@@ -533,6 +638,7 @@ export default function ManageYouTube() {
           </div>
         )}
 
+        {/* View Modal */}
         {viewModal && selectedVideo && (
           <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4 overflow-y-auto">
             <div className="bg-white rounded-2xl shadow-2xl w-full max-w-3xl max-h-[90vh] flex flex-col">

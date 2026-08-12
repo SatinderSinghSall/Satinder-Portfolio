@@ -1,82 +1,105 @@
-import { useEffect, useMemo, useState } from "react";
+import React, { useState, useEffect, useMemo, useRef } from "react";
 import axios from "axios";
 import AdminLayout from "../components/AdminLayout";
 import toast from "react-hot-toast";
 import {
-  Edit,
-  Trash2,
-  Plus,
-  FolderKanban,
-  Github,
-  ExternalLink,
-  AlertTriangle,
-  Loader2,
+  MagnifyingGlassIcon,
+  ArrowPathIcon,
+  PencilSquareIcon,
+  TrashIcon,
+  EyeIcon,
+  FolderIcon,
+  ChevronLeftIcon,
+  ChevronRightIcon,
+  StarIcon,
+  PlusIcon,
+  DocumentTextIcon,
+  PhotoIcon,
   TagIcon,
-  Search,
-  RefreshCcw,
-  Eye,
-} from "lucide-react";
+  XMarkIcon,
+  ExclamationTriangleIcon,
+  LinkIcon,
+  CheckIcon,
+  CodeBracketIcon,
+  GlobeAltIcon,
+  HashtagIcon,
+  HeartIcon,
+  ChartBarIcon,
+} from "@heroicons/react/24/outline";
 
 const API = import.meta.env.VITE_API_URL || "/api";
 
-const Spinner = ({ text }) => (
-  <div className="flex items-center gap-2">
-    <Loader2 className="w-5 h-5 animate-spin" />
-    <span>{text}</span>
-  </div>
-);
-
 export default function Projects() {
   const [projects, setProjects] = useState([]);
-  const [form, setForm] = useState({
+  const [loading, setLoading] = useState(true);
+  const [submitting, setSubmitting] = useState(false);
+
+  // Edit State
+  const [editingId, setEditingId] = useState(null);
+  const formRef = useRef(null);
+
+  // Modal States
+  const [viewingProject, setViewingProject] = useState(null);
+  const [deletingProject, setDeletingProject] = useState(null);
+  const [deleting, setDeleting] = useState(false);
+
+  // --- Form State (Mapped exactly to Mongoose Schema) ---
+  const initialFormState = {
     title: "",
     description: "",
-    technologies: [],
+    technologies: "", // Comma-separated in UI -> Array on Submit
     githubLink: "",
     link: "",
-    imageFiles: [],
-    priority: 0,
+    images: "", // Comma-separated URLs in UI -> Array on Submit
     featured: false,
-  });
-
-  const [editingId, setEditingId] = useState(null);
-  const [loading, setLoading] = useState(false);
-  const [fetching, setFetching] = useState(false);
-  const token = localStorage.getItem("token");
-
-  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-  const [selectedProjectId, setSelectedProjectId] = useState(null);
-  const [deleteLoading, setDeleteLoading] = useState(false);
-  const [isViewModalOpen, setIsViewModalOpen] = useState(false);
-  const [selectedProject, setSelectedProject] = useState(null);
-
-  const [search, setSearch] = useState("");
-  const [techFilter, setTechFilter] = useState("all");
-  const [sort, setSort] = useState("latest"); // latest | oldest
-
-  const handleViewProject = async (id) => {
-    try {
-      const res = await axios.get(`${API}/projects/${id}`);
-      setSelectedProject(res.data);
-      setIsViewModalOpen(true);
-    } catch {
-      toast.error("Failed to fetch project");
-    }
+    priority: 0,
+    order: 0,
   };
 
-  const headers = useMemo(() => {
-    return { Authorization: `Bearer ${token}` };
-  }, [token]);
+  const [form, setForm] = useState(initialFormState);
+
+  // --- Search & Filter State ---
+  const [searchTerm, setSearchTerm] = useState("");
+  const [selectedFeatured, setSelectedFeatured] = useState("All");
+  const [sortBy, setSortBy] = useState("latest");
+
+  // --- Pagination State ---
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 4;
+
+  const token = localStorage.getItem("token");
+  const headers = useMemo(
+    () => ({ Authorization: `Bearer ${token}` }),
+    [token],
+  );
+
+  const handleFormChange = (e) => {
+    const { name, value, type, checked } = e.target;
+    setForm((prev) => ({
+      ...prev,
+      [name]: type === "checkbox" ? checked : value,
+    }));
+  };
 
   const fetchProjects = async () => {
-    setFetching(true);
+    setLoading(true);
     try {
-      const res = await axios.get(`${API}/projects`);
-      setProjects(res.data || []);
-    } catch {
-      toast.error("Failed to fetch projects");
+      const res = await axios.get(`${API}/projects`, { headers });
+      let projectList = [];
+      if (Array.isArray(res.data)) {
+        projectList = res.data;
+      } else if (Array.isArray(res.data.projects)) {
+        projectList = res.data.projects;
+      } else if (Array.isArray(res.data.data)) {
+        projectList = res.data.data;
+      }
+      setProjects(projectList);
+    } catch (err) {
+      console.error("Fetch Error:", err);
+      toast.error("Failed to load projects");
+      setProjects([]);
     } finally {
-      setFetching(false);
+      setLoading(false);
     }
   };
 
@@ -84,656 +107,783 @@ export default function Projects() {
     fetchProjects();
   }, []);
 
-  const handleChange = (e) => {
-    const { name, value, type, checked } = e.target;
-
-    if (name === "technologies") {
-      setForm({
-        ...form,
-        technologies: value.split(",").map((t) => t.trim()),
-      });
-    } else {
-      setForm({
-        ...form,
-        [name]: type === "checkbox" ? checked : value,
-      });
-    }
+  const handleStartEdit = (project) => {
+    setEditingId(project._id);
+    setForm({
+      title: project.title || "",
+      description: project.description || "",
+      technologies: Array.isArray(project.technologies)
+        ? project.technologies.join(", ")
+        : project.technologies || "",
+      githubLink: project.githubLink || "",
+      link: project.link || "",
+      images: Array.isArray(project.images)
+        ? project.images.join(", ")
+        : project.images || "",
+      featured: Boolean(project.featured),
+      priority: project.priority || 0,
+      order: project.order || 0,
+    });
+    formRef.current?.scrollIntoView({ behavior: "smooth" });
   };
 
-  const handleSubmit = async (e) => {
+  const handleCancelEdit = () => {
+    setEditingId(null);
+    setForm(initialFormState);
+  };
+
+  const handleFormSubmit = async (e) => {
     e.preventDefault();
 
     if (
-      !form.title ||
-      !form.description ||
-      !form.githubLink ||
-      !form.technologies.length ||
-      !form.link
+      !form.title.trim() ||
+      !form.githubLink.trim() ||
+      !form.technologies.trim()
     ) {
-      toast.error("All fields are required.");
+      toast.error("Title, Technologies, and GitHub Link are required!");
       return;
     }
 
-    setLoading(true);
+    setSubmitting(true);
+    const payload = {
+      ...form,
+      priority: Number(form.priority) || 0,
+      order: Number(form.order) || 0,
+      technologies: form.technologies
+        ? form.technologies
+            .split(",")
+            .map((t) => t.trim())
+            .filter(Boolean)
+        : [],
+      images: form.images
+        ? form.images
+            .split(",")
+            .map((img) => img.trim())
+            .filter(Boolean)
+        : [],
+    };
 
     try {
-      const formData = new FormData();
-      formData.append("title", form.title);
-      formData.append("description", form.description);
-      formData.append("link", form.link);
-      formData.append("githubLink", form.githubLink);
-      formData.append("technologies", form.technologies.join(","));
-      formData.append("featured", form.featured);
-      formData.append("priority", form.priority);
-      if (form.imageFiles?.length) {
-        form.imageFiles.forEach((file) => {
-          formData.append("images", file);
-        });
+      if (editingId) {
+        await axios.put(`${API}/projects/${editingId}`, payload, { headers });
+        toast.success("Project updated successfully!");
+      } else {
+        await axios.post(`${API}/projects`, payload, { headers });
+        toast.success("Project created successfully!");
       }
 
-      editingId
-        ? await axios.put(`${API}/projects/${editingId}`, formData, { headers })
-        : await axios.post(`${API}/projects`, formData, { headers });
-
-      toast.success(editingId ? "Project updated" : "Project added");
-
-      setForm({
-        title: "",
-        description: "",
-        link: "",
-        githubLink: "",
-        technologies: [],
-        imageFiles: [],
-        priority: 0,
-        featured: false,
-      });
-
-      setEditingId(null);
+      handleCancelEdit();
       fetchProjects();
-      window.scrollTo({ top: 0, behavior: "smooth" });
-    } catch {
-      toast.error("Failed to save project");
+    } catch (err) {
+      console.error("Submit Error:", err);
+      toast.error(err.response?.data?.message || "Operation failed");
     } finally {
-      setLoading(false);
+      setSubmitting(false);
     }
   };
 
-  const handleEdit = (project) => {
-    setForm({
-      title: project.title,
-      description: project.description,
-      link: project.link,
-      technologies: project.technologies,
-      githubLink: project.githubLink,
-      priority: project.priority || 0,
-      featured: project.featured || false,
-      imageFiles: [],
-    });
-    setEditingId(project._id);
-    window.scrollTo({ top: 0, behavior: "smooth" });
-  };
-
-  const handleDelete = async () => {
-    if (!selectedProjectId) return;
-    setDeleteLoading(true);
-
+  const confirmDelete = async () => {
+    if (!deletingProject) return;
+    setDeleting(true);
     try {
-      await axios.delete(`${API}/projects/${selectedProjectId}`, { headers });
-      toast.success("Project deleted");
-      fetchProjects();
-    } catch {
-      toast.error("Delete failed");
+      await axios.delete(`${API}/projects/${deletingProject._id}`, { headers });
+      toast.success("Project deleted successfully!");
+      setProjects((prev) => prev.filter((p) => p._id !== deletingProject._id));
+      setDeletingProject(null);
+    } catch (err) {
+      console.error(err);
+      toast.error("Failed to delete project");
     } finally {
-      setDeleteLoading(false);
-      setIsDeleteModalOpen(false);
-      setSelectedProjectId(null);
+      setDeleting(false);
     }
   };
 
-  const uniqueTechnologies = useMemo(() => {
-    const set = new Set();
-    projects.forEach((p) => {
-      (p.technologies || []).forEach((t) => set.add(t));
-    });
-    return Array.from(set).sort();
-  }, [projects]);
-
-  // Filter + Search + Sort
   const filteredProjects = useMemo(() => {
-    let list = [...projects];
+    if (!Array.isArray(projects)) return [];
 
-    // search by title/description/tech
-    if (search.trim()) {
-      const q = search.toLowerCase().trim();
-      list = list.filter((p) => {
-        const title = (p.title || "").toLowerCase();
-        const desc = (p.description || "").toLowerCase();
-        const techs = (p.technologies || []).join(" ").toLowerCase();
-        return title.includes(q) || desc.includes(q) || techs.includes(q);
+    return projects
+      .filter((project) => {
+        const matchesSearch =
+          project.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          project.description
+            ?.toLowerCase()
+            .includes(searchTerm.toLowerCase()) ||
+          project.technologies?.some((t) =>
+            t.toLowerCase().includes(searchTerm.toLowerCase()),
+          );
+
+        const matchesFeatured =
+          selectedFeatured === "All" ||
+          (selectedFeatured === "Featured" && project.featured) ||
+          (selectedFeatured === "Normal" && !project.featured);
+
+        return matchesSearch && matchesFeatured;
+      })
+      .sort((a, b) => {
+        if (sortBy === "latest") {
+          return (
+            new Date(b.createdAt || Date.now()) -
+            new Date(a.createdAt || Date.now())
+          );
+        }
+        if (sortBy === "oldest") {
+          return (
+            new Date(a.createdAt || Date.now()) -
+            new Date(b.createdAt || Date.now())
+          );
+        }
+        if (sortBy === "title") {
+          return (a.title || "").localeCompare(b.title || "");
+        }
+        if (sortBy === "priority") {
+          return (b.priority || 0) - (a.priority || 0);
+        }
+        if (sortBy === "order") {
+          return (a.order || 0) - (b.order || 0);
+        }
+        return 0;
       });
-    }
+  }, [projects, searchTerm, selectedFeatured, sortBy]);
 
-    // tech filter
-    if (techFilter !== "all") {
-      list = list.filter((p) => (p.technologies || []).includes(techFilter));
-    }
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm, selectedFeatured, sortBy]);
 
-    // sort by createdAt (if exists) else keep order
-    if (sort === "latest") {
-      list.sort(
-        (a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0),
-      );
-    }
-    if (sort === "oldest") {
-      list.sort(
-        (a, b) => new Date(a.createdAt || 0) - new Date(b.createdAt || 0),
-      );
-    }
-
-    return list;
-  }, [projects, search, techFilter, sort]);
-
-  const toggleFeatured = async (id) => {
-    try {
-      await axios.patch(
-        `${API}/projects/${id}/toggle-featured`,
-        {},
-        { headers },
-      );
-      setProjects((prev) =>
-        prev.map((p) => (p._id === id ? { ...p, featured: !p.featured } : p)),
-      );
-      toast.success("Updated");
-    } catch {
-      toast.error("Failed");
-    }
-  };
+  const totalPages = Math.ceil(filteredProjects.length / itemsPerPage) || 1;
+  const paginatedProjects = useMemo(() => {
+    const start = (currentPage - 1) * itemsPerPage;
+    return filteredProjects.slice(start, start + itemsPerPage);
+  }, [filteredProjects, currentPage, itemsPerPage]);
 
   return (
     <AdminLayout>
-      <div className="w-full max-w-[1400px] mx-auto px-6 pb-16">
-        {/* HEADER */}
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
+        {/* HEADER BAR */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div className="flex items-center gap-3">
-            <FolderKanban className="w-7 h-7 text-indigo-600" />
+            <span className="inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-indigo-50 text-indigo-600 ring-1 ring-indigo-500/10">
+              <FolderIcon className="h-6 w-6" />
+            </span>
             <div>
-              <h2 className="text-2xl font-semibold text-gray-800">
-                Project Management CMS
-              </h2>
-              <p className="text-sm text-gray-500">
-                Manage your portfolio projects.
+              <h1 className="text-2xl font-bold text-gray-900 tracking-tight">
+                Manage Projects CMS
+              </h1>
+              <p className="text-xs text-gray-500">
+                Custom Portfolio Project Management
               </p>
             </div>
           </div>
 
-          {/* Refresh Button */}
           <div className="flex items-center gap-3">
-            <span className="text-sm text-gray-500">
-              Total Projects: {projects.length}
+            <span className="text-xs font-semibold text-gray-500 bg-white px-3.5 py-2 rounded-xl border border-gray-200 shadow-sm">
+              Total Projects:{" "}
+              <strong className="text-gray-900">
+                {filteredProjects.length}
+              </strong>
             </span>
-
             <button
               onClick={fetchProjects}
-              disabled={fetching}
-              className={`inline-flex items-center gap-2 px-3 py-2 rounded-md border font-medium transition
-            ${
-              fetching
-                ? "bg-gray-100 text-gray-400 cursor-not-allowed"
-                : "bg-white hover:bg-gray-50 text-gray-700"
-            }`}
+              className="inline-flex items-center gap-1.5 bg-white border border-gray-200 hover:bg-gray-50 text-gray-700 text-xs font-semibold px-3.5 py-2 rounded-xl transition shadow-sm"
             >
-              <RefreshCcw
-                className={`w-5 h-5 ${
-                  fetching ? "animate-spin text-indigo-600" : "text-gray-600"
-                }`}
+              <ArrowPathIcon
+                className={`w-4 h-4 ${loading ? "animate-spin" : ""}`}
               />
-              {fetching ? "Refreshing..." : "Refresh"}
+              Refresh
             </button>
           </div>
         </div>
 
-        {/* Search + Filter + Sort */}
-        <div className="bg-white border border-gray-200 rounded-xl p-4 shadow-sm mb-6 flex flex-col md:flex-row md:items-center gap-3">
-          <div className="relative flex-1">
-            <Search className="w-5 h-5 absolute left-3 top-2.5 text-gray-400" />
+        {/* SEARCH & FILTERS BAR */}
+        <div className="bg-white rounded-2xl border border-gray-200/80 p-4 shadow-sm flex flex-col md:flex-row items-center justify-between gap-3">
+          <div className="relative w-full md:flex-1">
+            <MagnifyingGlassIcon className="w-5 h-5 absolute left-3.5 top-3 text-gray-400" />
             <input
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
+              type="text"
               placeholder="Search projects by title, description, technologies..."
-              className="w-full pl-10 pr-3 py-2.5 border rounded-md"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="w-full pl-10 pr-4 py-2 text-sm rounded-xl border border-gray-200 outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100 transition bg-gray-50/50"
             />
           </div>
 
-          <select
-            value={techFilter}
-            onChange={(e) => setTechFilter(e.target.value)}
-            className="px-3 py-2.5 border rounded-md"
-          >
-            <option value="all">All Tech</option>
-            {uniqueTechnologies.map((tech) => (
-              <option key={tech} value={tech}>
-                {tech}
-              </option>
-            ))}
-          </select>
+          <div className="flex flex-wrap items-center gap-2 w-full md:w-auto">
+            <select
+              value={selectedFeatured}
+              onChange={(e) => setSelectedFeatured(e.target.value)}
+              className="px-3 py-2 text-xs font-medium bg-gray-50/50 border border-gray-200 rounded-xl outline-none focus:border-indigo-500 transition text-gray-700"
+            >
+              <option value="All">Featured: All</option>
+              <option value="Featured">Featured Only</option>
+              <option value="Normal">Non-Featured</option>
+            </select>
 
-          <select
-            value={sort}
-            onChange={(e) => setSort(e.target.value)}
-            className="px-3 py-2.5 border rounded-md"
-          >
-            <option value="latest">Latest</option>
-            <option value="oldest">Oldest</option>
-          </select>
-
-          <button
-            onClick={fetchProjects}
-            disabled={fetching}
-            className={`px-4 py-2.5 rounded-md font-medium text-white transition inline-flex items-center justify-center gap-2
-          ${
-            fetching
-              ? "bg-indigo-400 cursor-not-allowed"
-              : "bg-indigo-600 hover:bg-indigo-700"
-          }`}
-          >
-            {fetching ? (
-              <>
-                <Loader2 className="w-5 h-5 animate-spin" />
-                Applying...
-              </>
-            ) : (
-              "Apply"
-            )}
-          </button>
+            <select
+              value={sortBy}
+              onChange={(e) => setSortBy(e.target.value)}
+              className="px-3 py-2 text-xs font-medium bg-gray-50/50 border border-gray-200 rounded-xl outline-none focus:border-indigo-500 transition text-gray-700"
+            >
+              <option value="latest">Latest First</option>
+              <option value="oldest">Oldest First</option>
+              <option value="priority">High Priority First</option>
+              <option value="order">Display Order Asc</option>
+              <option value="title">Title A-Z</option>
+            </select>
+          </div>
         </div>
 
-        {/* FORM (UNCHANGED UI) */}
-        <form
-          onSubmit={handleSubmit}
-          className="bg-white border rounded-xl p-6 shadow-sm mb-10"
+        {/* INLINE "ADD / EDIT PROJECT" FORM */}
+        <div
+          ref={formRef}
+          className="bg-white rounded-3xl border border-gray-200/80 p-6 shadow-sm space-y-4"
         >
-          <h3 className="font-semibold text-gray-700 mb-4">
-            {editingId ? "Edit Project" : "Add New Project"}
-          </h3>
+          <div className="flex items-center justify-between">
+            <h2 className="text-sm font-bold text-gray-800 tracking-wide uppercase flex items-center gap-2">
+              {editingId ? (
+                <>
+                  <PencilSquareIcon className="w-4 h-4 text-purple-600" />
+                  Edit Project Details
+                </>
+              ) : (
+                <>
+                  <PlusIcon className="w-4 h-4 text-indigo-600" />
+                  Add New Project
+                </>
+              )}
+            </h2>
+            {editingId && (
+              <button
+                onClick={handleCancelEdit}
+                className="text-xs font-semibold text-gray-500 hover:text-gray-700 underline"
+              >
+                Cancel Editing
+              </button>
+            )}
+          </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-            {/* Project Title */}
+          <form onSubmit={handleFormSubmit} className="space-y-4">
+            {/* Title */}
             <div className="relative">
-              <FolderKanban className="w-5 h-5 absolute left-3 top-3 text-gray-400" />
+              <DocumentTextIcon className="w-5 h-5 absolute left-3.5 top-3 text-gray-400" />
               <input
+                type="text"
                 name="title"
                 value={form.title}
-                onChange={handleChange}
-                placeholder="Project Title"
-                className="w-full pl-10 pr-3 py-2.5 border rounded-md focus:ring-2 focus:ring-indigo-500"
+                onChange={handleFormChange}
+                placeholder="Project Title *"
+                required
+                className="w-full pl-11 pr-4 py-2.5 text-sm rounded-xl border border-gray-200 bg-gray-50/30 focus:bg-white outline-none focus:border-indigo-500 transition"
               />
             </div>
 
-            {/* GitHub Link */}
-            <div className="relative">
-              <Github className="w-5 h-5 absolute left-3 top-3 text-gray-400" />
-              <input
-                name="githubLink"
-                value={form.githubLink}
-                onChange={handleChange}
-                placeholder="GitHub Repository URL"
-                className="w-full pl-10 pr-3 py-2.5 border rounded-md focus:ring-2 focus:ring-indigo-500"
-              />
+            {/* Links: GitHub Link & Live Demo Link */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="relative">
+                <CodeBracketIcon className="w-5 h-5 absolute left-3.5 top-3 text-gray-400" />
+                <input
+                  type="text"
+                  name="githubLink"
+                  value={form.githubLink}
+                  onChange={handleFormChange}
+                  placeholder="GitHub Link (https://...) *"
+                  required
+                  className="w-full pl-11 pr-4 py-2.5 text-sm rounded-xl border border-gray-200 bg-gray-50/30 focus:bg-white outline-none focus:border-indigo-500 transition"
+                />
+              </div>
+
+              <div className="relative">
+                <GlobeAltIcon className="w-5 h-5 absolute left-3.5 top-3 text-gray-400" />
+                <input
+                  type="text"
+                  name="link"
+                  value={form.link}
+                  onChange={handleFormChange}
+                  placeholder="Live Project Link (https://...)"
+                  className="w-full pl-11 pr-4 py-2.5 text-sm rounded-xl border border-gray-200 bg-gray-50/30 focus:bg-white outline-none focus:border-indigo-500 transition"
+                />
+              </div>
             </div>
 
-            {/* Live Link */}
-            <div className="relative">
-              <ExternalLink className="w-5 h-5 absolute left-3 top-3 text-gray-400" />
-              <input
-                name="link"
-                value={form.link}
-                onChange={handleChange}
-                placeholder="Live Project URL"
-                className="w-full pl-10 pr-3 py-2.5 border rounded-md focus:ring-2 focus:ring-indigo-500"
-              />
+            {/* Technologies & Images */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="relative">
+                <TagIcon className="w-5 h-5 absolute left-3.5 top-3 text-gray-400" />
+                <input
+                  type="text"
+                  name="technologies"
+                  value={form.technologies}
+                  onChange={handleFormChange}
+                  placeholder="Technologies (comma separated e.g. React, Node.js, MongoDB) *"
+                  required
+                  className="w-full pl-11 pr-4 py-2.5 text-sm rounded-xl border border-gray-200 bg-gray-50/30 focus:bg-white outline-none focus:border-indigo-500 transition"
+                />
+              </div>
+
+              <div className="relative">
+                <PhotoIcon className="w-5 h-5 absolute left-3.5 top-3 text-gray-400" />
+                <input
+                  type="text"
+                  name="images"
+                  value={form.images}
+                  onChange={handleFormChange}
+                  placeholder="Image URLs (comma separated for multiple)"
+                  className="w-full pl-11 pr-4 py-2.5 text-sm rounded-xl border border-gray-200 bg-gray-50/30 focus:bg-white outline-none focus:border-indigo-500 transition"
+                />
+              </div>
             </div>
 
-            {/* Technologies */}
-            <div className="relative lg:col-span-2">
-              <TagIcon className="w-5 h-5 absolute left-3 top-3 text-gray-400" />
-              <input
-                name="technologies"
-                value={form.technologies.join(", ")}
-                onChange={handleChange}
-                placeholder="Technologies (comma separated)"
-                className="w-full pl-10 pr-3 py-2.5 border rounded-md focus:ring-2 focus:ring-indigo-500"
-              />
-            </div>
-          </div>
-
-          <div className="flex items-center gap-6 mt-2">
-            {/* Featured Toggle */}
-            <label className="flex items-center gap-2 text-sm">
-              <input
-                type="checkbox"
-                name="featured"
-                checked={form.featured}
-                onChange={handleChange}
-              />
-              Featured Project 🌟
-            </label>
-
-            {/* Priority */}
-            <input
-              type="number"
-              name="priority"
-              value={form.priority}
-              onChange={handleChange}
-              placeholder="Priority"
-              className="border rounded px-3 py-1 w-28"
+            {/* Description */}
+            <textarea
+              name="description"
+              value={form.description}
+              onChange={handleFormChange}
+              placeholder="Project Description..."
+              rows={4}
+              className="w-full p-4 text-sm rounded-xl border border-gray-200 bg-gray-50/30 focus:bg-white outline-none focus:border-indigo-500 transition resize-y font-sans"
             />
+
+            {/* Ordering, Priority, Featured & Action */}
+            <div className="grid grid-cols-1 sm:grid-cols-4 gap-4 items-end pt-2">
+              {/* Priority Input */}
+              <div>
+                <label className="block text-xs font-semibold text-gray-500 mb-1">
+                  Priority
+                </label>
+                <div className="relative">
+                  <HashtagIcon className="w-5 h-5 absolute left-3.5 top-2.5 text-gray-400" />
+                  <input
+                    type="number"
+                    name="priority"
+                    value={form.priority}
+                    onChange={handleFormChange}
+                    placeholder="e.g. 1"
+                    className="w-full pl-11 pr-4 py-2 text-sm rounded-xl border border-gray-200 bg-gray-50/30 focus:bg-white outline-none focus:border-indigo-500 transition"
+                  />
+                </div>
+              </div>
+
+              {/* Display Order Input */}
+              <div>
+                <label className="block text-xs font-semibold text-gray-500 mb-1">
+                  Display Order
+                </label>
+                <div className="relative">
+                  <HashtagIcon className="w-5 h-5 absolute left-3.5 top-2.5 text-gray-400" />
+                  <input
+                    type="number"
+                    name="order"
+                    value={form.order}
+                    onChange={handleFormChange}
+                    placeholder="e.g. 1"
+                    className="w-full pl-11 pr-4 py-2 text-sm rounded-xl border border-gray-200 bg-gray-50/30 focus:bg-white outline-none focus:border-indigo-500 transition"
+                  />
+                </div>
+              </div>
+
+              {/* Featured Checkbox */}
+              <div className="flex items-center h-10">
+                <label className="flex items-center gap-2 cursor-pointer text-sm text-gray-700 font-medium">
+                  <input
+                    type="checkbox"
+                    name="featured"
+                    checked={form.featured}
+                    onChange={handleFormChange}
+                    className="w-4 h-4 text-indigo-600 rounded border-gray-300 focus:ring-indigo-500"
+                  />
+                  Mark Featured
+                </label>
+              </div>
+              {/* Submit Button */}
+              <div>
+                <button
+                  type="submit"
+                  disabled={submitting}
+                  className={`w-full inline-flex items-center justify-center gap-2 text-white font-semibold text-sm px-6 py-2.5 rounded-xl transition shadow-md disabled:opacity-50 ${
+                    editingId
+                      ? "bg-purple-600 hover:bg-purple-700 shadow-purple-500/10"
+                      : "bg-indigo-600 hover:bg-indigo-700 shadow-indigo-500/10"
+                  }`}
+                >
+                  {editingId ? (
+                    <>
+                      <CheckIcon className="w-4 h-4" />
+                      {submitting ? "Updating..." : "Update Project"}
+                    </>
+                  ) : (
+                    <>
+                      <PlusIcon className="w-4 h-4" />
+                      {submitting ? "Adding..." : "Add Project"}
+                    </>
+                  )}
+                </button>
+              </div>
+            </div>
+          </form>
+        </div>
+
+        {/* PROJECT GRID LIST */}
+        {loading ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {[1, 2, 3, 4].map((i) => (
+              <div
+                key={i}
+                className="bg-white rounded-3xl border border-gray-200 p-4 space-y-4 animate-pulse"
+              >
+                <div className="h-48 bg-gray-200 rounded-2xl w-full" />
+                <div className="h-6 bg-gray-200 rounded w-3/4" />
+                <div className="h-4 bg-gray-200 rounded w-1/2" />
+              </div>
+            ))}
           </div>
-
-          {/* Description */}
-          <textarea
-            name="description"
-            value={form.description}
-            onChange={handleChange}
-            placeholder="Project description"
-            className="w-full mt-4 p-3 border rounded-md h-32 focus:ring-2 focus:ring-indigo-500"
-          />
-
-          {/* Image Upload */}
-          <div className="mt-4">
-            <label className="block text-sm font-medium text-gray-600 mb-1">
-              Project Image
-            </label>
-            <input
-              type="file"
-              accept="image/*"
-              multiple
-              onChange={(e) =>
-                setForm({ ...form, imageFiles: Array.from(e.target.files) })
-              }
-              className="block w-full text-sm text-gray-600
-              file:mr-4 file:py-2 file:px-4
-              file:rounded-md file:border-0
-              file:bg-gray-100 file:text-gray-700
-              hover:file:bg-gray-200"
-            />
-          </div>
-
-          {/* Submit */}
-          <button
-            type="submit"
-            disabled={loading}
-            className={`mt-6 inline-flex items-center justify-center gap-2 px-6 py-2.5 rounded-md text-white font-medium transition
-                ${
-                  loading
-                    ? "bg-indigo-400 cursor-not-allowed"
-                    : "bg-indigo-600 hover:bg-indigo-700"
-                }
-              `}
-          >
-            {loading ? (
-              <Spinner
-                text={editingId ? "Updating project..." : "Adding project..."}
-              />
-            ) : (
-              <>
-                <Plus className="w-5 h-5" />
-                {editingId ? "Update Project" : "Add Project"}
-              </>
-            )}
-          </button>
-        </form>
-
-        {/* Cards Section */}
-        {fetching ? (
-          <div className="flex justify-center gap-2 text-gray-600">
-            <Spinner text="Loading projects..." />
-          </div>
-        ) : filteredProjects.length === 0 ? (
-          <div className="text-center py-16 bg-white border rounded-xl">
-            <p className="text-gray-700 font-semibold">No projects found</p>
-            <p className="text-sm text-gray-500 mt-1">
-              Try changing filters or add a new project ✨
+        ) : paginatedProjects.length === 0 ? (
+          <div className="bg-white rounded-3xl border border-gray-200/80 p-12 text-center space-y-3">
+            <FolderIcon className="w-12 h-12 text-gray-300 mx-auto" />
+            <h3 className="text-base font-semibold text-gray-800">
+              No projects found
+            </h3>
+            <p className="text-xs text-gray-500 max-w-sm mx-auto">
+              Try adjusting your search filters or add a new project using the
+              form above.
             </p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 xl:grid-cols-2 gap-5">
-            {filteredProjects.map((proj) => (
-              <div
-                key={proj._id}
-                className="bg-white border rounded-xl overflow-hidden hover:shadow-md transition"
-              >
-                {/* Image */}
-                <div className="h-44 bg-gray-100 overflow-hidden">
-                  {proj.images?.length ? (
-                    <img
-                      src={proj.images[0]}
-                      alt={proj.title}
-                      className="w-full h-full object-cover hover:scale-105 transition-transform duration-500"
-                    />
-                  ) : (
-                    <div className="h-full flex items-center justify-center text-gray-400">
-                      No Image
-                    </div>
-                  )}
-                </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {paginatedProjects.map((project) => {
+              const mainImage =
+                Array.isArray(project.images) && project.images.length > 0
+                  ? project.images[0]
+                  : "https://images.unsplash.com/photo-1460925895917-afdab827c52f";
 
-                <div className="p-4">
-                  <div className="flex justify-between items-start gap-4">
-                    <div>
-                      <h3 className="font-semibold text-gray-800 text-lg">
-                        {proj.title}
-                      </h3>
-                      <p className="text-sm text-gray-600 mt-2 line-clamp-2">
-                        {proj.description}
-                      </p>
-                      {proj.featured && (
-                        <span className="text-xs bg-yellow-100 text-yellow-700 px-2 py-0.5 rounded-full">
-                          Featured
-                        </span>
-                      )}
-                      {proj.views > 50 && (
-                        <span className="text-xs bg-indigo-100 text-indigo-700 px-2 py-0.5 rounded-full">
-                          Popular
-                        </span>
-                      )}
-                      {proj.priority > 0 && (
-                        <span className="text-xs bg-gray-100 text-gray-700 px-2 py-0.5 rounded-full ml-1">
-                          Priority: {proj.priority}
-                        </span>
-                      )}
-                    </div>
-
-                    <div className="flex gap-2">
-                      <button
-                        onClick={() => handleViewProject(proj._id)}
-                        className="p-2 hover:bg-blue-50 rounded-md"
-                        title="View Project Data"
-                      >
-                        <Eye className="w-5 h-5 text-blue-600" />
-                      </button>
-
-                      <button
-                        onClick={() => handleEdit(proj)}
-                        className="p-2 hover:bg-gray-100 rounded-md"
-                        title="Edit"
-                      >
-                        <Edit className="w-5 h-5 text-indigo-600" />
-                      </button>
-
-                      <button
-                        onClick={() => {
-                          setSelectedProjectId(proj._id);
-                          setIsDeleteModalOpen(true);
+              return (
+                <div
+                  key={project._id}
+                  className="bg-white rounded-3xl border border-gray-200/80 overflow-hidden shadow-sm hover:shadow-md transition-all duration-200 flex flex-col justify-between"
+                >
+                  <div>
+                    <div className="relative h-48 bg-gray-100 overflow-hidden">
+                      <img
+                        src={mainImage}
+                        alt={project.title}
+                        className="w-full h-full object-cover"
+                        onError={(e) => {
+                          e.target.src =
+                            "https://images.unsplash.com/photo-1460925895917-afdab827c52f";
                         }}
-                        className="p-2 hover:bg-red-50 rounded-md"
-                        title="Delete"
-                      >
-                        <Trash2 className="w-5 h-5 text-red-600" />
-                      </button>
-
-                      <button
-                        onClick={() => toggleFeatured(proj._id)}
-                        className="p-2 hover:bg-yellow-50 rounded-md"
-                        title="Toggle Featured"
-                      >
-                        ⭐
-                      </button>
-                    </div>
-                  </div>
-
-                  {/* Technologies */}
-                  <div className="flex flex-wrap gap-2 mt-4">
-                    {proj.technologies?.length > 0 ? (
-                      proj.technologies.map((tech) => (
-                        <span
-                          key={tech}
-                          className="text-xs bg-gray-100 px-2 py-1 rounded-full border"
-                        >
-                          {tech}
+                      />
+                      {project.featured && (
+                        <span className="absolute top-3 left-3 inline-flex items-center gap-1 bg-amber-500 text-white text-[10px] font-bold px-2.5 py-1 rounded-full shadow">
+                          <StarIcon className="w-3 h-3 fill-current" />
+                          FEATURED
                         </span>
-                      ))
-                    ) : (
-                      <span className="text-xs text-gray-400">
-                        No technologies
-                      </span>
-                    )}
-                  </div>
+                      )}
+                      <div className="absolute bottom-3 right-3 flex gap-2">
+                        {project.githubLink && (
+                          <a
+                            href={project.githubLink}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="bg-black/70 backdrop-blur-md hover:bg-black text-white p-2 rounded-full transition"
+                            title="GitHub Repo"
+                          >
+                            <CodeBracketIcon className="w-4 h-4" />
+                          </a>
+                        )}
+                        {project.link && (
+                          <a
+                            href={project.link}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="bg-black/70 backdrop-blur-md hover:bg-black text-white p-2 rounded-full transition"
+                            title="Live Demo"
+                          >
+                            <GlobeAltIcon className="w-4 h-4" />
+                          </a>
+                        )}
+                      </div>
+                    </div>
 
-                  {/* Links */}
-                  <div className="flex justify-between items-center mt-5">
-                    <div className="flex gap-4 text-gray-500">
-                      {proj.githubLink && (
-                        <a href={proj.githubLink} target="_blank">
-                          <Github className="w-5 h-5 hover:text-gray-800" />
-                        </a>
-                      )}
-                      {proj.link && (
-                        <a href={proj.link} target="_blank">
-                          <ExternalLink className="w-5 h-5 hover:text-gray-800" />
-                        </a>
-                      )}
+                    <div className="p-5 space-y-3">
+                      <div className="flex items-start justify-between gap-3">
+                        <h2 className="text-base font-bold text-gray-900 line-clamp-1">
+                          {project.title}
+                        </h2>
+
+                        <div className="flex items-center gap-1 shrink-0">
+                          <button
+                            onClick={() => setViewingProject(project)}
+                            className="p-1.5 text-blue-600 hover:bg-blue-50 rounded-lg transition"
+                            title="View Details"
+                          >
+                            <EyeIcon className="w-4 h-4" />
+                          </button>
+                          <button
+                            onClick={() => handleStartEdit(project)}
+                            className="p-1.5 text-purple-600 hover:bg-purple-50 rounded-lg transition"
+                            title="Edit Project"
+                          >
+                            <PencilSquareIcon className="w-4 h-4" />
+                          </button>
+                          <button
+                            onClick={() => setDeletingProject(project)}
+                            className="p-1.5 text-red-600 hover:bg-red-50 rounded-lg transition"
+                            title="Delete Project"
+                          >
+                            <TrashIcon className="w-4 h-4" />
+                          </button>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center gap-3 text-xs font-semibold text-gray-500">
+                        <span className="inline-flex items-center gap-1">
+                          <ChartBarIcon className="w-3.5 h-3.5" />
+                          {project.views || 0} views
+                        </span>
+                        <span>•</span>
+                        <span className="inline-flex items-center gap-1 text-red-500">
+                          <HeartIcon className="w-3.5 h-3.5 fill-current" />
+                          {project.likes || 0} likes
+                        </span>
+                        <span>•</span>
+                        <span>Priority: {project.priority || 0}</span>
+                      </div>
+
+                      <p className="text-xs text-gray-600 line-clamp-2">
+                        {project.description || "No description provided."}
+                      </p>
+
+                      {Array.isArray(project.technologies) &&
+                        project.technologies.length > 0 && (
+                          <div className="flex flex-wrap gap-1.5 pt-1">
+                            {project.technologies
+                              .slice(0, 5)
+                              .map((tech, idx) => (
+                                <span
+                                  key={idx}
+                                  className="bg-indigo-50 text-indigo-600 text-[11px] font-medium px-2 py-0.5 rounded-md"
+                                >
+                                  {tech}
+                                </span>
+                              ))}
+                          </div>
+                        )}
                     </div>
                   </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         )}
 
-        {/* Delete Modal */}
-        {isDeleteModalOpen && (
-          <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
-            <div className="bg-white p-6 rounded-lg w-96">
-              <h3 className="flex items-center gap-2 font-semibold text-lg">
-                <AlertTriangle className="w-5 h-5 text-red-600" />
-                Delete Project
-              </h3>
-              <p className="text-sm text-gray-600 my-4">
-                This action cannot be undone.
-              </p>
+        {/* PAGINATION CONTROLS */}
+        {!loading && filteredProjects.length > 0 && (
+          <div className="bg-white rounded-2xl border border-gray-200/80 p-4 shadow-sm flex flex-col sm:flex-row items-center justify-between gap-4">
+            <p className="text-xs text-gray-500 font-medium">
+              Showing{" "}
+              <strong className="text-gray-800">
+                {Math.min(
+                  (currentPage - 1) * itemsPerPage + 1,
+                  filteredProjects.length,
+                )}
+              </strong>{" "}
+              to{" "}
+              <strong className="text-gray-800">
+                {Math.min(currentPage * itemsPerPage, filteredProjects.length)}
+              </strong>{" "}
+              of{" "}
+              <strong className="text-gray-800">
+                {filteredProjects.length}
+              </strong>{" "}
+              projects
+            </p>
 
-              <div className="flex justify-end gap-3">
-                <button
-                  onClick={() => setIsDeleteModalOpen(false)}
-                  className="px-4 py-2 bg-gray-200 rounded"
-                >
-                  Cancel
-                </button>
+            <div className="flex items-center gap-1.5">
+              <button
+                onClick={() => setCurrentPage((p) => Math.max(p - 1, 1))}
+                disabled={currentPage === 1}
+                className="p-2 rounded-xl border border-gray-200 text-gray-600 hover:bg-gray-50 disabled:opacity-40 transition"
+              >
+                <ChevronLeftIcon className="w-4 h-4" />
+              </button>
 
-                <button
-                  onClick={handleDelete}
-                  disabled={deleteLoading}
-                  className={`px-4 py-2 rounded text-white flex items-center gap-2 ${
-                    deleteLoading ? "bg-red-400" : "bg-red-600 hover:bg-red-700"
-                  }`}
-                >
-                  {deleteLoading ? <Spinner text="Deleting..." /> : "Delete"}
-                </button>
-              </div>
+              {Array.from({ length: totalPages }, (_, i) => i + 1).map(
+                (pageNum) => (
+                  <button
+                    key={pageNum}
+                    onClick={() => setCurrentPage(pageNum)}
+                    className={`px-3.5 py-1.5 rounded-xl text-xs font-semibold transition ${
+                      currentPage === pageNum
+                        ? "bg-indigo-600 text-white shadow-sm"
+                        : "bg-white border border-gray-200 text-gray-700 hover:bg-gray-50"
+                    }`}
+                  >
+                    {pageNum}
+                  </button>
+                ),
+              )}
+
+              <button
+                onClick={() =>
+                  setCurrentPage((p) => Math.min(p + 1, totalPages))
+                }
+                disabled={currentPage === totalPages}
+                className="p-2 rounded-xl border border-gray-200 text-gray-600 hover:bg-gray-50 disabled:opacity-40 transition"
+              >
+                <ChevronRightIcon className="w-4 h-4" />
+              </button>
             </div>
           </div>
         )}
       </div>
 
-      {isViewModalOpen && selectedProject && (
-        <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50">
-          <div className="bg-white rounded-2xl shadow-2xl max-w-2xl w-full p-6 relative">
-            {/* Close */}
-            <button
-              onClick={() => setIsViewModalOpen(false)}
-              className="absolute top-3 right-3 text-gray-500 hover:text-black"
-            >
-              ✕
-            </button>
+      {/* VIEW PROJECT MODAL */}
+      {viewingProject && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-fade-in">
+          <div className="bg-white rounded-3xl max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl border border-gray-100 p-6 space-y-6">
+            <div className="flex items-start justify-between border-b border-gray-100 pb-4">
+              <div>
+                <span className="text-[10px] font-bold text-indigo-600 tracking-wider uppercase bg-indigo-50 px-2 py-0.5 rounded-md border border-indigo-100">
+                  Schema Inspector
+                </span>
+                <h3 className="text-xl font-bold text-gray-900 mt-1">
+                  {viewingProject.title}
+                </h3>
+              </div>
+              <button
+                onClick={() => setViewingProject(null)}
+                className="p-1 text-gray-400 hover:text-gray-600 rounded-lg hover:bg-gray-100 transition"
+              >
+                <XMarkIcon className="w-6 h-6" />
+              </button>
+            </div>
 
-            <h3 className="text-xl font-bold mb-4">{selectedProject.title}</h3>
+            {/* Modal Images Carousel/Grid */}
+            {Array.isArray(viewingProject.images) &&
+              viewingProject.images.length > 0 && (
+                <div className="grid grid-cols-2 gap-2 max-h-48 overflow-y-auto p-1 bg-gray-50 rounded-2xl border border-gray-100">
+                  {viewingProject.images.map((img, idx) => (
+                    <img
+                      key={idx}
+                      src={img}
+                      alt={`Project ${idx}`}
+                      className="w-full h-32 object-cover rounded-xl border border-gray-200"
+                    />
+                  ))}
+                </div>
+              )}
 
-            {/* Image */}
-            {selectedProject.images?.length > 0 && (
-              <img
-                src={selectedProject.images[0]}
-                className="w-full h-56 object-cover rounded-lg mb-4"
-              />
-            )}
-
-            <div className="space-y-3 text-sm">
-              <p>
-                <strong>Description:</strong> {selectedProject.description}
-              </p>
-
-              <p>
-                <strong>GitHub:</strong>{" "}
+            {/* External Links */}
+            <div className="flex items-center gap-3">
+              {viewingProject.githubLink && (
                 <a
-                  href={selectedProject.githubLink}
+                  href={viewingProject.githubLink}
                   target="_blank"
-                  className="text-blue-600"
+                  rel="noreferrer"
+                  className="inline-flex items-center gap-1.5 text-xs font-semibold text-white bg-gray-900 px-3.5 py-2 rounded-xl hover:bg-black transition"
                 >
-                  {selectedProject.githubLink}
+                  <CodeBracketIcon className="w-4 h-4" /> GitHub Repository
                 </a>
-              </p>
-
-              <p>
-                <strong>Live Link:</strong>{" "}
+              )}
+              {viewingProject.link && (
                 <a
-                  href={selectedProject.link}
+                  href={viewingProject.link}
                   target="_blank"
-                  className="text-blue-600"
+                  rel="noreferrer"
+                  className="inline-flex items-center gap-1.5 text-xs font-semibold text-white bg-indigo-600 px-3.5 py-2 rounded-xl hover:bg-indigo-700 transition"
                 >
-                  {selectedProject.link}
+                  <GlobeAltIcon className="w-4 h-4" /> Live Project Link
                 </a>
-              </p>
+              )}
+            </div>
 
-              <p>
-                <strong>Technologies:</strong>{" "}
-                {selectedProject.technologies?.join(", ")}
-              </p>
+            {/* Modal Content Sections */}
+            <div className="space-y-4 text-xs">
+              <div>
+                <h4 className="font-bold text-gray-700 uppercase tracking-wide mb-1">
+                  Description
+                </h4>
+                <div className="text-gray-800 bg-gray-50 p-3 rounded-xl border border-gray-100 text-xs whitespace-pre-wrap max-h-40 overflow-y-auto">
+                  {viewingProject.description || "N/A"}
+                </div>
+              </div>
 
-              <p>
-                <strong>Featured:</strong>{" "}
-                {selectedProject.featured ? "Yes ⭐" : "No"}
-              </p>
+              {/* Schema Details Table */}
+              <div className="grid grid-cols-2 gap-3 bg-gray-50/50 p-4 rounded-2xl border border-gray-100">
+                <div>
+                  <span className="text-gray-400 block font-medium">
+                    Featured
+                  </span>
+                  <span className="text-gray-800 font-semibold">
+                    {viewingProject.featured ? "Yes" : "No"}
+                  </span>
+                </div>
+                <div>
+                  <span className="text-gray-400 block font-medium">
+                    Priority
+                  </span>
+                  <span className="text-gray-800 font-semibold">
+                    {viewingProject.priority ?? 0}
+                  </span>
+                </div>
+                <div>
+                  <span className="text-gray-400 block font-medium">Order</span>
+                  <span className="text-gray-800 font-semibold">
+                    {viewingProject.order ?? 0}
+                  </span>
+                </div>
+                <div>
+                  <span className="text-gray-400 block font-medium">
+                    Views / Likes
+                  </span>
+                  <span className="text-gray-800 font-semibold">
+                    {viewingProject.views ?? 0} Views /{" "}
+                    {viewingProject.likes ?? 0} Likes
+                  </span>
+                </div>
+              </div>
+            </div>
 
-              <p>
-                <strong>Priority:</strong> {selectedProject.priority}
-              </p>
+            <div className="flex justify-end pt-2">
+              <button
+                onClick={() => setViewingProject(null)}
+                className="bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold px-5 py-2 rounded-xl text-xs transition"
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
-              <p>
-                <strong>Views:</strong> {selectedProject.views}
-              </p>
-
-              <p>
-                <strong>Likes:</strong> {selectedProject.likes}
-              </p>
-
-              <p>
-                <strong>Created At:</strong>{" "}
-                {new Date(selectedProject.createdAt).toLocaleString()}
-              </p>
-
-              <p>
-                <strong>Updated At:</strong>{" "}
-                {new Date(selectedProject.updatedAt).toLocaleString()}
-              </p>
+      {/* DELETE CONFIRMATION MODAL */}
+      {deletingProject && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-fade-in">
+          <div className="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl border border-gray-100 space-y-4">
+            <div className="flex items-center gap-3 text-red-600">
+              <ExclamationTriangleIcon className="w-8 h-8 shrink-0" />
+              <h3 className="text-base font-bold text-gray-900">
+                Confirm Delete Project
+              </h3>
+            </div>
+            <p className="text-xs text-gray-600">
+              Are you sure you want to delete{" "}
+              <strong className="text-gray-900">
+                "{deletingProject.title}"
+              </strong>
+              ? This action cannot be undone.
+            </p>
+            <div className="flex items-center justify-end gap-2 pt-2">
+              <button
+                onClick={() => setDeletingProject(null)}
+                className="bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold px-4 py-2 rounded-xl text-xs transition"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={confirmDelete}
+                disabled={deleting}
+                className="bg-red-600 hover:bg-red-700 text-white font-semibold px-4 py-2 rounded-xl text-xs transition shadow-md shadow-red-500/20 disabled:opacity-50"
+              >
+                {deleting ? "Deleting..." : "Delete Permanently"}
+              </button>
             </div>
           </div>
         </div>

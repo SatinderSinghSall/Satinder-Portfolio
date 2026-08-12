@@ -40,7 +40,7 @@ export default function Home() {
         </section>
 
         <section id="services">
-          <Services />
+          <Services isPage={false} />
         </section>
 
         <section id="experience">

@@ -1,5 +1,6 @@
 import { useParams, Link } from "react-router-dom";
 import { useEffect, useMemo, useState } from "react";
+import { Helmet } from "react-helmet-async";
 import axios from "axios";
 import toast from "react-hot-toast";
 
@@ -13,18 +14,26 @@ import {
   StarIcon,
   ChevronLeftIcon,
   ChevronRightIcon,
+  ShareIcon,
+  XMarkIcon,
+  ArrowTopRightOnSquareIcon,
+  ChatBubbleBottomCenterTextIcon,
+  CheckIcon,
 } from "@heroicons/react/24/outline";
 
 const API = import.meta.env.VITE_API_URL || "/api";
 
 /* ================= Image Carousel ================= */
-function ImageCarousel({ images = [] }) {
+function ImageCarousel({ images = [], title = "" }) {
   const [index, setIndex] = useState(0);
 
   if (!images.length) {
     return (
-      <div className="aspect-video rounded-2xl border border-white/10 bg-black/40 flex items-center justify-center text-gray-400">
-        No images available
+      <div className="aspect-video rounded-2xl border border-slate-200 bg-slate-100 flex flex-col items-center justify-center text-slate-400 p-6">
+        <BriefcaseIcon className="h-10 w-10 mb-2 opacity-50" />
+        <p className="text-sm font-medium">
+          No project preview images available
+        </p>
       </div>
     );
   }
@@ -33,36 +42,42 @@ function ImageCarousel({ images = [] }) {
   const next = () => setIndex((i) => (i === images.length - 1 ? 0 : i + 1));
 
   return (
-    <div className="relative aspect-video rounded-2xl overflow-hidden border border-white/10 shadow-xl bg-black">
+    <div className="relative aspect-video rounded-2xl overflow-hidden border border-slate-200/80 shadow-sm bg-slate-900 group">
       <img
         src={images[index]}
-        alt={`Project screenshot ${index + 1}`}
-        className="w-full h-full object-cover"
+        alt={`${title} screenshot ${index + 1}`}
+        className="w-full h-full object-cover transition-all duration-300"
       />
 
       {images.length > 1 && (
         <>
           <button
             onClick={prev}
-            className="absolute left-3 top-1/2 -translate-y-1/2 p-2 rounded-full bg-black/40 border border-white/10 hover:bg-black/60 transition"
+            aria-label="Previous image"
+            className="absolute left-3 top-1/2 -translate-y-1/2 p-2.5 rounded-full bg-white/80 hover:bg-white text-slate-800 backdrop-blur-md shadow-md border border-slate-200/50 transition-all opacity-90 group-hover:opacity-100 active:scale-95"
           >
             <ChevronLeftIcon className="h-5 w-5" />
           </button>
 
           <button
             onClick={next}
-            className="absolute right-3 top-1/2 -translate-y-1/2 p-2 rounded-full bg-black/40 border border-white/10 hover:bg-black/60 transition"
+            aria-label="Next image"
+            className="absolute right-3 top-1/2 -translate-y-1/2 p-2.5 rounded-full bg-white/80 hover:bg-white text-slate-800 backdrop-blur-md shadow-md border border-slate-200/50 transition-all opacity-90 group-hover:opacity-100 active:scale-95"
           >
             <ChevronRightIcon className="h-5 w-5" />
           </button>
 
-          {/* Dots */}
-          <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-2">
+          {/* Dots Indicator */}
+          <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-slate-900/60 backdrop-blur-md">
             {images.map((_, i) => (
-              <span
+              <button
                 key={i}
-                className={`h-2 w-2 rounded-full transition ${
-                  i === index ? "bg-white" : "bg-white/40"
+                onClick={() => setIndex(i)}
+                aria-label={`Go to slide ${i + 1}`}
+                className={`h-2 rounded-full transition-all ${
+                  i === index
+                    ? "w-6 bg-white"
+                    : "w-2 bg-white/40 hover:bg-white/70"
                 }`}
               />
             ))}
@@ -73,12 +88,164 @@ function ImageCarousel({ images = [] }) {
   );
 }
 
+/* ================= Share Dialog Modal ================= */
+function ShareModal({ isOpen, onClose, project }) {
+  const [copied, setCopied] = useState(false);
+  if (!isOpen || !project) return null;
+
+  const shareUrl = window.location.href;
+  const shareTitle = `Check out "${project.title}" - Freelance Project by Satinder Singh Sall`;
+  const shareText = project.description
+    ? `${project.title}: ${project.description.slice(0, 120)}...`
+    : shareTitle;
+
+  const handleCopy = async () => {
+    try {
+      await navigator.clipboard.writeText(shareUrl);
+      setCopied(true);
+      toast.success("Link copied to clipboard!");
+      setTimeout(() => setCopied(false), 2500);
+    } catch {
+      toast.error("Failed to copy link");
+    }
+  };
+
+  const shareNative = async () => {
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: shareTitle,
+          text: shareText,
+          url: shareUrl,
+        });
+      } catch (err) {
+        if (err.name !== "AbortError") console.error(err);
+      }
+    } else {
+      handleCopy();
+    }
+  };
+
+  const socialLinks = [
+    {
+      name: "X / Twitter",
+      color: "bg-slate-900 hover:bg-slate-800 text-white",
+      url: `https://twitter.com/intent/tweet?text=${encodeURIComponent(
+        shareTitle,
+      )}&url=${encodeURIComponent(shareUrl)}`,
+    },
+    {
+      name: "LinkedIn",
+      color: "bg-[#0A66C2] hover:bg-[#08519c] text-white",
+      url: `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(
+        shareUrl,
+      )}`,
+    },
+    {
+      name: "WhatsApp",
+      color: "bg-[#25D366] hover:bg-[#20bd5a] text-white",
+      url: `https://api.whatsapp.com/send?text=${encodeURIComponent(
+        `${shareTitle} - ${shareUrl}`,
+      )}`,
+    },
+    {
+      name: "Email",
+      color: "bg-indigo-600 hover:bg-indigo-700 text-white",
+      url: `mailto:?subject=${encodeURIComponent(
+        shareTitle,
+      )}&body=${encodeURIComponent(`${shareText}\n\nView full project: ${shareUrl}`)}`,
+    },
+  ];
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm animate-fadeIn">
+      <div
+        className="relative w-full max-w-md bg-white border border-slate-200 rounded-2xl shadow-2xl p-6 space-y-5 animate-scaleUp"
+        onClick={(e) => e.stopPropagation()}
+      >
+        {/* Modal Header */}
+        <div className="flex items-center justify-between pb-3 border-b border-slate-100">
+          <div className="flex items-center gap-2 text-slate-900 font-bold text-lg">
+            <ShareIcon className="h-5 w-5 text-indigo-600" />
+            <span>Share Project</span>
+          </div>
+          <button
+            onClick={onClose}
+            className="p-1 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition"
+          >
+            <XMarkIcon className="h-5 w-5" />
+          </button>
+        </div>
+
+        {/* Social Grid */}
+        <div className="grid grid-cols-2 gap-2.5">
+          {socialLinks.map((item) => (
+            <a
+              key={item.name}
+              href={item.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className={`flex items-center justify-center gap-2 p-3 rounded-xl font-semibold text-xs transition shadow-sm ${item.color}`}
+            >
+              <span>{item.name}</span>
+              <ArrowTopRightOnSquareIcon className="h-3.5 w-3.5" />
+            </a>
+          ))}
+        </div>
+
+        {/* Native Mobile Share option */}
+        {navigator.share && (
+          <button
+            onClick={shareNative}
+            className="w-full py-2.5 rounded-xl border border-slate-200 bg-slate-50 hover:bg-slate-100 text-slate-700 font-semibold text-xs flex items-center justify-center gap-2 transition"
+          >
+            <ShareIcon className="h-4 w-4" />
+            <span>More Sharing Options</span>
+          </button>
+        )}
+
+        {/* Copy Link Input */}
+        <div className="space-y-1.5 pt-2 border-t border-slate-100">
+          <label className="text-xs font-semibold text-slate-500">
+            Direct Link
+          </label>
+          <div className="flex items-center gap-2">
+            <input
+              type="text"
+              readOnly
+              value={shareUrl}
+              className="flex-1 bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs text-slate-600 focus:outline-none select-all"
+            />
+            <button
+              onClick={handleCopy}
+              className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-xs transition shadow-sm active:scale-95"
+            >
+              {copied ? (
+                <>
+                  <CheckIcon className="h-4 w-4 text-emerald-300" />
+                  <span>Copied</span>
+                </>
+              ) : (
+                <>
+                  <LinkIcon className="h-4 w-4" />
+                  <span>Copy</span>
+                </>
+              )}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function FreelanceDetails() {
   const { id } = useParams();
 
   const [project, setProject] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [isShareOpen, setIsShareOpen] = useState(false);
 
   /* ================= Fetch ================= */
   useEffect(() => {
@@ -87,10 +254,13 @@ export default function FreelanceDetails() {
 
     axios
       .get(`${API}/freelance/${id}`)
-      .then((res) => setProject(res.data))
+      .then((res) => {
+        const payload = res.data?.data || res.data;
+        setProject(payload);
+      })
       .catch((err) => {
         console.error("Failed to fetch project:", err);
-        setError("Failed to load project.");
+        setError("Failed to load project details.");
       })
       .finally(() => setLoading(false));
   }, [id]);
@@ -98,60 +268,55 @@ export default function FreelanceDetails() {
   const createdDate = useMemo(() => {
     if (!project?.createdAt) return null;
     try {
-      return new Date(project.createdAt).toLocaleDateString();
+      return new Date(project.createdAt).toLocaleDateString("en-US", {
+        month: "long",
+        day: "numeric",
+        year: "numeric",
+      });
     } catch {
       return null;
     }
   }, [project?.createdAt]);
 
-  const handleCopyLink = async () => {
-    try {
-      await navigator.clipboard.writeText(window.location.href);
-      toast.success("Link copied!");
-    } catch {
-      toast.error("Failed to copy link");
-    }
-  };
-
-  /* ================= Loading ================= */
+  /* ================= Loading State ================= */
   if (loading) {
     return (
-      <section className="min-h-screen flex items-center justify-center bg-gradient-to-b from-[#0f0c29] via-[#302b63] to-[#24243e] px-4 text-white">
-        <div className="text-center space-y-4 animate-pulse">
-          <div className="w-14 h-14 rounded-full border-4 border-white/20 border-t-white animate-spin mx-auto" />
-          <p className="text-lg text-gray-200 font-semibold">
-            Loading project...
+      <section className="min-h-screen flex items-center justify-center bg-slate-50 px-4 text-slate-800">
+        <div className="text-center space-y-4">
+          <div className="w-12 h-12 rounded-full border-4 border-indigo-200 border-t-indigo-600 animate-spin mx-auto" />
+          <p className="text-sm font-semibold text-slate-600">
+            Loading project details...
           </p>
         </div>
       </section>
     );
   }
 
-  /* ================= Error ================= */
+  /* ================= Error State ================= */
   if (error || !project) {
     return (
-      <section className="min-h-screen flex items-center justify-center bg-gradient-to-b from-[#0f0c29] via-[#302b63] to-[#24243e] px-4">
-        <div className="max-w-md w-full bg-white/5 backdrop-blur-xl border border-white/10 rounded-3xl shadow-2xl p-8 text-center text-white">
-          <div className="mx-auto w-14 h-14 rounded-2xl bg-red-500/10 border border-red-400/20 flex items-center justify-center">
-            <BriefcaseIcon className="h-7 w-7 text-red-300" />
+      <section className="min-h-screen flex items-center justify-center bg-slate-50 px-4">
+        <div className="max-w-md w-full bg-white border border-slate-200/80 rounded-2xl shadow-sm p-8 text-center text-slate-800 space-y-4">
+          <div className="mx-auto w-12 h-12 rounded-xl bg-red-50 border border-red-100 flex items-center justify-center text-red-600">
+            <BriefcaseIcon className="h-6 w-6" />
           </div>
 
-          <h2 className="text-2xl font-bold mt-5">
-            {error ? "Something went wrong" : "Project Not Found"}
-          </h2>
+          <h1 className="text-xl font-bold text-slate-900">
+            {error ? "Unable to Load Project" : "Project Not Found"}
+          </h1>
 
-          <p className="text-sm text-gray-300 mt-2">
+          <p className="text-sm text-slate-500">
             {error ||
-              "Sorry, we couldn’t find this project. It may have been removed."}
+              "Sorry, we couldn’t find this project. It may have been updated or removed."}
           </p>
 
-          <div className="mt-6">
+          <div className="pt-2">
             <Link
               to="/freelance-projects"
-              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-white/10 hover:bg-white/15 border border-white/10 transition text-sm font-semibold"
+              className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white transition text-xs font-semibold shadow-sm"
             >
-              <ArrowLeftIcon className="h-5 w-5" />
-              Back to Projects
+              <ArrowLeftIcon className="h-4 w-4" />
+              <span>Back to Freelance Portfolio</span>
             </Link>
           </div>
         </div>
@@ -159,30 +324,68 @@ export default function FreelanceDetails() {
     );
   }
 
-  return (
-    <section className="relative min-h-screen bg-gradient-to-b from-[#0f0c29] via-[#302b63] to-[#24243e] py-10 sm:py-14 px-4 sm:px-6 text-white overflow-hidden">
-      {/* Glow */}
-      <div className="absolute -top-40 -left-40 w-[420px] h-[420px] bg-indigo-500/20 blur-[120px]" />
-      <div className="absolute -bottom-40 -right-40 w-[420px] h-[420px] bg-fuchsia-500/20 blur-[120px]" />
+  const pageTitle = `${project.title} | Freelance Project | By Satinder Singh Sall`;
+  const metaDescription =
+    project.description?.slice(0, 160) ||
+    "Detailed breakdown of client freelance work delivered to startups and founders.";
 
-      <div className="max-w-5xl mx-auto relative z-10">
-        {/* Top Bar */}
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between mb-6">
+  return (
+    <main className="min-h-screen bg-slate-50 text-slate-800 antialiased py-10 sm:py-14 px-4 sm:px-6 lg:px-8">
+      {/* Dynamic SEO Meta Tags */}
+      <Helmet>
+        <title>{pageTitle}</title>
+        <meta name="description" content={metaDescription} />
+        <link
+          rel="canonical"
+          href={`https://satinder-portfolio.vercel.app/freelance/${id}`}
+        />
+
+        {/* Open Graph */}
+        <meta property="og:title" content={pageTitle} />
+        <meta property="og:description" content={metaDescription} />
+        <meta property="og:type" content="article" />
+        <meta
+          property="og:url"
+          content={`https://satinder-portfolio.vercel.app/freelance/${id}`}
+        />
+        {project.images?.[0] && (
+          <meta property="og:image" content={project.images[0]} />
+        )}
+
+        {/* Twitter */}
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content={pageTitle} />
+        <meta name="twitter:description" content={metaDescription} />
+        {project.images?.[0] && (
+          <meta name="twitter:image" content={project.images[0]} />
+        )}
+      </Helmet>
+
+      {/* Share Modal Dialog */}
+      <ShareModal
+        isOpen={isShareOpen}
+        onClose={() => setIsShareOpen(false)}
+        project={project}
+      />
+
+      <div className="max-w-4xl mx-auto space-y-6">
+        {/* TOP BAR / NAVIGATION */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <Link
             to="/freelance-projects"
-            className="inline-flex items-center gap-2 text-sm text-gray-300 hover:text-white transition"
+            className="inline-flex items-center gap-2 text-xs sm:text-sm font-semibold text-slate-600 hover:text-indigo-600 transition"
           >
-            <ArrowLeftIcon className="h-5 w-5" />
-            Back to Projects
+            <ArrowLeftIcon className="h-4 w-4" />
+            <span>Back to All Freelance Projects</span>
           </Link>
 
-          <div className="flex flex-wrap gap-2">
+          <div className="flex items-center gap-2">
             <button
-              onClick={handleCopyLink}
-              className="inline-flex items-center gap-2 px-3 py-2 rounded-lg bg-white/10 hover:bg-white/15 border border-white/10 text-xs sm:text-sm transition"
+              onClick={() => setIsShareOpen(true)}
+              className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-white border border-slate-200/80 hover:bg-slate-50 text-slate-700 text-xs sm:text-sm font-semibold shadow-sm transition active:scale-95"
             >
-              <LinkIcon className="h-4 w-4" />
-              Copy Link
+              <ShareIcon className="h-4 w-4 text-slate-500" />
+              <span>Share</span>
             </button>
 
             {project.projectUrl && (
@@ -190,110 +393,134 @@ export default function FreelanceDetails() {
                 href={project.projectUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 px-3 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-700 border border-indigo-500/30 text-xs sm:text-sm transition"
+                className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs sm:text-sm font-semibold shadow-sm transition active:scale-95"
               >
-                <BriefcaseIcon className="h-4 w-4" />
-                Visit Project
+                <span>Live Project</span>
+                <ArrowTopRightOnSquareIcon className="h-4 w-4" />
               </a>
             )}
           </div>
         </div>
 
-        {/* Main Card */}
-        <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-3xl shadow-2xl overflow-hidden">
-          {/* Images */}
-          <div className="p-4 sm:p-6">
-            <ImageCarousel images={project.images || []} />
+        {/* MAIN CARD CONTAINER */}
+        <article className="bg-white border border-slate-200/80 rounded-2xl shadow-sm overflow-hidden">
+          {/* Images Section */}
+          <div className="p-4 sm:p-6 bg-slate-50/50 border-b border-slate-100">
+            <ImageCarousel
+              images={project.images || []}
+              title={project.title}
+            />
           </div>
 
-          {/* Content */}
-          <div className="px-6 pb-8 sm:px-10 sm:pb-10">
-            {/* Title */}
-            <h1 className="text-2xl sm:text-3xl md:text-4xl font-extrabold">
-              {project.title}
-            </h1>
+          {/* Details Body */}
+          <div className="p-6 sm:p-10 space-y-8">
+            {/* Header / Title */}
+            <div className="space-y-4">
+              <h1 className="text-2xl sm:text-4xl font-extrabold text-slate-900 leading-tight">
+                {project.title}
+              </h1>
 
-            {/* Meta Chips */}
-            <div className="mt-4 flex flex-wrap gap-2">
-              <span className="inline-flex items-center gap-2 text-xs px-3 py-1 rounded-full bg-white/10 border border-white/10">
-                <UserCircleIcon className="h-4 w-4" />
-                {project.clientName}
-              </span>
+              {/* Meta Chips */}
+              <div className="flex flex-wrap items-center gap-2 pt-1">
+                <span className="inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1 rounded-full bg-slate-100 text-slate-700">
+                  <UserCircleIcon className="h-4 w-4 text-slate-500" />
+                  <span>{project.clientName || "Client Confidential"}</span>
+                </span>
 
-              <span className="inline-flex items-center gap-2 text-xs px-3 py-1 rounded-full bg-indigo-500/10 border border-indigo-400/20">
-                <CalendarDaysIcon className="h-4 w-4" />
-                {createdDate || "—"}
-              </span>
+                <span className="inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1 rounded-full bg-indigo-50 text-indigo-700 border border-indigo-100">
+                  <CalendarDaysIcon className="h-4 w-4 text-indigo-500" />
+                  <span>{createdDate || "Completed Project"}</span>
+                </span>
 
-              <span className="inline-flex items-center gap-2 text-xs px-3 py-1 rounded-full bg-yellow-500/10 border border-yellow-400/20">
-                <StarIcon className="h-4 w-4" />
-                {project.clientRating || "N/A"} / 5
-              </span>
+                <span className="inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1 rounded-full bg-amber-50 text-amber-700 border border-amber-200/60">
+                  <StarIcon className="h-4 w-4 text-amber-500 fill-amber-500" />
+                  <span>
+                    {project.clientRating
+                      ? `${project.clientRating.toFixed(1)} / 5 Rating`
+                      : "Client Rated"}
+                  </span>
+                </span>
 
-              <span className="inline-flex items-center gap-2 text-xs px-3 py-1 rounded-full bg-green-500/10 border border-green-400/20">
-                {project.status.toUpperCase()}
-              </span>
+                {project.status && (
+                  <span className="inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200/60">
+                    <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                    <span className="uppercase tracking-wider text-[10px]">
+                      {project.status}
+                    </span>
+                  </span>
+                )}
+              </div>
             </div>
 
             {/* Description */}
             {project.description && (
-              <div className="mt-6 text-gray-200/90 leading-relaxed whitespace-pre-line">
-                {project.description}
+              <div className="space-y-3">
+                <h2 className="text-sm uppercase tracking-wider font-bold text-slate-400">
+                  Project Overview
+                </h2>
+                <p className="text-slate-700 text-base leading-relaxed whitespace-pre-line">
+                  {project.description}
+                </p>
               </div>
             )}
 
             {/* Technologies */}
             {project.technologies?.length > 0 && (
-              <div className="mt-8">
-                <p className="text-sm font-semibold mb-3 flex items-center gap-2">
-                  <TagIcon className="h-5 w-5" />
-                  Technologies
-                </p>
+              <div className="space-y-3 pt-4 border-t border-slate-100">
+                <h2 className="text-sm uppercase tracking-wider font-bold text-slate-400 flex items-center gap-2">
+                  <TagIcon className="h-4 w-4" />
+                  <span>Technologies & Stack Used</span>
+                </h2>
 
                 <div className="flex flex-wrap gap-2">
-                  {project.technologies.map((t, i) => (
+                  {project.technologies.map((tech, i) => (
                     <span
                       key={i}
-                      className="px-3 py-1 rounded-full text-xs bg-white/10 border border-white/10"
+                      className="px-3 py-1.5 rounded-xl text-xs font-semibold bg-slate-100 text-slate-700 border border-slate-200/60"
                     >
-                      #{t}
+                      #{tech}
                     </span>
                   ))}
                 </div>
               </div>
             )}
 
-            {/* Testimonial */}
+            {/* Testimonial Quote */}
             {project.testimonial && (
-              <div className="mt-10 bg-white/5 border border-white/10 rounded-2xl p-6">
-                <h3 className="text-lg font-bold">Client Testimonial</h3>
-                <p className="text-sm text-gray-300 mt-2 leading-relaxed">
+              <div className="bg-indigo-50/50 border border-indigo-100 rounded-2xl p-6 relative overflow-hidden space-y-3">
+                <ChatBubbleBottomCenterTextIcon className="h-8 w-8 text-indigo-200 absolute top-4 right-4" />
+                <h2 className="text-xs uppercase tracking-wider font-bold text-indigo-600">
+                  Client Feedback
+                </h2>
+                <blockquote className="text-sm sm:text-base italic text-slate-700 leading-relaxed relative z-10">
                   “{project.testimonial}”
+                </blockquote>
+                <p className="text-xs font-bold text-slate-900 pt-1">
+                  — {project.clientName || "Client"}
                 </p>
               </div>
             )}
 
-            {/* CTA Footer */}
-            <div className="mt-10 bg-white/5 border border-white/10 rounded-2xl p-6 flex flex-col md:flex-row justify-between gap-4">
-              <div>
-                <h3 className="text-lg font-bold">Want similar work?</h3>
-                <p className="text-sm text-gray-300 mt-1">
-                  Explore more freelance projects from my portfolio.
+            {/* Footer CTA */}
+            <div className="bg-slate-900 rounded-2xl p-6 text-white flex flex-col sm:flex-row items-center justify-between gap-4 shadow-sm">
+              <div className="space-y-1 text-center sm:text-left">
+                <h3 className="text-base font-bold">Have a project in mind?</h3>
+                <p className="text-xs text-slate-400">
+                  Explore similar freelance work or get in touch for custom
+                  development.
                 </p>
               </div>
 
               <Link
                 to="/freelance-projects"
-                className="px-5 py-2.5 rounded-xl bg-white/10 hover:bg-white/15 border border-white/10 transition text-sm font-semibold"
+                className="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold text-center transition shadow-sm active:scale-95"
               >
-                Browse All Projects →
+                Browse All Work
               </Link>
             </div>
           </div>
-        </div>
-
-        <div className="h-10" />
+        </article>
       </div>
-    </section>
+    </main>
   );
 }

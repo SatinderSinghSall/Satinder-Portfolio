@@ -2,9 +2,8 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import toast from "react-hot-toast";
-import { Eye, EyeOff, Loader2, ArrowLeft } from "lucide-react";
+import { Eye, EyeOff, Loader2, ArrowLeft, Shield } from "lucide-react";
 
-import AdminAuthLayout from "../components/AdminAuthLayout";
 import SecurityAlertModal from "../components/SecurityAlertModal";
 
 function Login() {
@@ -70,89 +69,116 @@ function Login() {
   };
 
   return (
-    <AdminAuthLayout>
-      {/* Back Button */}
-      <div className="mb-6">
-        <button
-          type="button"
-          onClick={handleBack}
-          className="inline-flex items-center gap-2 rounded-full border border-gray-800 bg-[#0f0f0f] px-3 py-1.5 text-sm font-medium text-gray-400 hover:text-blue-400 hover:border-blue-500/40 hover:bg-blue-500/5 active:scale-95 transition-all cursor-pointer"
-        >
-          <ArrowLeft size={16} />
-          <span>Back</span>
-        </button>
+    <div className="min-h-screen w-full bg-black text-gray-100 flex flex-col items-center justify-center p-4">
+      {/* Top Header Section */}
+      <div className="flex flex-col items-center mb-6 text-center">
+        <Shield className="text-blue-500 w-10 h-10 mb-3" strokeWidth={1.75} />
+        <h1 className="text-3xl font-bold text-white mb-2 tracking-tight">
+          Administrator Access
+        </h1>
+        <p className="text-gray-400 text-sm mb-3">
+          Restricted system — authorized personnel only
+        </p>
+        <span className="text-[10px] font-bold tracking-widest uppercase text-amber-500 border border-amber-500/40 bg-amber-500/10 px-3 py-1 rounded-full">
+          DEVELOPMENT ENVIRONMENT
+        </span>
       </div>
 
-      <h2 className="text-2xl font-bold text-blue-500 mb-6 text-center">
-        Admin Login
-      </h2>
-
-      {error && (
-        <p className="text-red-400 text-sm text-center mb-4">{error}</p>
-      )}
-
-      <form onSubmit={handleSubmit} className="space-y-5">
-        <div>
-          <label className="block text-sm mb-1 text-gray-300">
-            Email Address
-          </label>
-          <input
-            type="email"
-            autoFocus
-            placeholder="admin@example.com"
-            className="w-full px-4 py-2 bg-[#1a1a1a] border border-gray-700 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-          />
+      {/* Main Login Card */}
+      <div className="w-full max-w-[480px] bg-[#0d0d0d] border border-neutral-800 rounded-3xl p-8 sm:p-10 shadow-2xl relative">
+        {/* Back Button */}
+        <div className="mb-6">
+          <button
+            type="button"
+            onClick={handleBack}
+            className="inline-flex items-center gap-2 rounded-full border border-gray-800 bg-[#161616] px-4 py-2 text-sm font-medium text-gray-400 hover:text-blue-400 hover:border-blue-500/40 hover:bg-blue-500/5 active:scale-95 transition-all cursor-pointer"
+          >
+            <ArrowLeft size={16} />
+            <span>Back</span>
+          </button>
         </div>
 
-        <div>
-          <label className="block text-sm mb-1 text-gray-300">Password</label>
+        <h2 className="text-2xl font-bold text-blue-500 mb-6 text-center">
+          Admin Login
+        </h2>
 
-          <div className="relative">
+        {error && (
+          <p className="text-red-400 text-sm text-center mb-4 bg-red-500/10 py-2 px-3 rounded-lg border border-red-500/20">
+            {error}
+          </p>
+        )}
+
+        <form onSubmit={handleSubmit} className="space-y-6">
+          <div>
+            <label className="block text-sm mb-2 text-gray-300 font-medium">
+              Email Address
+            </label>
             <input
-              type={showPassword ? "text" : "password"}
-              placeholder="••••••••"
-              className="w-full px-4 py-2 pr-11 bg-[#1a1a1a] border border-gray-700 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
+              type="email"
+              autoFocus
+              placeholder="admin@example.com"
+              className="w-full px-4 py-3 bg-[#181818] border border-gray-800 rounded-xl text-base text-white placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
             />
-
-            <button
-              type="button"
-              onClick={() => setShowPassword((prev) => !prev)}
-              className="absolute inset-y-0 right-0 px-3 flex items-center text-gray-400 hover:text-blue-400 transition"
-              tabIndex={-1}
-            >
-              {showPassword ? (
-                <EyeOff size={18} className="cursor-pointer" />
-              ) : (
-                <Eye size={18} className="cursor-pointer" />
-              )}
-            </button>
           </div>
-        </div>
 
-        <button
-          type="submit"
-          disabled={loading}
-          className={`w-full py-2 rounded-lg text-sm font-medium transition-all flex items-center justify-center gap-2 cursor-pointer ${
-            loading
-              ? "bg-blue-400 cursor-not-allowed"
-              : "bg-blue-600 hover:bg-blue-700 active:scale-[0.98]"
-          }`}
-        >
-          {loading && <Loader2 className="w-4 h-4 animate-spin" />}
-          {loading ? "Authenticating..." : "Login"}
-        </button>
-      </form>
+          <div>
+            <label className="block text-sm mb-2 text-gray-300 font-medium">
+              Password
+            </label>
+
+            <div className="relative">
+              <input
+                type={showPassword ? "text" : "password"}
+                placeholder="••••••••"
+                className="w-full px-4 py-3 pr-12 bg-[#181818] border border-gray-800 rounded-xl text-base text-white placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+              />
+
+              <button
+                type="button"
+                onClick={() => setShowPassword((prev) => !prev)}
+                className="absolute inset-y-0 right-0 px-4 flex items-center text-gray-500 hover:text-blue-400 transition-colors"
+                tabIndex={-1}
+              >
+                {showPassword ? (
+                  <EyeOff size={20} className="cursor-pointer" />
+                ) : (
+                  <Eye size={20} className="cursor-pointer" />
+                )}
+              </button>
+            </div>
+          </div>
+
+          <button
+            type="submit"
+            disabled={loading}
+            className={`w-full py-3.5 rounded-xl text-base font-semibold transition-all flex items-center justify-center gap-2 cursor-pointer shadow-lg ${
+              loading
+                ? "bg-blue-600/50 text-blue-200 cursor-not-allowed"
+                : "bg-blue-600 hover:bg-blue-500 text-white active:scale-[0.98]"
+            }`}
+          >
+            {loading && <Loader2 className="w-5 h-5 animate-spin" />}
+            {loading ? "Authenticating..." : "Login"}
+          </button>
+        </form>
+      </div>
+
+      {/* Footer Text */}
+      <p className="text-gray-500 text-xs text-center mt-6 max-w-md leading-relaxed">
+        This system is monitored. Unauthorized access attempts may be logged and
+        reviewed.
+      </p>
 
       <SecurityAlertModal
         open={showSecurityModal}
         onClose={() => setShowSecurityModal(false)}
         message={error}
       />
-    </AdminAuthLayout>
+    </div>
   );
 }
 
