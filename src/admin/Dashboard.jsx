@@ -304,7 +304,7 @@ export default function Dashboard() {
                 count={counts.messages}
                 icon={<Mail className="w-5 h-5" />}
                 badge="Inbox"
-                link="/admin/messages"
+                link="/admin/contact-messages"
               />
 
               <MetricCard
@@ -350,7 +350,7 @@ export default function Dashboard() {
             title="Messages & Inquiry"
             description="View inbound contact submissions and client inquiries."
             icon={<Mail className="w-5 h-5 text-indigo-600" />}
-            onClick={() => navigate("/admin/messages")}
+            onClick={() => navigate("/admin/contact-messages")}
             count={`${counts.messages} Unread/Total`}
           />
         </div>

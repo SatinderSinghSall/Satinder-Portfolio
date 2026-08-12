@@ -10,6 +10,8 @@ import {
   ExclamationTriangleIcon,
   ArrowPathIcon,
   SparklesIcon,
+  PlusIcon,
+  ExclamationCircleIcon,
 } from "@heroicons/react/24/outline";
 
 const API = import.meta.env.VITE_API_URL || "/api";
@@ -28,6 +30,7 @@ export default function AddProject() {
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [errors, setErrors] = useState({});
   const token = localStorage.getItem("token");
 
   // Handle input changes
@@ -37,6 +40,11 @@ export default function AddProject() {
       ...prev,
       [name]: type === "checkbox" ? checked : value,
     }));
+
+    // Clear inline error on field edit
+    if (errors[name]) {
+      setErrors((prev) => ({ ...prev, [name]: "" }));
+    }
   };
 
   // Convert comma-separated string to array for live badge preview
@@ -57,6 +65,10 @@ export default function AddProject() {
       ...prev,
       imageFiles: [...prev.imageFiles, ...files],
     }));
+
+    if (errors.imageFiles) {
+      setErrors((prev) => ({ ...prev, imageFiles: "" }));
+    }
   };
 
   const removeImage = (indexToRemove) => {
@@ -66,22 +78,62 @@ export default function AddProject() {
     }));
   };
 
+  // Form submission validation
+  const validateForm = () => {
+    const newErrors = {};
+
+    if (!form.title.trim()) {
+      newErrors.title = "Project Title is required.";
+    }
+
+    if (!form.githubLink.trim()) {
+      newErrors.githubLink = "GitHub Repository URL is required.";
+    } else if (
+      !form.githubLink.startsWith("http://") &&
+      !form.githubLink.startsWith("https://")
+    ) {
+      newErrors.githubLink =
+        "Please enter a valid URL (starting with http:// or https://).";
+    }
+
+    if (
+      form.link.trim() &&
+      !form.link.startsWith("http://") &&
+      !form.link.startsWith("https://")
+    ) {
+      newErrors.link =
+        "Please enter a valid URL (starting with http:// or https://).";
+    }
+
+    if (!form.description.trim()) {
+      newErrors.description = "Description is required.";
+    }
+
+    if (!techBadges.length) {
+      newErrors.technologies =
+        "Please provide at least one technology keyword.";
+    }
+
+    if (!form.imageFiles.length) {
+      newErrors.imageFiles =
+        "Please attach at least one screenshot or cover image.";
+    }
+
+    setErrors(newErrors);
+    return newErrors;
+  };
+
   // Form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
 
-    if (
-      !form.title.trim() ||
-      !form.description.trim() ||
-      !form.githubLink.trim() ||
-      !techBadges.length ||
-      !form.imageFiles.length
-    ) {
-      const msg =
-        "Please fill in all required fields and attach at least one image.";
-      toast.error(msg);
-      setError(msg);
+    const validationErrors = validateForm();
+    if (Object.keys(validationErrors).length > 0) {
+      const topMsg =
+        "Please review highlighted fields and complete required entries.";
+      setError(topMsg);
+      toast.error(topMsg);
       return;
     }
 
@@ -119,6 +171,7 @@ export default function AddProject() {
         imageFiles: [],
       });
 
+      setErrors({});
       toast.success("Project added successfully!");
     } catch (err) {
       console.error(err);
@@ -150,16 +203,25 @@ export default function AddProject() {
             </div>
           </div>
 
-          {/* Error Banner */}
+          {/* Form Error Banner */}
           {error && (
-            <div className="flex items-center gap-3 bg-rose-50 border border-rose-200 text-rose-700 px-4 py-3.5 rounded-2xl text-xs sm:text-sm font-medium">
-              <ExclamationTriangleIcon className="h-5 w-5 shrink-0 text-rose-500" />
-              <span>{error}</span>
+            <div className="flex items-start justify-between gap-3 bg-rose-50 border border-rose-200 text-rose-700 p-4 rounded-2xl text-xs sm:text-sm font-medium transition animate-in fade-in">
+              <div className="flex items-center gap-3">
+                <ExclamationTriangleIcon className="h-5 w-5 shrink-0 text-rose-500" />
+                <span>{error}</span>
+              </div>
+              <button
+                type="button"
+                onClick={() => setError("")}
+                className="text-rose-400 hover:text-rose-600 transition cursor-pointer"
+              >
+                <XMarkIcon className="h-5 w-5" />
+              </button>
             </div>
           )}
 
           {/* Form */}
-          <form onSubmit={handleSubmit} className="space-y-6">
+          <form onSubmit={handleSubmit} noValidate className="space-y-6">
             {/* Title & Github Row */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
               <div>
@@ -172,9 +234,18 @@ export default function AddProject() {
                   value={form.title}
                   onChange={handleChange}
                   placeholder="e.g. AI Content Studio"
-                  className="w-full rounded-xl border border-slate-200 px-4 py-3 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition bg-slate-50/50"
-                  required
+                  className={`w-full rounded-xl border px-4 py-3 text-sm text-slate-900 focus:outline-none focus:ring-2 transition bg-slate-50/50 ${
+                    errors.title
+                      ? "border-rose-400 focus:ring-rose-500/20 focus:border-rose-500 bg-rose-50/20"
+                      : "border-slate-200 focus:ring-indigo-500/20 focus:border-indigo-500"
+                  }`}
                 />
+                {errors.title && (
+                  <p className="flex items-center gap-1.5 text-xs text-rose-500 mt-1.5 font-medium">
+                    <ExclamationCircleIcon className="h-4 w-4 shrink-0" />
+                    <span>{errors.title}</span>
+                  </p>
+                )}
               </div>
 
               <div>
@@ -187,9 +258,18 @@ export default function AddProject() {
                   value={form.githubLink}
                   onChange={handleChange}
                   placeholder="https://github.com/user/repo"
-                  className="w-full rounded-xl border border-slate-200 px-4 py-3 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition bg-slate-50/50"
-                  required
+                  className={`w-full rounded-xl border px-4 py-3 text-sm text-slate-900 focus:outline-none focus:ring-2 transition bg-slate-50/50 ${
+                    errors.githubLink
+                      ? "border-rose-400 focus:ring-rose-500/20 focus:border-rose-500 bg-rose-50/20"
+                      : "border-slate-200 focus:ring-indigo-500/20 focus:border-indigo-500"
+                  }`}
                 />
+                {errors.githubLink && (
+                  <p className="flex items-center gap-1.5 text-xs text-rose-500 mt-1.5 font-medium">
+                    <ExclamationCircleIcon className="h-4 w-4 shrink-0" />
+                    <span>{errors.githubLink}</span>
+                  </p>
+                )}
               </div>
             </div>
 
@@ -205,8 +285,18 @@ export default function AddProject() {
                   value={form.link}
                   onChange={handleChange}
                   placeholder="https://my-app.vercel.app"
-                  className="w-full rounded-xl border border-slate-200 px-4 py-3 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition bg-slate-50/50"
+                  className={`w-full rounded-xl border px-4 py-3 text-sm text-slate-900 focus:outline-none focus:ring-2 transition bg-slate-50/50 ${
+                    errors.link
+                      ? "border-rose-400 focus:ring-rose-500/20 focus:border-rose-500 bg-rose-50/20"
+                      : "border-slate-200 focus:ring-indigo-500/20 focus:border-indigo-500"
+                  }`}
                 />
+                {errors.link && (
+                  <p className="flex items-center gap-1.5 text-xs text-rose-500 mt-1.5 font-medium">
+                    <ExclamationCircleIcon className="h-4 w-4 shrink-0" />
+                    <span>{errors.link}</span>
+                  </p>
+                )}
               </div>
 
               <div>
@@ -236,9 +326,18 @@ export default function AddProject() {
                 value={form.description}
                 onChange={handleChange}
                 placeholder="Detail key architectural decisions, problem statement, and technical highlights..."
-                className="w-full rounded-xl border border-slate-200 px-4 py-3 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition bg-slate-50/50 resize-none"
-                required
+                className={`w-full rounded-xl border px-4 py-3 text-sm text-slate-900 focus:outline-none focus:ring-2 transition bg-slate-50/50 resize-none ${
+                  errors.description
+                    ? "border-rose-400 focus:ring-rose-500/20 focus:border-rose-500 bg-rose-50/20"
+                    : "border-slate-200 focus:ring-indigo-500/20 focus:border-indigo-500"
+                }`}
               />
+              {errors.description && (
+                <p className="flex items-center gap-1.5 text-xs text-rose-500 mt-1.5 font-medium">
+                  <ExclamationCircleIcon className="h-4 w-4 shrink-0" />
+                  <span>{errors.description}</span>
+                </p>
+              )}
             </div>
 
             {/* Tech Stack Input & Badges */}
@@ -255,8 +354,18 @@ export default function AddProject() {
                 value={form.technologies}
                 onChange={handleChange}
                 placeholder="React, TypeScript, Node.js, Tailwind CSS"
-                className="w-full rounded-xl border border-slate-200 px-4 py-3 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition bg-slate-50/50"
+                className={`w-full rounded-xl border px-4 py-3 text-sm text-slate-900 focus:outline-none focus:ring-2 transition bg-slate-50/50 ${
+                  errors.technologies
+                    ? "border-rose-400 focus:ring-rose-500/20 focus:border-rose-500 bg-rose-50/20"
+                    : "border-slate-200 focus:ring-indigo-500/20 focus:border-indigo-500"
+                }`}
               />
+              {errors.technologies && (
+                <p className="flex items-center gap-1.5 text-xs text-rose-500 mt-1.5 font-medium">
+                  <ExclamationCircleIcon className="h-4 w-4 shrink-0" />
+                  <span>{errors.technologies}</span>
+                </p>
+              )}
 
               {/* Dynamic Tech Badge Previews */}
               {techBadges.length > 0 && (
@@ -309,7 +418,13 @@ export default function AddProject() {
                 <span className="text-rose-500">*</span>
               </label>
 
-              <label className="group flex flex-col items-center justify-center gap-2 border-2 border-dashed border-slate-200 hover:border-indigo-400 rounded-2xl p-6 transition cursor-pointer bg-slate-50/50 hover:bg-indigo-50/30">
+              <label
+                className={`group flex flex-col items-center justify-center gap-2 border-2 border-dashed rounded-2xl p-6 transition cursor-pointer ${
+                  errors.imageFiles
+                    ? "border-rose-400 bg-rose-50/20 hover:bg-rose-50/30"
+                    : "border-slate-200 hover:border-indigo-400 bg-slate-50/50 hover:bg-indigo-50/30"
+                }`}
+              >
                 <div className="p-3 rounded-full bg-indigo-50 text-indigo-600 group-hover:scale-110 transition">
                   <PhotoIcon className="h-6 w-6" />
                 </div>
@@ -333,6 +448,13 @@ export default function AddProject() {
                   onChange={handleImageChange}
                 />
               </label>
+
+              {errors.imageFiles && (
+                <p className="flex items-center gap-1.5 text-xs text-rose-500 mt-1.5 font-medium">
+                  <ExclamationCircleIcon className="h-4 w-4 shrink-0" />
+                  <span>{errors.imageFiles}</span>
+                </p>
+              )}
 
               {/* Selected Images Grid Preview */}
               {form.imageFiles.length > 0 && (
@@ -369,19 +491,22 @@ export default function AddProject() {
               <button
                 type="submit"
                 disabled={loading}
-                className={`inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl font-semibold text-white text-sm shadow-sm transition active:scale-95 cursor-pointer ${
+                className={`w-full sm:w-auto min-w-[200px] inline-flex items-center justify-center gap-2 px-8 py-3.5 rounded-xl font-semibold text-white text-sm shadow-sm transition active:scale-95 ${
                   loading
                     ? "bg-indigo-400 cursor-not-allowed"
-                    : "bg-indigo-600 hover:bg-indigo-700"
+                    : "bg-indigo-600 hover:bg-indigo-700 cursor-pointer"
                 }`}
               >
                 {loading ? (
                   <>
-                    <ArrowPathIcon className="h-4 w-4 animate-spin" />
+                    <ArrowPathIcon className="h-5 w-5 animate-spin" />
                     <span>Saving Project...</span>
                   </>
                 ) : (
-                  <span>Publish Project</span>
+                  <>
+                    <PlusIcon className="h-5 w-5 stroke-[2.5]" />
+                    <span>Publish Project</span>
+                  </>
                 )}
               </button>
             </div>

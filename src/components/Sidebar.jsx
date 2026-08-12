@@ -353,7 +353,7 @@ export default function Sidebar({ isOpen = false, onClose = () => {} }) {
             type="button"
             aria-label="Close logout modal"
             onClick={() => setLogoutModalOpen(false)}
-            className="absolute right-4 top-4 h-8 w-8 rounded-full bg-slate-100 flex items-center justify-center text-slate-500 hover:text-slate-800 hover:bg-slate-200 transition"
+            className="absolute right-4 top-4 h-8 w-8 rounded-full bg-slate-100 flex items-center justify-center text-slate-500 hover:text-slate-800 hover:bg-slate-200 transition cursor-pointer"
           >
             <X size={16} />
           </button>

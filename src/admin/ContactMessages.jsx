@@ -106,6 +106,18 @@ export default function Messages() {
     ).length;
   }, [messages]);
 
+  useEffect(() => {
+    if (showModal) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "unset";
+    }
+
+    return () => {
+      document.body.style.overflow = "unset";
+    };
+  }, [showModal]);
+
   return (
     <AdminLayout>
       <div className="max-w-7xl mx-auto space-y-8">
@@ -138,7 +150,7 @@ export default function Messages() {
                 <button
                   onClick={fetchMessages}
                   disabled={refreshing}
-                  className={`inline-flex items-center gap-2 px-4 py-2.5 rounded-xl border shadow-sm font-semibold transition
+                  className={`inline-flex items-center gap-2 px-4 py-2.5 rounded-xl border shadow-sm font-semibold transition cursor-pointer
                     ${
                       refreshing
                         ? "bg-gray-100 text-gray-400 border-gray-200 cursor-not-allowed"
@@ -280,36 +292,90 @@ export default function Messages() {
         </div>
       </div>
 
-      {/* Modal */}
-      {showModal && (
-        <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-2xl p-6 w-full max-w-md space-y-4 border border-gray-200 shadow-xl">
-            <div className="flex items-center gap-3">
-              <ShieldAlert className="text-red-500" />
-              <h3 className="text-lg font-semibold">Delete Message</h3>
-            </div>
-            <p className="text-gray-600">
-              This action is permanent. Are you sure?
-            </p>
-            <div className="flex justify-end gap-3">
-              <button
-                onClick={() => setShowModal(false)}
-                className="px-4 py-2 border border-gray-200 rounded-xl bg-white hover:bg-gray-50 font-semibold"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={deleteMessage}
-                disabled={deleting}
-                className="px-4 py-2 bg-red-600 text-white rounded-xl
-                hover:bg-red-700 disabled:opacity-60
-                disabled:cursor-not-allowed flex items-center gap-2 font-semibold"
-              >
-                {deleting && (
-                  <span className="h-4 w-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                )}
-                {deleting ? "Deleting…" : "Delete"}
-              </button>
+      {/* Danger Zone Delete Modal */}
+      {showModal && selectedMessage && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-gray-950/60 backdrop-blur-sm animate-in fade-in duration-200">
+          <div className="relative w-full max-w-md overflow-hidden bg-white border border-red-100 rounded-3xl shadow-2xl shadow-red-500/10">
+            {/* Top Warning Stripe Accent */}
+            <div className="h-2 w-full bg-gradient-to-r from-red-500 via-rose-500 to-amber-500" />
+
+            {/* Decorative Glow background */}
+            <div className="absolute -top-12 -right-12 h-32 w-32 rounded-full bg-red-100/50 blur-2xl pointer-events-none" />
+
+            <div className="p-6 sm:p-7 space-y-5">
+              {/* Header with Icon Badge */}
+              <div className="flex items-start gap-4">
+                <div className="relative flex items-center justify-center h-12 w-12 rounded-2xl bg-red-50 border border-red-200/60 text-red-600 shrink-0 shadow-inner">
+                  <ShieldAlert className="w-6 h-6 animate-pulse" />
+                  <span className="absolute -top-1 -right-1 flex h-3 w-3">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+                    <span className="relative inline-flex rounded-full h-3 w-3 bg-red-500"></span>
+                  </span>
+                </div>
+
+                <div className="min-w-0 flex-1">
+                  <span className="inline-block px-2.5 py-0.5 text-[10px] font-extrabold uppercase tracking-wider text-red-700 bg-red-100/80 rounded-md border border-red-200/50 mb-1">
+                    Danger Zone
+                  </span>
+                  <h3 className="text-xl font-black text-gray-900 leading-tight">
+                    Delete Message?
+                  </h3>
+                </div>
+              </div>
+
+              {/* Message Summary Card */}
+              <div className="p-3.5 rounded-2xl bg-gray-50 border border-gray-200/80 text-sm space-y-1.5">
+                <div className="flex items-center justify-between text-xs text-gray-500">
+                  <span className="font-medium text-gray-400">Target Item</span>
+                  <span className="font-mono text-[10px] text-gray-400 truncate max-w-[120px]">
+                    {selectedMessage._id}
+                  </span>
+                </div>
+                <p className="font-bold text-gray-900 truncate">
+                  {selectedMessage.name}
+                </p>
+                <p className="text-xs text-gray-500 truncate">
+                  {selectedMessage.email}
+                </p>
+              </div>
+
+              {/* Warning Text */}
+              <p className="text-xs text-gray-600 leading-relaxed">
+                This operation is{" "}
+                <strong className="text-red-600 font-bold">irreversible</strong>
+                . The message will be permanently wiped from the database.
+              </p>
+
+              {/* Action Buttons */}
+              <div className="flex items-center justify-end gap-3 pt-2">
+                <button
+                  type="button"
+                  onClick={() => setShowModal(false)}
+                  disabled={deleting}
+                  className="px-5 py-2.5 rounded-xl border border-gray-200 bg-white hover:bg-gray-50 active:bg-gray-100 text-gray-700 font-bold text-sm shadow-sm transition disabled:opacity-50 cursor-pointer"
+                >
+                  Cancel
+                </button>
+
+                <button
+                  type="button"
+                  onClick={deleteMessage}
+                  disabled={deleting}
+                  className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-700 hover:to-rose-700 active:from-red-800 active:to-rose-800 text-white font-bold text-sm shadow-md shadow-red-500/20 transition hover:shadow-lg hover:shadow-red-500/30 disabled:opacity-60 disabled:cursor-not-allowed cursor-pointer"
+                >
+                  {deleting ? (
+                    <>
+                      <span className="h-4 w-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                      <span>Deleting...</span>
+                    </>
+                  ) : (
+                    <>
+                      <Trash2 className="w-4 h-4" />
+                      <span>Confirm Delete</span>
+                    </>
+                  )}
+                </button>
+              </div>
             </div>
           </div>
         </div>
@@ -375,7 +441,7 @@ function MessagePreview({ message, onDelete }) {
 
         <button
           onClick={onDelete}
-          className="text-red-600 text-sm flex items-center gap-1 hover:underline font-semibold"
+          className="text-red-600 text-sm flex items-center gap-1 hover:underline font-semibold cursor-pointer"
         >
           <Trash2 className="w-4 h-4" />
           Delete

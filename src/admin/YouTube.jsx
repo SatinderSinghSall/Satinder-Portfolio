@@ -15,6 +15,8 @@ import {
   MagnifyingGlassIcon,
   ChevronLeftIcon,
   ChevronRightIcon,
+  XMarkIcon,
+  ExclamationTriangleIcon,
 } from "@heroicons/react/24/outline";
 import { EyeIcon } from "@heroicons/react/24/outline";
 
@@ -213,6 +215,19 @@ export default function ManageYouTube() {
     }
   };
 
+  useEffect(() => {
+    if (showDeleteModal || viewModal) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "unset";
+    }
+
+    // Cleanup on unmount
+    return () => {
+      document.body.style.overflow = "unset";
+    };
+  }, [showDeleteModal, viewModal]);
+
   return (
     <AdminLayout>
       <div className="w-full max-w-[1400px] mx-auto px-6 pb-16">
@@ -236,7 +251,7 @@ export default function ManageYouTube() {
             <button
               onClick={() => fetchVideos()}
               disabled={fetching}
-              className={`inline-flex items-center gap-2 px-3 py-2 rounded-md border font-medium transition
+              className={`inline-flex items-center gap-2 px-3 py-2 rounded-md border font-medium transition cursor-pointer
             ${
               fetching
                 ? "bg-gray-100 text-gray-400 cursor-not-allowed"
@@ -309,7 +324,7 @@ export default function ManageYouTube() {
           <button
             onClick={handleApplyFilters}
             disabled={fetching}
-            className={`px-4 py-2.5 rounded-md font-medium text-white transition inline-flex items-center justify-center gap-2
+            className={`px-4 py-2.5 rounded-md font-medium text-white transition inline-flex items-center justify-center gap-2 cursor-pointer
           ${
             fetching
               ? "bg-red-400 cursor-not-allowed"
@@ -408,7 +423,7 @@ export default function ManageYouTube() {
 
           <button
             disabled={submitting}
-            className={`mt-5 inline-flex items-center gap-2 px-5 py-2.5 rounded-md text-white font-medium transition
+            className={`mt-5 inline-flex items-center gap-2 px-5 py-2.5 rounded-md text-white font-medium transition cursor-pointer
               ${
                 submitting
                   ? "bg-red-400 cursor-not-allowed"
@@ -500,7 +515,7 @@ export default function ManageYouTube() {
                       <div className="flex gap-2">
                         <button
                           onClick={() => handleView(video)}
-                          className="p-2 hover:bg-blue-50 rounded-md"
+                          className="p-2 hover:bg-blue-50 rounded-md cursor-pointer"
                           title="View Video"
                         >
                           <EyeIcon className="h-5 w-5 text-blue-600" />
@@ -508,7 +523,7 @@ export default function ManageYouTube() {
 
                         <button
                           onClick={() => handleEdit(video)}
-                          className="p-2 hover:bg-gray-100 rounded-md"
+                          className="p-2 hover:bg-gray-100 rounded-md cursor-pointer"
                           title="Edit"
                         >
                           <PencilSquareIcon className="h-5 w-5 text-indigo-600" />
@@ -519,7 +534,7 @@ export default function ManageYouTube() {
                             setDeletingId(video._id);
                             setShowDeleteModal(true);
                           }}
-                          className="p-2 hover:bg-red-50 rounded-md"
+                          className="p-2 hover:bg-red-50 rounded-md cursor-pointer"
                           title="Delete"
                         >
                           <TrashIcon className="h-5 w-5 text-red-600" />
@@ -603,36 +618,94 @@ export default function ManageYouTube() {
           </>
         )}
 
-        {/* Delete Modal */}
+        {/* Delete Modal - Premium Danger Zone */}
         {showDeleteModal && (
-          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-            <div className="bg-white p-6 rounded-xl w-[420px] shadow-xl">
-              <h3 className="font-semibold text-lg mb-2">Confirm Delete</h3>
-              <p className="text-sm text-gray-600 mb-4">
-                This action cannot be undone.
-              </p>
+          <div
+            className="fixed inset-0 bg-slate-900/60 backdrop-blur-md flex items-center justify-center z-50 p-4 transition-all duration-300 animate-fadeIn"
+            onClick={() => setShowDeleteModal(false)}
+          >
+            <div
+              className="bg-white rounded-3xl max-w-md w-full shadow-2xl overflow-hidden border border-red-100/80 relative transform transition-all scale-100"
+              onClick={(e) => e.stopPropagation()}
+            >
+              {/* Top Accent Glowing Line */}
+              <div className="h-1.5 w-full bg-gradient-to-r from-red-500 via-rose-500 to-red-600" />
 
-              <div className="flex justify-end gap-3">
-                <button
-                  onClick={() => setShowDeleteModal(false)}
-                  className="px-4 py-2 bg-gray-200 rounded-md"
-                >
-                  Cancel
-                </button>
+              {/* Close Button */}
+              <button
+                onClick={() => setShowDeleteModal(false)}
+                className="absolute top-4 right-4 p-1.5 text-slate-400 hover:text-slate-700 hover:bg-slate-100 rounded-full transition-colors cursor-pointer"
+                aria-label="Close modal"
+              >
+                <XMarkIcon className="h-5 w-5" />
+              </button>
 
-                <button
-                  onClick={confirmDelete}
-                  disabled={deleting}
-                  className={`px-4 py-2 rounded-md text-white flex items-center gap-2 transition
-                    ${
+              <div className="p-6 sm:p-8 text-center">
+                {/* Pulsing Danger Icon */}
+                <div className="relative mx-auto mb-5 w-16 h-16 flex items-center justify-center">
+                  <div className="absolute inset-0 bg-red-100 rounded-2xl rotate-6 scale-95 opacity-70" />
+                  <div className="absolute inset-0 bg-red-200/50 rounded-2xl -rotate-3 scale-100" />
+                  <div className="relative w-16 h-16 bg-gradient-to-b from-red-50 to-red-100/80 rounded-2xl border border-red-200/60 flex items-center justify-center text-red-600 shadow-inner">
+                    <ExclamationTriangleIcon className="h-8 w-8 text-red-600 drop-shadow-sm" />
+                  </div>
+                </div>
+
+                {/* Danger Zone Badge */}
+                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-bold uppercase tracking-wider bg-red-50 text-red-600 border border-red-200/60 mb-3">
+                  <span className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse" />
+                  Danger Zone
+                </span>
+
+                {/* Title */}
+                <h3 className="text-xl font-extrabold text-slate-900 tracking-tight">
+                  Delete YouTube Video?
+                </h3>
+
+                {/* Description & Highlight Box */}
+                <p className="text-sm text-slate-600 mt-2 leading-relaxed">
+                  Are you sure you want to delete this video? This action is{" "}
+                  <span className="font-semibold text-slate-900 underline decoration-red-300 decoration-2 underline-offset-2">
+                    permanent
+                  </span>{" "}
+                  and cannot be undone.
+                </p>
+
+                {/* Context Preview Pill (Optional item info card) */}
+                {selectedVideo?.title && (
+                  <div className="mt-4 p-3 bg-slate-50 rounded-xl border border-slate-100 text-xs text-slate-600 truncate font-medium flex items-center justify-center gap-2">
+                    <VideoCameraIcon className="h-4 w-4 text-slate-400 shrink-0" />
+                    <span className="truncate">{selectedVideo.title}</span>
+                  </div>
+                )}
+
+                {/* Footer Buttons */}
+                <div className="flex items-center gap-3 mt-7">
+                  <button
+                    onClick={() => setShowDeleteModal(false)}
+                    className="flex-1 px-4 py-3 rounded-xl border border-slate-200 text-slate-700 font-semibold hover:bg-slate-50 hover:border-slate-300 active:bg-slate-100 transition-all text-sm cursor-pointer shadow-sm"
+                  >
+                    Cancel
+                  </button>
+
+                  <button
+                    onClick={confirmDelete}
+                    disabled={deleting}
+                    className={`flex-1 px-4 py-3 rounded-xl text-white font-semibold flex items-center justify-center gap-2 text-sm shadow-md shadow-red-500/20 transition-all cursor-pointer ${
                       deleting
                         ? "bg-red-400 cursor-not-allowed"
-                        : "bg-red-600 hover:bg-red-700"
-                    }
-                  `}
-                >
-                  {deleting ? <Spinner text="Deleting..." /> : "Delete"}
-                </button>
+                        : "bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-700 hover:to-rose-700 hover:shadow-lg hover:shadow-red-500/30 active:scale-[0.98]"
+                    }`}
+                  >
+                    {deleting ? (
+                      <Spinner text="Deleting..." />
+                    ) : (
+                      <>
+                        <TrashIcon className="h-4.5 w-4.5" />
+                        Yes, Delete
+                      </>
+                    )}
+                  </button>
+                </div>
               </div>
             </div>
           </div>
@@ -648,7 +721,7 @@ export default function ManageYouTube() {
 
                 <button
                   onClick={() => setViewModal(false)}
-                  className="text-gray-500 hover:text-black text-xl"
+                  className="text-gray-500 hover:text-black text-xl cursor-pointer"
                 >
                   ✕
                 </button>

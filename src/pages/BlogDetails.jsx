@@ -324,15 +324,49 @@ export default function BlogDetails() {
 
             {/* Content Body */}
             <div className="pt-6 border-t border-slate-100">
-              {blog.editorType === "markdown" ? (
-                <div className="prose prose-slate max-w-none leading-relaxed text-slate-700 text-base">
-                  <ReactMarkdown remarkPlugins={[remarkGfm, remarkBreaks]}>
-                    {formattedMarkdown}
-                  </ReactMarkdown>
-                </div>
-              ) : (
-                <EditorBlocksRenderer data={blog.contentBlocks} />
-              )}
+              <div className="prose prose-slate max-w-none leading-relaxed text-slate-700 text-base">
+                <ReactMarkdown
+                  remarkPlugins={[remarkGfm, remarkBreaks]}
+                  components={{
+                    h2: ({ node, ...props }) => (
+                      <h2
+                        className="text-xl font-bold text-slate-900 mt-8 mb-4"
+                        {...props}
+                      />
+                    ),
+                    p: ({ node, ...props }) => (
+                      <p
+                        className="text-slate-700 leading-relaxed my-4"
+                        {...props}
+                      />
+                    ),
+                    ul: ({ node, ...props }) => (
+                      <ul
+                        className="list-disc pl-6 my-4 space-y-2"
+                        {...props}
+                      />
+                    ),
+                    ol: ({ node, ...props }) => (
+                      <ol
+                        className="list-decimal pl-6 my-4 space-y-2"
+                        {...props}
+                      />
+                    ),
+                    li: ({ node, ...props }) => (
+                      <li className="text-slate-700" {...props} />
+                    ),
+                    blockquote: ({ node, ...props }) => (
+                      <blockquote
+                        className="border-l-4 border-slate-300 pl-4 italic my-6 text-slate-600"
+                        {...props}
+                      />
+                    ),
+                    hr: () => <hr className="my-8 border-slate-200" />,
+                  }}
+                >
+                  {formattedMarkdown}
+                </ReactMarkdown>
+              </div>
             </div>
 
             {/* Footer Sign-off Banner */}

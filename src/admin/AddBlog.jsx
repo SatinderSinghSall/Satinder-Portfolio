@@ -21,6 +21,8 @@ import {
   XMarkIcon,
   CalendarIcon,
   LinkIcon,
+  ExclamationCircleIcon,
+  ExclamationTriangleIcon,
 } from "@heroicons/react/24/outline";
 
 const API = import.meta.env.VITE_API_URL || "/api";
@@ -38,6 +40,10 @@ export default function AddBlog() {
   const [activeTab, setActiveTab] = useState("content");
   const [editorMode, setEditorMode] = useState("edit"); // "edit" | "split" | "preview"
   const [isSlugTouched, setIsSlugTouched] = useState(false);
+
+  // Error States
+  const [errors, setErrors] = useState({});
+  const [mainError, setMainError] = useState("");
 
   const [form, setForm] = useState({
     title: "",
@@ -65,6 +71,14 @@ export default function AddBlog() {
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
+
+    // Clear inline error & main error when user edits field
+    if (errors[name]) {
+      setErrors((prev) => ({ ...prev, [name]: "" }));
+    }
+    if (mainError) {
+      setMainError("");
+    }
 
     if (name === "title") {
       setForm((prev) => {
@@ -134,28 +148,55 @@ export default function AddBlog() {
       metaDescription: "",
       scheduledAt: "",
     });
+    setErrors({});
+    setMainError("");
     setIsSlugTouched(false);
     setActiveTab("content");
+  };
+
+  const validate = () => {
+    const newErrors = {};
+
+    // Required fields check
+    if (!form.title.trim()) newErrors.title = "Blog title is required.";
+    if (!form.image.trim()) newErrors.image = "Cover image URL is required.";
+    if (!form.content.trim())
+      newErrors.content = "Markdown content is required.";
+
+    setErrors(newErrors);
+
+    if (Object.keys(newErrors).length > 0) {
+      setMainError("Please resolve all validation errors before submitting.");
+
+      // Switch tab if required fields are missing
+      if (newErrors.title || newErrors.image || newErrors.content) {
+        setActiveTab("content");
+      } else if (
+        newErrors.slug ||
+        newErrors.metaTitle ||
+        newErrors.metaDescription ||
+        newErrors.ogImage
+      ) {
+        setActiveTab("seo");
+      } else if (
+        newErrors.author ||
+        newErrors.category ||
+        newErrors.scheduledAt
+      ) {
+        setActiveTab("settings");
+      }
+      return false;
+    }
+
+    setMainError("");
+    return true;
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!form.title.trim()) {
-      toast.error("Blog title is required");
-      setActiveTab("content");
-      return;
-    }
-
-    if (!form.image.trim()) {
-      toast.error("Cover image URL is required");
-      setActiveTab("content");
-      return;
-    }
-
-    if (!form.content.trim()) {
-      toast.error("Markdown content is required");
-      setActiveTab("content");
+    if (!validate()) {
+      toast.error("Please fix errors before submitting.");
       return;
     }
 
@@ -190,7 +231,9 @@ export default function AddBlog() {
       window.scrollTo({ top: 0, behavior: "smooth" });
     } catch (err) {
       console.error(err);
-      toast.error(err.response?.data?.message || "Failed to add blog post");
+      const errorMsg = err.response?.data?.message || "Failed to add blog post";
+      setMainError(errorMsg);
+      toast.error(errorMsg);
     } finally {
       setLoading(false);
     }
@@ -245,7 +288,7 @@ export default function AddBlog() {
                 <button
                   type="submit"
                   disabled={loading}
-                  className={`flex-1 md:flex-none inline-flex items-center justify-center gap-2 rounded-xl px-6 py-2.5 text-sm font-semibold text-white shadow-md shadow-indigo-500/20 transition-all duration-200 ${
+                  className={`flex-1 md:flex-none inline-flex items-center justify-center gap-2 rounded-xl px-6 py-2.5 text-sm font-semibold text-white shadow-md shadow-indigo-500/20 transition-all duration-200 cursor-pointer ${
                     loading
                       ? "bg-indigo-400 cursor-not-allowed"
                       : "bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-700 hover:to-violet-700 active:scale-[0.98]"
@@ -261,6 +304,33 @@ export default function AddBlog() {
               </div>
             </div>
           </div>
+
+          {/* MAIN TOP ERROR ALERT BANNER WITH WARNING & CROSS ICON */}
+          {mainError && (
+            <div className="mb-6 flex items-center justify-between rounded-2xl border border-rose-200 bg-rose-50/90 p-4 shadow-sm backdrop-blur-md animate-fadeIn">
+              <div className="flex items-center gap-3">
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-rose-100 text-rose-600">
+                  <ExclamationTriangleIcon className="h-6 w-6" />
+                </div>
+                <div>
+                  <h4 className="text-sm font-bold text-rose-900">
+                    Validation Error
+                  </h4>
+                  <p className="text-xs font-medium text-rose-700 mt-0.5">
+                    {mainError}
+                  </p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setMainError("")}
+                className="p-2 rounded-xl text-rose-500 hover:bg-rose-100/60 hover:text-rose-800 transition cursor-pointer"
+                title="Dismiss"
+              >
+                <XMarkIcon className="h-5 w-5" />
+              </button>
+            </div>
+          )}
 
           {/* MAIN GRID LAYOUT */}
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
@@ -294,7 +364,7 @@ export default function AddBlog() {
                       key={t.id}
                       type="button"
                       onClick={() => setActiveTab(t.id)}
-                      className={`w-full flex items-center gap-3.5 p-3 rounded-2xl text-left transition-all duration-150 ${
+                      className={`w-full flex items-center gap-3.5 p-3 rounded-2xl text-left transition-all duration-150 cursor-pointer ${
                         isActive
                           ? "bg-slate-900 text-white shadow-md shadow-slate-900/10"
                           : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
@@ -372,9 +442,19 @@ export default function AddBlog() {
                         value={form.title}
                         onChange={handleChange}
                         placeholder="e.g. How We Scaled Our Infrastructure to 1M Users"
-                        className="w-full rounded-2xl border border-slate-200 bg-slate-50/30 px-4 py-3.5 text-base sm:text-lg font-semibold text-slate-900 focus:bg-white focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100 outline-none transition"
+                        className={`w-full rounded-2xl border px-4 py-3.5 text-base sm:text-lg font-semibold text-slate-900 focus:bg-white focus:ring-4 outline-none transition ${
+                          errors.title
+                            ? "border-rose-400 bg-rose-50/20 focus:border-rose-500 focus:ring-rose-100"
+                            : "border-slate-200 bg-slate-50/30 focus:border-indigo-500 focus:ring-indigo-100"
+                        }`}
                       />
-                      {form.slug && (
+                      {errors.title && (
+                        <p className="text-xs font-medium text-rose-500 mt-1.5 flex items-center gap-1">
+                          <ExclamationCircleIcon className="w-4 h-4 text-rose-500 shrink-0" />
+                          {errors.title}
+                        </p>
+                      )}
+                      {form.slug && !errors.title && (
                         <p className="text-xs text-slate-500 mt-2 flex items-center gap-1 font-mono">
                           <LinkIcon className="w-3 h-3 text-slate-400" />
                           Slug preview:{" "}
@@ -395,8 +475,18 @@ export default function AddBlog() {
                         value={form.summary}
                         onChange={handleChange}
                         placeholder="A concise hook displayed in card feeds and listings..."
-                        className="w-full rounded-2xl border border-slate-200 bg-slate-50/30 px-4 py-3 text-sm text-slate-800 focus:bg-white focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100 outline-none transition"
+                        className={`w-full rounded-2xl border px-4 py-3 text-sm text-slate-800 focus:bg-white focus:ring-4 outline-none transition ${
+                          errors.summary
+                            ? "border-rose-400 bg-rose-50/20 focus:border-rose-500 focus:ring-rose-100"
+                            : "border-slate-200 bg-slate-50/30 focus:border-indigo-500 focus:ring-indigo-100"
+                        }`}
                       />
+                      {errors.summary && (
+                        <p className="text-xs font-medium text-rose-500 mt-1.5 flex items-center gap-1">
+                          <ExclamationCircleIcon className="w-4 h-4 text-rose-500 shrink-0" />
+                          {errors.summary}
+                        </p>
+                      )}
                     </div>
 
                     {/* Cover Image URL with Live Card */}
@@ -411,9 +501,19 @@ export default function AddBlog() {
                           value={form.image}
                           onChange={handleChange}
                           placeholder="https://images.unsplash.com/photo-..."
-                          className="w-full pl-11 rounded-2xl border border-slate-200 bg-slate-50/30 px-4 py-3 text-sm text-slate-800 focus:bg-white focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100 outline-none transition"
+                          className={`w-full pl-11 rounded-2xl border px-4 py-3 text-sm text-slate-800 focus:bg-white focus:ring-4 outline-none transition ${
+                            errors.image
+                              ? "border-rose-400 bg-rose-50/20 focus:border-rose-500 focus:ring-rose-100"
+                              : "border-slate-200 bg-slate-50/30 focus:border-indigo-500 focus:ring-indigo-100"
+                          }`}
                         />
                       </div>
+                      {errors.image && (
+                        <p className="text-xs font-medium text-rose-500 mt-1.5 flex items-center gap-1">
+                          <ExclamationCircleIcon className="w-4 h-4 text-rose-500 shrink-0" />
+                          {errors.image}
+                        </p>
+                      )}
 
                       {/* Image Preview Window */}
                       {form.image && (
@@ -484,14 +584,26 @@ export default function AddBlog() {
                         }`}
                       >
                         {(editorMode === "edit" || editorMode === "split") && (
-                          <textarea
-                            name="content"
-                            value={form.content}
-                            onChange={handleChange}
-                            placeholder="Write your article markdown here... Use # Headings, **bold**, or code blocks."
-                            rows={16}
-                            className="w-full rounded-2xl border border-slate-200 bg-slate-50/30 p-4 text-sm font-mono text-slate-800 focus:bg-white focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100 outline-none transition resize-y leading-relaxed"
-                          />
+                          <div>
+                            <textarea
+                              name="content"
+                              value={form.content}
+                              onChange={handleChange}
+                              placeholder="Write your article markdown here... Use # Headings, **bold**, or code blocks."
+                              rows={16}
+                              className={`w-full rounded-2xl border p-4 text-sm font-mono text-slate-800 focus:bg-white focus:ring-4 outline-none transition resize-y leading-relaxed ${
+                                errors.content
+                                  ? "border-rose-400 bg-rose-50/20 focus:border-rose-500 focus:ring-rose-100"
+                                  : "border-slate-200 bg-slate-50/30 focus:border-indigo-500 focus:ring-indigo-100"
+                              }`}
+                            />
+                            {errors.content && (
+                              <p className="text-xs font-medium text-rose-500 mt-1.5 flex items-center gap-1">
+                                <ExclamationCircleIcon className="w-4 h-4 text-rose-500 shrink-0" />
+                                {errors.content}
+                              </p>
+                            )}
+                          </div>
                         )}
 
                         {(editorMode === "preview" ||
@@ -533,8 +645,18 @@ export default function AddBlog() {
                           value={form.metaTitle}
                           onChange={handleChange}
                           placeholder="Optimized headline for search engines"
-                          className="w-full rounded-2xl border border-slate-200 bg-slate-50/30 px-4 py-3 text-sm text-slate-800 focus:bg-white focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100 outline-none transition"
+                          className={`w-full rounded-2xl border px-4 py-3 text-sm text-slate-800 focus:bg-white focus:ring-4 outline-none transition ${
+                            errors.metaTitle
+                              ? "border-rose-400 bg-rose-50/20 focus:border-rose-500 focus:ring-rose-100"
+                              : "border-slate-200 bg-slate-50/30 focus:border-indigo-500 focus:ring-indigo-100"
+                          }`}
                         />
+                        {errors.metaTitle && (
+                          <p className="text-xs font-medium text-rose-500 mt-1.5 flex items-center gap-1">
+                            <ExclamationCircleIcon className="w-4 h-4 text-rose-500 shrink-0" />
+                            {errors.metaTitle}
+                          </p>
+                        )}
                       </div>
 
                       <div>
@@ -546,8 +668,18 @@ export default function AddBlog() {
                           value={form.ogImage}
                           onChange={handleChange}
                           placeholder="https://example.com/og-card.png"
-                          className="w-full rounded-2xl border border-slate-200 bg-slate-50/30 px-4 py-3 text-sm text-slate-800 focus:bg-white focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100 outline-none transition"
+                          className={`w-full rounded-2xl border px-4 py-3 text-sm text-slate-800 focus:bg-white focus:ring-4 outline-none transition ${
+                            errors.ogImage
+                              ? "border-rose-400 bg-rose-50/20 focus:border-rose-500 focus:ring-rose-100"
+                              : "border-slate-200 bg-slate-50/30 focus:border-indigo-500 focus:ring-indigo-100"
+                          }`}
                         />
+                        {errors.ogImage && (
+                          <p className="text-xs font-medium text-rose-500 mt-1.5 flex items-center gap-1">
+                            <ExclamationCircleIcon className="w-4 h-4 text-rose-500 shrink-0" />
+                            {errors.ogImage}
+                          </p>
+                        )}
                       </div>
                     </div>
 
@@ -564,9 +696,22 @@ export default function AddBlog() {
                             ...prev,
                             slug: slugify(e.target.value),
                           }));
+                          if (errors.slug) {
+                            setErrors((prev) => ({ ...prev, slug: "" }));
+                          }
                         }}
-                        className="w-full rounded-2xl border border-slate-200 bg-slate-50/30 px-4 py-3 text-sm text-slate-800 focus:bg-white focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100 outline-none transition font-mono"
+                        className={`w-full rounded-2xl border px-4 py-3 text-sm text-slate-800 focus:bg-white focus:ring-4 outline-none transition font-mono ${
+                          errors.slug
+                            ? "border-rose-400 bg-rose-50/20 focus:border-rose-500 focus:ring-rose-100"
+                            : "border-slate-200 bg-slate-50/30 focus:border-indigo-500 focus:ring-indigo-100"
+                        }`}
                       />
+                      {errors.slug && (
+                        <p className="text-xs font-medium text-rose-500 mt-1.5 flex items-center gap-1">
+                          <ExclamationCircleIcon className="w-4 h-4 text-rose-500 shrink-0" />
+                          {errors.slug}
+                        </p>
+                      )}
                     </div>
 
                     <div>
@@ -590,8 +735,18 @@ export default function AddBlog() {
                         onChange={handleChange}
                         placeholder="Brief summary that appears under your link on Google..."
                         rows={4}
-                        className="w-full rounded-2xl border border-slate-200 bg-slate-50/30 p-4 text-sm text-slate-800 focus:bg-white focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100 outline-none transition resize-none"
+                        className={`w-full rounded-2xl border p-4 text-sm text-slate-800 focus:bg-white focus:ring-4 outline-none transition resize-none ${
+                          errors.metaDescription
+                            ? "border-rose-400 bg-rose-50/20 focus:border-rose-500 focus:ring-rose-100"
+                            : "border-slate-200 bg-slate-50/30 focus:border-indigo-500 focus:ring-indigo-100"
+                        }`}
                       />
+                      {errors.metaDescription && (
+                        <p className="text-xs font-medium text-rose-500 mt-1.5 flex items-center gap-1">
+                          <ExclamationCircleIcon className="w-4 h-4 text-rose-500 shrink-0" />
+                          {errors.metaDescription}
+                        </p>
+                      )}
                     </div>
 
                     {/* LIVE GOOGLE SERP CARD */}
@@ -634,9 +789,19 @@ export default function AddBlog() {
                           value={form.author}
                           onChange={handleChange}
                           placeholder="e.g. Jane Doe"
-                          className="w-full pl-11 rounded-2xl border border-slate-200 bg-slate-50/30 px-4 py-3 text-sm text-slate-800 focus:bg-white focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100 outline-none transition"
+                          className={`w-full pl-11 rounded-2xl border px-4 py-3 text-sm text-slate-800 focus:bg-white focus:ring-4 outline-none transition ${
+                            errors.author
+                              ? "border-rose-400 bg-rose-50/20 focus:border-rose-500 focus:ring-rose-100"
+                              : "border-slate-200 bg-slate-50/30 focus:border-indigo-500 focus:ring-indigo-100"
+                          }`}
                         />
                       </div>
+                      {errors.author && (
+                        <p className="text-xs font-medium text-rose-500 mt-1.5 flex items-center gap-1">
+                          <ExclamationCircleIcon className="w-4 h-4 text-rose-500 shrink-0" />
+                          {errors.author}
+                        </p>
+                      )}
                     </div>
 
                     <div>
@@ -648,8 +813,18 @@ export default function AddBlog() {
                         value={form.category}
                         onChange={handleChange}
                         placeholder="General, Engineering, Tutorials..."
-                        className="w-full rounded-2xl border border-slate-200 bg-slate-50/30 px-4 py-3 text-sm text-slate-800 focus:bg-white focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100 outline-none transition"
+                        className={`w-full rounded-2xl border px-4 py-3 text-sm text-slate-800 focus:bg-white focus:ring-4 outline-none transition ${
+                          errors.category
+                            ? "border-rose-400 bg-rose-50/20 focus:border-rose-500 focus:ring-rose-100"
+                            : "border-slate-200 bg-slate-50/30 focus:border-indigo-500 focus:ring-indigo-100"
+                        }`}
                       />
+                      {errors.category && (
+                        <p className="text-xs font-medium text-rose-500 mt-1.5 flex items-center gap-1">
+                          <ExclamationCircleIcon className="w-4 h-4 text-rose-500 shrink-0" />
+                          {errors.category}
+                        </p>
+                      )}
                     </div>
 
                     {/* INTERACTIVE TAG INPUT */}
@@ -728,9 +903,19 @@ export default function AddBlog() {
                           name="scheduledAt"
                           value={form.scheduledAt}
                           onChange={handleChange}
-                          className="w-full pl-11 rounded-2xl border border-slate-200 bg-slate-50/30 px-4 py-3 text-sm text-slate-800 focus:bg-white focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100 outline-none transition"
+                          className={`w-full pl-11 rounded-2xl border px-4 py-3 text-sm text-slate-800 focus:bg-white focus:ring-4 outline-none transition ${
+                            errors.scheduledAt
+                              ? "border-rose-400 bg-rose-50/20 focus:border-rose-500 focus:ring-rose-100"
+                              : "border-slate-200 bg-slate-50/30 focus:border-indigo-500 focus:ring-indigo-100"
+                          }`}
                         />
                       </div>
+                      {errors.scheduledAt && (
+                        <p className="text-xs font-medium text-rose-500 mt-1.5 flex items-center gap-1">
+                          <ExclamationCircleIcon className="w-4 h-4 text-rose-500 shrink-0" />
+                          {errors.scheduledAt}
+                        </p>
+                      )}
                     </div>
                   </div>
                 )}

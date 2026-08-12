@@ -217,6 +217,18 @@ export default function Blogs() {
     }
   };
 
+  useEffect(() => {
+    if (deletingBlog) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "unset";
+    }
+
+    return () => {
+      document.body.style.overflow = "unset";
+    };
+  }, [deletingBlog]);
+
   const categories = useMemo(() => {
     if (!Array.isArray(blogs)) return ["All"];
     const cats = new Set(blogs.map((b) => b.category).filter(Boolean));
@@ -299,7 +311,7 @@ export default function Blogs() {
             </span>
             <button
               onClick={fetchBlogs}
-              className="inline-flex items-center gap-1.5 bg-white border border-gray-200 hover:bg-gray-50 text-gray-700 text-xs font-semibold px-3.5 py-2 rounded-xl transition shadow-sm"
+              className="inline-flex items-center gap-1.5 bg-white border border-gray-200 hover:bg-gray-50 text-gray-700 text-xs font-semibold px-3.5 py-2 rounded-xl transition shadow-sm cursor-pointer"
             >
               <ArrowPathIcon
                 className={`w-4 h-4 ${loading ? "animate-spin" : ""}`}
@@ -584,7 +596,7 @@ export default function Blogs() {
               <button
                 type="submit"
                 disabled={submitting}
-                className={`inline-flex items-center justify-center gap-2 text-white font-semibold text-sm px-6 py-2.5 rounded-xl transition shadow-md disabled:opacity-50 ${
+                className={`inline-flex items-center justify-center gap-2 text-white font-semibold text-sm px-6 py-2.5 rounded-xl transition shadow-md disabled:opacity-50 cursor-pointer ${
                   editingId
                     ? "bg-purple-600 hover:bg-purple-700 shadow-purple-500/10"
                     : "bg-red-600 hover:bg-red-700 shadow-red-500/10"
@@ -672,21 +684,21 @@ export default function Blogs() {
                       <div className="flex items-center gap-1 shrink-0">
                         <button
                           onClick={() => setViewingBlog(blog)}
-                          className="p-1.5 text-blue-600 hover:bg-blue-50 rounded-lg transition"
+                          className="p-1.5 text-blue-600 hover:bg-blue-50 rounded-lg transition cursor-pointer"
                           title="View Details"
                         >
                           <EyeIcon className="w-4 h-4" />
                         </button>
                         <button
                           onClick={() => handleStartEdit(blog)}
-                          className="p-1.5 text-purple-600 hover:bg-purple-50 rounded-lg transition"
+                          className="p-1.5 text-purple-600 hover:bg-purple-50 rounded-lg transition cursor-pointer"
                           title="Edit Blog"
                         >
                           <PencilSquareIcon className="w-4 h-4" />
                         </button>
                         <button
                           onClick={() => setDeletingBlog(blog)}
-                          className="p-1.5 text-red-600 hover:bg-red-50 rounded-lg transition"
+                          className="p-1.5 text-red-600 hover:bg-red-50 rounded-lg transition cursor-pointer"
                           title="Delete Blog"
                         >
                           <TrashIcon className="w-4 h-4" />
@@ -814,7 +826,7 @@ export default function Blogs() {
               </div>
               <button
                 onClick={() => setViewingBlog(null)}
-                className="p-1.5 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-xl transition"
+                className="p-1.5 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-xl transition cursor-pointer"
               >
                 <XMarkIcon className="w-5 h-5" />
               </button>
@@ -929,7 +941,7 @@ export default function Blogs() {
             <div className="flex justify-end pt-2">
               <button
                 onClick={() => setViewingBlog(null)}
-                className="bg-gray-900 hover:bg-gray-800 text-white text-xs font-semibold px-5 py-2.5 rounded-xl transition"
+                className="bg-gray-900 hover:bg-gray-800 text-white text-xs font-semibold px-5 py-2.5 rounded-xl transition cursor-pointer"
               >
                 Close
               </button>
@@ -940,44 +952,74 @@ export default function Blogs() {
 
       {/* DANGEROUS DELETE MODAL */}
       {deletingBlog && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
-          <div className="bg-white rounded-3xl max-w-md w-full p-6 space-y-5 shadow-2xl border border-red-100">
-            <div className="flex items-center gap-3">
-              <span className="p-3 bg-red-100 text-red-600 rounded-2xl ring-4 ring-red-50">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-md animate-fadeIn">
+          <div className="relative bg-white rounded-3xl max-w-md w-full p-6 sm:p-7 space-y-5 shadow-2xl border border-rose-100/80 overflow-hidden transform transition-all scale-100">
+            {/* GLOWING TOP ACCENT BAR */}
+            <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-rose-500 via-red-500 to-rose-600 shadow-sm shadow-rose-500/50" />
+
+            {/* HEADER SECTION WITH ICON & PREMIUM DANGER ZONE BADGE */}
+            <div className="flex items-start gap-4 pt-1">
+              <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-rose-50 to-red-100/60 text-rose-600 ring-4 ring-rose-50/80 shadow-sm">
                 <ExclamationTriangleIcon className="w-6 h-6" />
-              </span>
-              <div>
-                <h3 className="text-lg font-bold text-gray-900">
+              </div>
+
+              <div className="space-y-1.5">
+                {/* PREMIUM DANGER ZONE BADGE */}
+                <div className="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full text-[10px] font-black tracking-widest bg-rose-100/90 text-rose-700 border border-rose-200/60 uppercase shadow-2xs">
+                  <span className="w-1.5 h-1.5 rounded-full bg-rose-600 animate-pulse" />
+                  Danger Zone
+                </div>
+
+                <h3 className="text-xl font-bold text-slate-900 tracking-tight">
                   Delete Blog Post?
                 </h3>
-                <p className="text-xs text-red-500 font-medium">
-                  This action cannot be undone.
-                </p>
               </div>
             </div>
 
-            <div className="bg-red-50/50 p-3.5 rounded-2xl border border-red-100 text-xs text-gray-700">
-              You are about to delete{" "}
-              <strong className="text-gray-900 font-bold">
-                "{deletingBlog.title}"
-              </strong>
-              . This will permanently remove the blog post from your database.
+            {/* WARNING DESCRIPTION */}
+            <p className="text-xs text-slate-600 leading-relaxed font-medium">
+              You are about to permanently remove this blog post. This process{" "}
+              <span className="text-rose-600 font-bold underline decoration-rose-300 underline-offset-2">
+                cannot be undone
+              </span>{" "}
+              and will clear all associated data from your database.
+            </p>
+
+            {/* ITEM CARD HIGHLIGHT */}
+            <div className="flex items-center gap-3 bg-gradient-to-r from-rose-50/80 to-red-50/40 p-3.5 rounded-2xl border border-rose-200/60 text-xs font-bold text-slate-800 shadow-2xs">
+              <div className="p-1.5 bg-white/80 rounded-xl shadow-2xs text-rose-500 shrink-0">
+                <TrashIcon className="w-4 h-4" />
+              </div>
+              <span className="truncate">{deletingBlog.title}</span>
             </div>
 
+            {/* ACTION BUTTONS */}
             <div className="flex items-center justify-end gap-3 pt-2">
               <button
+                type="button"
                 onClick={() => setDeletingBlog(null)}
                 disabled={deleting}
-                className="px-4 py-2 text-xs font-semibold text-gray-600 hover:bg-gray-100 rounded-xl transition"
+                className="px-5 py-2.5 text-xs font-semibold text-slate-700 bg-slate-100 hover:bg-slate-200/80 active:scale-95 rounded-xl transition-all duration-150 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed border border-slate-200/50"
               >
                 Cancel
               </button>
               <button
+                type="button"
                 onClick={confirmDelete}
                 disabled={deleting}
-                className="px-5 py-2 text-xs font-semibold text-white bg-red-600 hover:bg-red-700 rounded-xl shadow-md shadow-red-500/20 transition disabled:opacity-50"
+                className="inline-flex items-center gap-2 px-5 py-2.5 text-xs font-bold text-white bg-gradient-to-r from-rose-600 to-red-600 hover:from-rose-700 hover:to-red-700 active:scale-95 rounded-xl shadow-lg shadow-rose-500/30 transition-all duration-150 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {deleting ? "Deleting..." : "Yes, Delete"}
+                {deleting ? (
+                  <>
+                    <div className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                    Deleting...
+                  </>
+                ) : (
+                  <>
+                    <TrashIcon className="w-4 h-4" />
+                    Delete Permanently
+                  </>
+                )}
               </button>
             </div>
           </div>

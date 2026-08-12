@@ -198,6 +198,18 @@ export default function Projects() {
     }
   };
 
+  useEffect(() => {
+    if (deletingProject) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "unset";
+    }
+
+    return () => {
+      document.body.style.overflow = "unset";
+    };
+  }, [deletingProject]);
+
   const filteredProjects = useMemo(() => {
     if (!Array.isArray(projects)) return [];
 
@@ -283,7 +295,7 @@ export default function Projects() {
             </span>
             <button
               onClick={fetchProjects}
-              className="inline-flex items-center gap-1.5 bg-white border border-gray-200 hover:bg-gray-50 text-gray-700 text-xs font-semibold px-3.5 py-2 rounded-xl transition shadow-sm"
+              className="inline-flex items-center gap-1.5 bg-white border border-gray-200 hover:bg-gray-50 text-gray-700 text-xs font-semibold px-3.5 py-2 rounded-xl transition shadow-sm cursor-pointer"
             >
               <ArrowPathIcon
                 className={`w-4 h-4 ${loading ? "animate-spin" : ""}`}
@@ -353,7 +365,7 @@ export default function Projects() {
             {editingId && (
               <button
                 onClick={handleCancelEdit}
-                className="text-xs font-semibold text-gray-500 hover:text-gray-700 underline"
+                className="text-xs font-semibold text-gray-500 hover:text-gray-700 underline cursor-pointer"
               >
                 Cancel Editing
               </button>
@@ -497,7 +509,8 @@ export default function Projects() {
                 <button
                   type="submit"
                   disabled={submitting}
-                  className={`w-full inline-flex items-center justify-center gap-2 text-white font-semibold text-sm px-6 py-2.5 rounded-xl transition shadow-md disabled:opacity-50 ${
+                  className={`w-full inline-flex items-center justify-center gap-2 text-white font-semibold text-sm px-6 py-2.5 rounded-xl transition shadow-md
+                  cursor-pointer disabled:opacity-50 ${
                     editingId
                       ? "bg-purple-600 hover:bg-purple-700 shadow-purple-500/10"
                       : "bg-indigo-600 hover:bg-indigo-700 shadow-indigo-500/10"
@@ -610,21 +623,21 @@ export default function Projects() {
                         <div className="flex items-center gap-1 shrink-0">
                           <button
                             onClick={() => setViewingProject(project)}
-                            className="p-1.5 text-blue-600 hover:bg-blue-50 rounded-lg transition"
+                            className="p-1.5 text-blue-600 hover:bg-blue-50 rounded-lg transition cursor-pointer"
                             title="View Details"
                           >
                             <EyeIcon className="w-4 h-4" />
                           </button>
                           <button
                             onClick={() => handleStartEdit(project)}
-                            className="p-1.5 text-purple-600 hover:bg-purple-50 rounded-lg transition"
+                            className="p-1.5 text-purple-600 hover:bg-purple-50 rounded-lg transition cursor-pointer"
                             title="Edit Project"
                           >
                             <PencilSquareIcon className="w-4 h-4" />
                           </button>
                           <button
                             onClick={() => setDeletingProject(project)}
-                            className="p-1.5 text-red-600 hover:bg-red-50 rounded-lg transition"
+                            className="p-1.5 text-red-600 hover:bg-red-50 rounded-lg transition cursor-pointer"
                             title="Delete Project"
                           >
                             <TrashIcon className="w-4 h-4" />
@@ -853,36 +866,73 @@ export default function Projects() {
         </div>
       )}
 
-      {/* DELETE CONFIRMATION MODAL */}
+      {/* DELETE CONFIRMATION MODAL - DANGER ZONE */}
       {deletingProject && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-fade-in">
-          <div className="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl border border-gray-100 space-y-4">
-            <div className="flex items-center gap-3 text-red-600">
-              <ExclamationTriangleIcon className="w-8 h-8 shrink-0" />
-              <h3 className="text-base font-bold text-gray-900">
-                Confirm Delete Project
-              </h3>
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-md animate-fade-in">
+          <div className="bg-white rounded-3xl max-w-md w-full p-6 sm:p-7 shadow-2xl border-t-4 border-t-rose-600 border-x border-b border-rose-100 space-y-5 relative overflow-hidden">
+            {/* Background Subtle Red Glow */}
+            <div className="absolute -top-12 -right-12 w-32 h-32 bg-rose-500/10 rounded-full blur-2xl pointer-events-none" />
+
+            {/* Header Badge & Title */}
+            <div className="flex items-start gap-4">
+              <div className="h-12 w-12 rounded-2xl bg-rose-100/80 border border-rose-200 flex items-center justify-center text-rose-600 shrink-0 shadow-sm">
+                <ExclamationTriangleIcon className="w-6 h-6 stroke-[2.2]" />
+              </div>
+              <div>
+                <span className="inline-block text-[10px] font-bold tracking-wider uppercase text-rose-600 bg-rose-50 border border-rose-200/60 px-2 py-0.5 rounded-md mb-1">
+                  Danger Zone
+                </span>
+                <h3 className="text-lg font-bold text-slate-900 leading-snug">
+                  Delete Project?
+                </h3>
+              </div>
             </div>
-            <p className="text-xs text-gray-600">
-              Are you sure you want to delete{" "}
-              <strong className="text-gray-900">
-                "{deletingProject.title}"
-              </strong>
-              ? This action cannot be undone.
-            </p>
-            <div className="flex items-center justify-end gap-2 pt-2">
+
+            {/* Warning Body */}
+            <div className="space-y-3">
+              <p className="text-xs leading-relaxed text-slate-600">
+                You are about to permanently remove this project. This process{" "}
+                <strong className="text-rose-600 font-semibold">
+                  cannot be undone
+                </strong>{" "}
+                and will clear all associated data from your portfolio.
+              </p>
+
+              {/* Highlighted Item Pill */}
+              <div className="bg-rose-50/60 border border-rose-200/80 rounded-2xl p-3.5 flex items-center gap-3">
+                <TrashIcon className="w-4 h-4 text-rose-500 shrink-0" />
+                <span className="text-xs font-bold text-slate-800 truncate">
+                  {deletingProject.title}
+                </span>
+              </div>
+            </div>
+
+            {/* Action Buttons */}
+            <div className="flex items-center justify-end gap-3 pt-2">
               <button
+                type="button"
                 onClick={() => setDeletingProject(null)}
-                className="bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold px-4 py-2 rounded-xl text-xs transition"
+                className="px-5 py-2.5 rounded-xl font-semibold text-slate-600 text-xs bg-slate-100 hover:bg-slate-200 transition cursor-pointer"
               >
                 Cancel
               </button>
               <button
+                type="button"
                 onClick={confirmDelete}
                 disabled={deleting}
-                className="bg-red-600 hover:bg-red-700 text-white font-semibold px-4 py-2 rounded-xl text-xs transition shadow-md shadow-red-500/20 disabled:opacity-50"
+                className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl font-semibold text-white text-xs bg-rose-600 hover:bg-rose-700 shadow-md shadow-rose-600/25 transition active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
               >
-                {deleting ? "Deleting..." : "Delete Permanently"}
+                {deleting ? (
+                  <>
+                    <ArrowPathIcon className="w-4 h-4 animate-spin" />
+                    <span>Deleting...</span>
+                  </>
+                ) : (
+                  <>
+                    <TrashIcon className="w-4 h-4" />
+                    <span>Delete Permanently</span>
+                  </>
+                )}
               </button>
             </div>
           </div>
