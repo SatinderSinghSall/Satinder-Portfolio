@@ -58,6 +58,7 @@ export default function ManageYouTube() {
   const [deletingId, setDeletingId] = useState(null);
   const [viewModal, setViewModal] = useState(false);
   const [selectedVideo, setSelectedVideo] = useState(null);
+  const [expandedImage, setExpandedImage] = useState(null);
 
   // Filters
   const [search, setSearch] = useState("");
@@ -711,122 +712,287 @@ export default function ManageYouTube() {
           </div>
         )}
 
-        {/* View Modal */}
+        {/* YOUTUBE SCHEMA & VIDEO INSPECTOR MODAL */}
+        {/* YOUTUBE SCHEMA & VIDEO INSPECTOR MODAL */}
         {viewModal && selectedVideo && (
-          <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4 overflow-y-auto">
-            <div className="bg-white rounded-2xl shadow-2xl w-full max-w-3xl max-h-[90vh] flex flex-col">
-              {/* HEADER */}
-              <div className="flex justify-between items-center px-6 py-4 border-b">
-                <h3 className="text-xl font-bold">{selectedVideo.title}</h3>
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-slate-950/70 backdrop-blur-md animate-fade-in">
+            <div className="bg-white rounded-3xl max-w-4xl w-full h-full max-h-[88vh] flex flex-col shadow-2xl border border-slate-200/80 overflow-hidden ring-1 ring-black/5">
+              {/* 1. STICKY HEADER */}
+              <div className="px-5 sm:px-8 py-4 sm:py-5 border-b border-slate-100 flex items-start sm:items-center justify-between bg-white shrink-0 gap-3">
+                <div className="space-y-1 pr-2 min-w-0">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <span className="text-[10px] font-extrabold text-red-600 tracking-wider uppercase bg-red-50/80 border border-red-200/60 px-2.5 py-0.5 rounded-full shrink-0">
+                      YouTube Schema Inspector
+                    </span>
+                    <span className="text-[10px] font-mono text-slate-400 bg-slate-100/80 px-2 py-0.5 rounded-md truncate max-w-[140px] sm:max-w-none">
+                      ID: {selectedVideo._id || "N/A"}
+                    </span>
+                  </div>
+                  <h3 className="text-lg sm:text-2xl font-bold text-slate-900 tracking-tight leading-snug truncate">
+                    {selectedVideo.title}
+                  </h3>
+                </div>
 
                 <button
                   onClick={() => setViewModal(false)}
-                  className="text-gray-500 hover:text-black text-xl cursor-pointer"
+                  className="p-1.5 text-slate-400 hover:text-slate-700 hover:bg-slate-100 rounded-xl transition cursor-pointer shrink-0"
                 >
-                  ✕
+                  <XMarkIcon className="w-5 h-5 sm:w-6 sm:h-6 stroke-[2.5]" />
                 </button>
               </div>
 
-              {/* BODY */}
-              <div className="p-6 space-y-6 overflow-y-auto">
-                {/* VIDEO PLAYER */}
-                {selectedVideo.videoUrl && (
-                  <div className="aspect-video rounded-lg overflow-hidden border">
-                    <iframe
-                      src={selectedVideo.videoUrl.replace("watch?v=", "embed/")}
-                      className="w-full h-full"
-                      allowFullScreen
-                      title={selectedVideo.title}
-                    />
-                  </div>
-                )}
-
-                {/* INFO GRID */}
-                <div className="grid md:grid-cols-2 gap-4 text-sm">
-                  <p>
-                    <b>Author:</b> {selectedVideo.author}
-                  </p>
-
-                  <p>
-                    <b>Status:</b>{" "}
-                    {selectedVideo.status === "published"
-                      ? "Published"
-                      : "Draft"}
-                  </p>
-
-                  <p>
-                    <b>Published At:</b>{" "}
-                    {new Date(selectedVideo.publishedAt).toLocaleString()}
-                  </p>
-
-                  <p>
-                    <b>Created At:</b>{" "}
-                    {new Date(selectedVideo.createdAt).toLocaleString()}
-                  </p>
-
-                  <p>
-                    <b>Updated At:</b>{" "}
-                    {new Date(selectedVideo.updatedAt).toLocaleString()}
-                  </p>
-                </div>
-
-                {/* DESCRIPTION */}
-                <div>
-                  <h4 className="font-semibold mb-1">Description</h4>
-
-                  <p className="text-gray-600 text-sm whitespace-pre-line">
-                    {selectedVideo.description || "No description"}
-                  </p>
-                </div>
-
-                {/* TAGS */}
-                <div>
-                  <h4 className="font-semibold mb-2">Tags</h4>
-
-                  <div className="flex flex-wrap gap-2">
-                    {selectedVideo.tags?.length > 0 ? (
-                      selectedVideo.tags.map((tag) => (
-                        <span
-                          key={tag}
-                          className="text-xs bg-gray-100 px-2 py-1 rounded-full border"
-                        >
-                          #{tag}
-                        </span>
-                      ))
+              {/* 2. INNER SCROLLABLE BODY */}
+              <div className="flex-1 overflow-y-auto p-5 sm:p-8 space-y-6 sm:space-y-8 divide-y divide-slate-100 [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-thumb]:bg-slate-300 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:bg-transparent">
+                {/* EMBEDDED PLAYER / PREVIEW */}
+                <div className="space-y-3">
+                  <h4 className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
+                    Video Player / Preview
+                  </h4>
+                  <div className="aspect-video w-full rounded-2xl overflow-hidden bg-slate-950 border border-slate-200 shadow-sm relative">
+                    {selectedVideo.videoUrl ? (
+                      <iframe
+                        src={(() => {
+                          const url = selectedVideo.videoUrl;
+                          if (url.includes("embed/")) return url;
+                          if (url.includes("watch?v="))
+                            return url
+                              .replace("watch?v=", "embed/")
+                              .split("&")[0];
+                          if (url.includes("youtu.be/"))
+                            return url.replace(
+                              "youtu.be/",
+                              "www.youtube.com/embed/",
+                            );
+                          return url;
+                        })()}
+                        className="w-full h-full border-0"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                        allowFullScreen
+                        title={selectedVideo.title}
+                      />
+                    ) : selectedVideo.thumbnail ? (
+                      <img
+                        src={selectedVideo.thumbnail}
+                        alt={selectedVideo.title}
+                        className="w-full h-full object-cover cursor-pointer hover:opacity-90 transition"
+                        onClick={() =>
+                          setExpandedImage(selectedVideo.thumbnail)
+                        }
+                      />
                     ) : (
-                      <span className="text-xs text-gray-400">No tags</span>
+                      <div className="flex flex-col items-center justify-center h-full text-slate-400 text-xs">
+                        <VideoCameraIcon className="w-10 h-10 mb-2 opacity-40" />
+                        No Video Player or Thumbnail available
+                      </div>
                     )}
                   </div>
                 </div>
 
-                {/* THUMBNAIL */}
-                {selectedVideo.thumbnail && (
-                  <div>
-                    <h4 className="font-semibold mb-2">Thumbnail</h4>
+                {/* SCHEMA PROPERTIES GRID */}
+                <div className="pt-6 space-y-2.5">
+                  <h4 className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
+                    Schema Properties
+                  </h4>
+                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
+                    <div className="p-3.5 bg-slate-50 rounded-2xl border border-slate-200/60">
+                      <span className="text-[9px] font-bold text-slate-400 uppercase block mb-1">
+                        Author
+                      </span>
+                      <span className="text-xs font-bold text-slate-800">
+                        {selectedVideo.author || "Satinder"}
+                      </span>
+                    </div>
 
-                    <img
-                      src={selectedVideo.thumbnail}
-                      alt="Thumbnail"
-                      className="rounded-lg border w-full"
-                    />
+                    <div className="p-3.5 bg-slate-50 rounded-2xl border border-slate-200/60">
+                      <span className="text-[9px] font-bold text-slate-400 uppercase block mb-1">
+                        Status
+                      </span>
+                      <span
+                        className={`text-xs font-bold capitalize ${
+                          selectedVideo.status === "published"
+                            ? "text-emerald-600"
+                            : "text-amber-600"
+                        }`}
+                      >
+                        ● {selectedVideo.status || "draft"}
+                      </span>
+                    </div>
+
+                    <div className="p-3.5 bg-slate-50 rounded-2xl border border-slate-200/60 col-span-2 sm:col-span-1">
+                      <span className="text-[9px] font-bold text-slate-400 uppercase block mb-1">
+                        Total Tags
+                      </span>
+                      <span className="text-xs font-bold text-slate-800">
+                        {selectedVideo.tags?.length || 0} Tag(s)
+                      </span>
+                    </div>
                   </div>
-                )}
+                </div>
 
-                {/* RAW VIDEO URL */}
-                <div>
-                  <h4 className="font-semibold mb-1">Video URL</h4>
+                {/* DESCRIPTION */}
+                <div className="pt-6 space-y-2.5">
+                  <h4 className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
+                    Description
+                  </h4>
+                  <div className="text-xs sm:text-sm text-slate-700 bg-slate-50/80 p-4 rounded-2xl border border-slate-200/70 leading-relaxed whitespace-pre-wrap font-medium">
+                    {selectedVideo.description || "No description provided."}
+                  </div>
+                </div>
 
-                  <a
-                    href={selectedVideo.videoUrl}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="text-blue-600 text-sm break-all hover:underline"
-                  >
-                    {selectedVideo.videoUrl}
-                  </a>
+                {/* TAGS LIST */}
+                <div className="pt-6 space-y-2.5">
+                  <h4 className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
+                    Tags Stack
+                  </h4>
+                  <div className="flex flex-wrap gap-2">
+                    {Array.isArray(selectedVideo.tags) &&
+                    selectedVideo.tags.length > 0 ? (
+                      selectedVideo.tags.map((t, idx) => (
+                        <span
+                          key={idx}
+                          className="bg-slate-100 hover:bg-red-50 text-slate-700 hover:text-red-600 border border-slate-200/70 text-xs font-semibold px-3 py-1 rounded-xl transition"
+                        >
+                          #{t}
+                        </span>
+                      ))
+                    ) : (
+                      <span className="text-xs text-slate-400 italic">
+                        No tags assigned
+                      </span>
+                    )}
+                  </div>
+                </div>
+
+                {/* THUMBNAIL PREVIEW WITH EXPAND TRIGGER & RAW URL */}
+                <div className="pt-6 space-y-4">
+                  <h4 className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
+                    Media Links & Assets
+                  </h4>
+
+                  {selectedVideo.thumbnail && (
+                    <div className="space-y-1.5">
+                      <span className="text-[11px] font-bold text-slate-600 block">
+                        Thumbnail Image{" "}
+                        <span className="text-slate-400 font-normal">
+                          (Click to enlarge)
+                        </span>
+                      </span>
+                      <div
+                        onClick={() =>
+                          setExpandedImage(selectedVideo.thumbnail)
+                        }
+                        className="group relative h-40 w-full sm:w-72 rounded-2xl overflow-hidden border border-slate-200 bg-slate-50 cursor-pointer shadow-xs hover:shadow-md transition-all"
+                      >
+                        <img
+                          src={selectedVideo.thumbnail}
+                          alt="Thumbnail Preview"
+                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                        />
+                        <div className="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white text-xs font-semibold">
+                          🔍 Click to expand
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  <div className="space-y-1.5">
+                    <span className="text-[11px] font-bold text-slate-600 block">
+                      Video URL
+                    </span>
+                    <div className="p-3 bg-slate-900 rounded-2xl border border-slate-800 flex items-center justify-between gap-3">
+                      <a
+                        href={selectedVideo.videoUrl}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="text-xs font-mono text-blue-400 hover:text-blue-300 truncate underline"
+                      >
+                        {selectedVideo.videoUrl}
+                      </a>
+                      <a
+                        href={selectedVideo.videoUrl}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="text-[10px] font-bold text-white bg-red-600 hover:bg-red-700 px-3 py-1.5 rounded-xl shrink-0 transition"
+                      >
+                        Open Link ↗
+                      </a>
+                    </div>
+                  </div>
+                </div>
+
+                {/* TIMESTAMPS */}
+                <div className="pt-6 space-y-2.5">
+                  <h4 className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
+                    Timestamps
+                  </h4>
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                    <div className="p-3.5 bg-slate-50 rounded-2xl border border-slate-200/60">
+                      <span className="text-[9px] font-bold text-slate-400 uppercase block mb-1">
+                        Published At
+                      </span>
+                      <span className="text-xs font-semibold text-slate-800 truncate block">
+                        {selectedVideo.publishedAt
+                          ? new Date(selectedVideo.publishedAt).toLocaleString()
+                          : "N/A"}
+                      </span>
+                    </div>
+
+                    <div className="p-3.5 bg-slate-50 rounded-2xl border border-slate-200/60">
+                      <span className="text-[9px] font-bold text-slate-400 uppercase block mb-1">
+                        Created At
+                      </span>
+                      <span className="text-xs font-semibold text-slate-800 truncate block">
+                        {selectedVideo.createdAt
+                          ? new Date(selectedVideo.createdAt).toLocaleString()
+                          : "N/A"}
+                      </span>
+                    </div>
+
+                    <div className="p-3.5 bg-slate-50 rounded-2xl border border-slate-200/60">
+                      <span className="text-[9px] font-bold text-slate-400 uppercase block mb-1">
+                        Updated At
+                      </span>
+                      <span className="text-xs font-semibold text-slate-800 truncate block">
+                        {selectedVideo.updatedAt
+                          ? new Date(selectedVideo.updatedAt).toLocaleString()
+                          : "N/A"}
+                      </span>
+                    </div>
+                  </div>
                 </div>
               </div>
+
+              {/* 3. STICKY FOOTER */}
+              <div className="px-5 sm:px-8 py-3.5 bg-slate-50 border-t border-slate-100 flex items-center justify-end shrink-0">
+                <button
+                  onClick={() => setViewModal(false)}
+                  className="bg-slate-900 hover:bg-black text-white font-semibold text-xs px-6 py-2.5 rounded-xl transition shadow-xs active:scale-95 cursor-pointer"
+                >
+                  Close Inspector
+                </button>
+              </div>
             </div>
+
+            {/* --- IMAGE EXPANSION / LIGHTBOX OVERLAY --- */}
+            {expandedImage && (
+              <div
+                className="fixed inset-0 z-60 bg-black/90 backdrop-blur-lg flex items-center justify-center p-4 sm:p-8 animate-fade-in cursor-zoom-out"
+                onClick={() => setExpandedImage(null)}
+              >
+                <button
+                  onClick={() => setExpandedImage(null)}
+                  className="absolute top-5 right-5 text-white/80 hover:text-white bg-white/10 hover:bg-white/20 p-2.5 rounded-full transition cursor-pointer"
+                >
+                  <XMarkIcon className="w-6 h-6" />
+                </button>
+                <img
+                  src={expandedImage}
+                  alt="Expanded Preview"
+                  className="max-w-full max-h-[90vh] object-contain rounded-2xl shadow-2xl border border-white/10 cursor-default"
+                  onClick={(e) => e.stopPropagation()}
+                />
+              </div>
+            )}
           </div>
         )}
       </div>

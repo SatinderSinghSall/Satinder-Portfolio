@@ -285,6 +285,18 @@ export default function Blogs() {
     return filteredBlogs.slice(start, start + itemsPerPage);
   }, [filteredBlogs, currentPage, itemsPerPage]);
 
+  // Lock body scroll when viewing modal
+  useEffect(() => {
+    if (viewingBlog) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "unset";
+    }
+    return () => {
+      document.body.style.overflow = "unset";
+    };
+  }, [viewingBlog]);
+
   return (
     <AdminLayout>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
@@ -813,137 +825,291 @@ export default function Blogs() {
 
       {/* VIEW BLOG SCHEMA MODAL */}
       {viewingBlog && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-fade-in">
-          <div className="bg-white rounded-3xl max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl border border-gray-100 p-6 space-y-6">
-            <div className="flex items-start justify-between border-b pb-4">
-              <div>
-                <span className="text-[10px] font-bold text-red-600 tracking-wider uppercase bg-red-50 px-2 py-0.5 rounded-md border border-red-100">
-                  Full Mongoose Schema Inspection
-                </span>
-                <h3 className="text-xl font-bold text-gray-900 mt-1">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-slate-950/70 backdrop-blur-md animate-fade-in">
+          <div className="bg-white rounded-3xl max-w-4xl w-full h-full max-h-[88vh] flex flex-col shadow-2xl border border-slate-200/80 overflow-hidden ring-1 ring-black/5">
+            {/* 1. STICKY HEADER */}
+            <div className="px-5 sm:px-8 py-4 sm:py-5 border-b border-slate-100 flex items-start sm:items-center justify-between bg-white shrink-0 gap-3">
+              <div className="space-y-1 pr-2 min-w-0">
+                <div className="flex flex-wrap items-center gap-2">
+                  <span className="text-[10px] font-extrabold text-red-600 tracking-wider uppercase bg-red-50/80 border border-red-200/60 px-2.5 py-0.5 rounded-full shrink-0">
+                    Full Schema Inspector
+                  </span>
+                  <span className="text-[10px] font-mono text-slate-400 bg-slate-100/80 px-2 py-0.5 rounded-md truncate max-w-[140px] sm:max-w-none">
+                    ID: {viewingBlog._id || "N/A"}
+                  </span>
+                </div>
+                <h3 className="text-lg sm:text-2xl font-bold text-slate-900 tracking-tight leading-snug truncate">
                   {viewingBlog.title}
                 </h3>
               </div>
+
               <button
                 onClick={() => setViewingBlog(null)}
-                className="p-1.5 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-xl transition cursor-pointer"
+                className="p-1.5 text-slate-400 hover:text-slate-700 hover:bg-slate-100 rounded-xl transition cursor-pointer shrink-0"
               >
-                <XMarkIcon className="w-5 h-5" />
+                <XMarkIcon className="w-5 h-5 sm:w-6 sm:h-6 stroke-[2.5]" />
               </button>
             </div>
 
-            {viewingBlog.image && (
-              <img
-                src={viewingBlog.image}
-                alt={viewingBlog.title}
-                className="w-full h-56 object-cover rounded-2xl border"
-              />
-            )}
-
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 text-xs">
-              <div className="p-3 bg-gray-50 rounded-xl border border-gray-100">
-                <span className="text-gray-400 block font-medium">Author</span>
-                <span className="font-semibold text-gray-800">
-                  {viewingBlog.author || "N/A"}
-                </span>
-              </div>
-              <div className="p-3 bg-gray-50 rounded-xl border border-gray-100">
-                <span className="text-gray-400 block font-medium">Status</span>
-                <span className="font-semibold text-gray-800 capitalize">
-                  {viewingBlog.status || "draft"}
-                </span>
-              </div>
-              <div className="p-3 bg-gray-50 rounded-xl border border-gray-100">
-                <span className="text-gray-400 block font-medium">
-                  Category
-                </span>
-                <span className="font-semibold text-gray-800">
-                  {viewingBlog.category || "General"}
-                </span>
-              </div>
-              <div className="p-3 bg-gray-50 rounded-xl border border-gray-100">
-                <span className="text-gray-400 block font-medium">
-                  Featured
-                </span>
-                <span className="font-semibold text-gray-800">
-                  {viewingBlog.featured ? "Yes" : "No"}
-                </span>
-              </div>
-              <div className="p-3 bg-gray-50 rounded-xl border border-gray-100">
-                <span className="text-gray-400 block font-medium">Views</span>
-                <span className="font-semibold text-gray-800">
-                  {viewingBlog.views || 0}
-                </span>
-              </div>
-              <div className="p-3 bg-gray-50 rounded-xl border border-gray-100">
-                <span className="text-gray-400 block font-medium">Slug</span>
-                <span className="font-mono text-gray-800 truncate block">
-                  {viewingBlog.slug || "N/A"}
-                </span>
-              </div>
-            </div>
-
-            {/* SEO Overview in Modal */}
-            <div className="p-3 bg-blue-50/50 rounded-xl border border-blue-100 space-y-1 text-xs">
-              <h4 className="font-bold text-blue-900 uppercase text-[10px]">
-                SEO Meta Information
-              </h4>
-              <p className="text-gray-700">
-                <strong>Meta Title:</strong> {viewingBlog.metaTitle || "N/A"}
-              </p>
-              <p className="text-gray-700">
-                <strong>Meta Description:</strong>{" "}
-                {viewingBlog.metaDescription || "N/A"}
-              </p>
-              <p className="text-gray-700 truncate">
-                <strong>OG Image:</strong> {viewingBlog.ogImage || "N/A"}
-              </p>
-            </div>
-
-            {viewingBlog.summary && (
-              <div className="space-y-1">
-                <h4 className="text-xs font-bold text-gray-700 uppercase">
-                  Summary
+            {/* 2. INNER SCROLLABLE CONTENT BODY */}
+            <div className="flex-1 overflow-y-auto p-5 sm:p-8 space-y-6 sm:space-y-8 divide-y divide-slate-100 [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-thumb]:bg-slate-300 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:bg-transparent">
+              {/* MEDIA PREVIEWS */}
+              <div className="space-y-3">
+                <h4 className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
+                  Media Previews
                 </h4>
-                <p className="text-xs text-gray-600 bg-gray-50 p-3 rounded-xl border border-gray-100">
-                  {viewingBlog.summary}
-                </p>
-              </div>
-            )}
-
-            <div className="space-y-1">
-              <h4 className="text-xs font-bold text-gray-700 uppercase">
-                Markdown Content
-              </h4>
-              <div className="text-xs text-gray-700 bg-gray-50 p-4 rounded-xl border border-gray-100 whitespace-pre-wrap font-mono max-h-48 overflow-y-auto">
-                {viewingBlog.content}
-              </div>
-            </div>
-
-            {Array.isArray(viewingBlog.tags) && viewingBlog.tags.length > 0 && (
-              <div className="space-y-1">
-                <h4 className="text-xs font-bold text-gray-700 uppercase">
-                  Tags
-                </h4>
-                <div className="flex flex-wrap gap-1.5">
-                  {viewingBlog.tags.map((t, idx) => (
-                    <span
-                      key={idx}
-                      className="bg-gray-100 text-gray-700 text-xs px-2.5 py-1 rounded-lg border border-gray-200"
-                    >
-                      #{t}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  {/* Main Cover Image */}
+                  <div className="relative h-48 rounded-2xl overflow-hidden bg-slate-900 border border-slate-200/80">
+                    {viewingBlog.image ? (
+                      <img
+                        src={viewingBlog.image}
+                        alt="Cover"
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <div className="flex flex-col items-center justify-center h-full text-slate-400 text-xs">
+                        <PhotoIcon className="w-8 h-8 mb-1 opacity-50" />
+                        No cover image
+                      </div>
+                    )}
+                    <span className="absolute bottom-2.5 left-2.5 text-[10px] font-bold text-white bg-slate-900/80 backdrop-blur-md px-2.5 py-1 rounded-lg border border-white/10">
+                      Cover Image (image)
                     </span>
-                  ))}
+                  </div>
+
+                  {/* OG Image */}
+                  <div className="relative h-48 rounded-2xl overflow-hidden bg-slate-900 border border-slate-200/80">
+                    {viewingBlog.ogImage ? (
+                      <img
+                        src={viewingBlog.ogImage}
+                        alt="OpenGraph"
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <div className="flex flex-col items-center justify-center h-full text-slate-400 text-xs">
+                        <GlobeAltIcon className="w-8 h-8 mb-1 opacity-50" />
+                        No OG Image specified
+                      </div>
+                    )}
+                    <span className="absolute bottom-2.5 left-2.5 text-[10px] font-bold text-white bg-slate-900/80 backdrop-blur-md px-2.5 py-1 rounded-lg border border-white/10">
+                      OpenGraph Image (ogImage)
+                    </span>
+                  </div>
                 </div>
               </div>
-            )}
 
-            <div className="flex justify-end pt-2">
+              {/* METADATA GRID */}
+              <div className="pt-6 space-y-2.5">
+                <h4 className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
+                  Schema Properties
+                </h4>
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
+                  <div className="p-3.5 bg-slate-50 rounded-2xl border border-slate-200/60">
+                    <span className="text-[9px] font-bold text-slate-400 uppercase block mb-1">
+                      Author
+                    </span>
+                    <span className="text-xs font-bold text-slate-800">
+                      {viewingBlog.author || "Admin"}
+                    </span>
+                  </div>
+
+                  <div className="p-3.5 bg-slate-50 rounded-2xl border border-slate-200/60">
+                    <span className="text-[9px] font-bold text-slate-400 uppercase block mb-1">
+                      Status
+                    </span>
+                    <span
+                      className={`text-xs font-bold capitalize ${
+                        viewingBlog.status === "published"
+                          ? "text-emerald-600"
+                          : "text-amber-600"
+                      }`}
+                    >
+                      ● {viewingBlog.status || "draft"}
+                    </span>
+                  </div>
+
+                  <div className="p-3.5 bg-slate-50 rounded-2xl border border-slate-200/60">
+                    <span className="text-[9px] font-bold text-slate-400 uppercase block mb-1">
+                      Category
+                    </span>
+                    <span className="text-xs font-bold text-slate-800">
+                      {viewingBlog.category || "General"}
+                    </span>
+                  </div>
+
+                  <div className="p-3.5 bg-slate-50 rounded-2xl border border-slate-200/60">
+                    <span className="text-[9px] font-bold text-slate-400 uppercase block mb-1">
+                      Featured
+                    </span>
+                    <span
+                      className={`text-xs font-bold ${
+                        viewingBlog.featured
+                          ? "text-amber-600"
+                          : "text-slate-700"
+                      }`}
+                    >
+                      {viewingBlog.featured ? "★ Featured" : "Standard"}
+                    </span>
+                  </div>
+
+                  <div className="p-3.5 bg-slate-50 rounded-2xl border border-slate-200/60">
+                    <span className="text-[9px] font-bold text-slate-400 uppercase block mb-1">
+                      Views
+                    </span>
+                    <span className="text-xs font-bold text-slate-800">
+                      {viewingBlog.views ?? 0}
+                    </span>
+                  </div>
+
+                  <div className="p-3.5 bg-slate-50 rounded-2xl border border-slate-200/60 col-span-2 sm:col-span-1">
+                    <span className="text-[9px] font-bold text-slate-400 uppercase block mb-1">
+                      Slug
+                    </span>
+                    <span className="text-xs font-mono font-bold text-slate-800 truncate block">
+                      /{viewingBlog.slug || "N/A"}
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              {/* SEO OVERVIEW SECTION */}
+              <div className="pt-6 space-y-2.5">
+                <h4 className="text-[10px] font-bold text-indigo-600 uppercase tracking-widest">
+                  SEO & Metadata Configuration
+                </h4>
+                <div className="p-4 bg-indigo-50/50 rounded-2xl border border-indigo-100 space-y-2 text-xs">
+                  <div>
+                    <strong className="text-indigo-950 font-bold block">
+                      Meta Title:
+                    </strong>
+                    <span className="text-slate-700 font-medium">
+                      {viewingBlog.metaTitle || viewingBlog.title || "Not set"}
+                    </span>
+                  </div>
+                  <div>
+                    <strong className="text-indigo-950 font-bold block">
+                      Meta Description:
+                    </strong>
+                    <span className="text-slate-700 font-medium">
+                      {viewingBlog.metaDescription || "Not set"}
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              {/* SUMMARY */}
+              <div className="pt-6 space-y-2.5">
+                <h4 className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
+                  Summary / Excerpt
+                </h4>
+                <div className="text-xs sm:text-sm text-slate-700 bg-slate-50/80 p-4 rounded-2xl border border-slate-200/70 font-medium leading-relaxed">
+                  {viewingBlog.summary || "No summary provided."}
+                </div>
+              </div>
+
+              {/* HIGH VISIBILITY PURE MARKDOWN CONTENT BLOCK */}
+              <div className="pt-6 space-y-2.5">
+                <div className="flex items-center justify-between">
+                  <h4 className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
+                    Pure Markdown Content
+                  </h4>
+                  <span className="text-[10px] font-mono text-emerald-400 bg-slate-900 px-2 py-0.5 rounded-md border border-slate-700">
+                    markdown
+                  </span>
+                </div>
+
+                <div className="rounded-2xl bg-slate-950 border border-slate-800 p-5 shadow-inner overflow-hidden">
+                  <div className="text-xs text-slate-100 font-mono whitespace-pre-wrap max-h-64 overflow-y-auto leading-relaxed select-text [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-thumb]:bg-slate-700 [&::-webkit-scrollbar-thumb]:rounded-full">
+                    {viewingBlog.content || "// No markdown content provided."}
+                  </div>
+                </div>
+              </div>
+
+              {/* TAGS */}
+              <div className="pt-6 space-y-2.5">
+                <h4 className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
+                  Tags List
+                </h4>
+                <div className="flex flex-wrap gap-2">
+                  {Array.isArray(viewingBlog.tags) &&
+                  viewingBlog.tags.length > 0 ? (
+                    viewingBlog.tags.map((t, idx) => (
+                      <span
+                        key={idx}
+                        className="bg-slate-100 hover:bg-red-50 text-slate-700 hover:text-red-600 border border-slate-200/70 text-xs font-semibold px-3 py-1 rounded-xl transition"
+                      >
+                        #{t}
+                      </span>
+                    ))
+                  ) : (
+                    <span className="text-xs text-slate-400 italic">
+                      No tags attached
+                    </span>
+                  )}
+                </div>
+              </div>
+
+              {/* COMPLETE DATES & TIMESTAMPS */}
+              <div className="pt-6 space-y-2.5">
+                <h4 className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
+                  Dates & Schedule Timestamps
+                </h4>
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3">
+                  <div className="p-3.5 bg-slate-50 rounded-2xl border border-slate-200/60">
+                    <span className="text-[9px] font-bold text-slate-400 uppercase block mb-1">
+                      Scheduled At
+                    </span>
+                    <span className="text-xs font-semibold text-slate-800 truncate block">
+                      {viewingBlog.scheduledAt
+                        ? new Date(viewingBlog.scheduledAt).toLocaleString()
+                        : "N/A"}
+                    </span>
+                  </div>
+
+                  <div className="p-3.5 bg-slate-50 rounded-2xl border border-slate-200/60">
+                    <span className="text-[9px] font-bold text-slate-400 uppercase block mb-1">
+                      Published At
+                    </span>
+                    <span className="text-xs font-semibold text-slate-800 truncate block">
+                      {viewingBlog.publishedAt
+                        ? new Date(viewingBlog.publishedAt).toLocaleString()
+                        : "N/A"}
+                    </span>
+                  </div>
+
+                  <div className="p-3.5 bg-slate-50 rounded-2xl border border-slate-200/60">
+                    <span className="text-[9px] font-bold text-slate-400 uppercase block mb-1">
+                      Created At
+                    </span>
+                    <span className="text-xs font-semibold text-slate-800 truncate block">
+                      {viewingBlog.createdAt
+                        ? new Date(viewingBlog.createdAt).toLocaleString()
+                        : "N/A"}
+                    </span>
+                  </div>
+
+                  <div className="p-3.5 bg-slate-50 rounded-2xl border border-slate-200/60">
+                    <span className="text-[9px] font-bold text-slate-400 uppercase block mb-1">
+                      Updated At
+                    </span>
+                    <span className="text-xs font-semibold text-slate-800 truncate block">
+                      {viewingBlog.updatedAt
+                        ? new Date(viewingBlog.updatedAt).toLocaleString()
+                        : "N/A"}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* 3. STICKY FOOTER */}
+            <div className="px-5 sm:px-8 py-3.5 bg-slate-50 border-t border-slate-100 flex items-center justify-end shrink-0">
               <button
                 onClick={() => setViewingBlog(null)}
-                className="bg-gray-900 hover:bg-gray-800 text-white text-xs font-semibold px-5 py-2.5 rounded-xl transition cursor-pointer"
+                className="bg-slate-900 hover:bg-black text-white font-semibold text-xs px-6 py-2.5 rounded-xl transition shadow-xs active:scale-95 cursor-pointer"
               >
-                Close
+                Close Inspector
               </button>
             </div>
           </div>

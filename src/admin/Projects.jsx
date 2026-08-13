@@ -199,7 +199,7 @@ export default function Projects() {
   };
 
   useEffect(() => {
-    if (deletingProject) {
+    if (deletingProject || viewingProject) {
       document.body.style.overflow = "hidden";
     } else {
       document.body.style.overflow = "unset";
@@ -208,7 +208,7 @@ export default function Projects() {
     return () => {
       document.body.style.overflow = "unset";
     };
-  }, [deletingProject]);
+  }, [deletingProject, viewingProject]);
 
   const filteredProjects = useMemo(() => {
     if (!Array.isArray(projects)) return [];
@@ -747,119 +747,226 @@ export default function Projects() {
         )}
       </div>
 
-      {/* VIEW PROJECT MODAL */}
+      {/* VIEW PROJECT MODAL - WIDE & RESPONSIVE */}
       {viewingProject && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-fade-in">
-          <div className="bg-white rounded-3xl max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl border border-gray-100 p-6 space-y-6">
-            <div className="flex items-start justify-between border-b border-gray-100 pb-4">
-              <div>
-                <span className="text-[10px] font-bold text-indigo-600 tracking-wider uppercase bg-indigo-50 px-2 py-0.5 rounded-md border border-indigo-100">
-                  Schema Inspector
-                </span>
-                <h3 className="text-xl font-bold text-gray-900 mt-1">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-slate-950/70 backdrop-blur-md animate-fade-in">
+          <div className="bg-white rounded-3xl max-w-4xl w-full max-h-[90vh] sm:max-h-[85vh] flex flex-col shadow-2xl border border-slate-200/80 overflow-hidden transition-all ring-1 ring-black/5">
+            {/* 1. STICKY HEADER */}
+            <div className="px-5 sm:px-8 py-4 sm:py-5 border-b border-slate-100 flex items-start sm:items-center justify-between bg-white shrink-0 gap-3">
+              <div className="space-y-1 pr-2 min-w-0">
+                <div className="flex flex-wrap items-center gap-2">
+                  <span className="text-[10px] font-extrabold text-indigo-600 tracking-wider uppercase bg-indigo-50/80 border border-indigo-200/60 px-2.5 py-0.5 rounded-full shrink-0">
+                    Schema Inspector
+                  </span>
+                  <span className="text-[10px] font-mono text-slate-400 bg-slate-100/80 px-2 py-0.5 rounded-md truncate max-w-[140px] sm:max-w-none">
+                    ID: {viewingProject._id || "N/A"}
+                  </span>
+                </div>
+                <h3 className="text-lg sm:text-2xl font-bold text-slate-900 tracking-tight leading-snug truncate">
                   {viewingProject.title}
                 </h3>
               </div>
+
               <button
                 onClick={() => setViewingProject(null)}
-                className="p-1 text-gray-400 hover:text-gray-600 rounded-lg hover:bg-gray-100 transition"
+                className="p-1.5 text-slate-400 hover:text-slate-700 hover:bg-slate-100 rounded-xl transition cursor-pointer shrink-0 mt-0.5 sm:mt-0"
               >
-                <XMarkIcon className="w-6 h-6" />
+                <XMarkIcon className="w-5 h-5 sm:w-6 sm:h-6 stroke-[2.5]" />
               </button>
             </div>
 
-            {/* Modal Images Carousel/Grid */}
-            {Array.isArray(viewingProject.images) &&
-              viewingProject.images.length > 0 && (
-                <div className="grid grid-cols-2 gap-2 max-h-48 overflow-y-auto p-1 bg-gray-50 rounded-2xl border border-gray-100">
-                  {viewingProject.images.map((img, idx) => (
-                    <img
-                      key={idx}
-                      src={img}
-                      alt={`Project ${idx}`}
-                      className="w-full h-32 object-cover rounded-xl border border-gray-200"
-                    />
-                  ))}
+            {/* 2. INNER SCROLLABLE CONTENT BODY */}
+            <div className="p-5 sm:p-8 overflow-y-auto space-y-6 sm:space-y-8 divide-y divide-slate-100 [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-thumb]:bg-slate-200 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:bg-transparent">
+              {/* MEDIA PREVIEW */}
+              <div className="space-y-3">
+                <h4 className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
+                  Media Preview
+                </h4>
+                {Array.isArray(viewingProject.images) &&
+                viewingProject.images.length > 0 ? (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3.5">
+                    {viewingProject.images.map((img, idx) => (
+                      <div
+                        key={idx}
+                        className="relative group h-44 sm:h-48 rounded-2xl overflow-hidden bg-slate-50 border border-slate-200/80 shadow-xs"
+                      >
+                        <img
+                          src={img}
+                          alt={`Preview ${idx}`}
+                          className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                          onError={(e) => {
+                            e.target.onerror = null;
+                            e.target.src =
+                              "https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=800&q=80";
+                          }}
+                        />
+                        <span className="absolute bottom-2.5 left-2.5 text-[10px] font-bold text-white bg-slate-900/80 backdrop-blur-md px-2.5 py-1 rounded-lg">
+                          Image #{idx + 1}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="p-8 rounded-2xl bg-slate-50 border border-dashed border-slate-200 text-center">
+                    <PhotoIcon className="w-8 h-8 text-slate-300 mx-auto mb-1" />
+                    <p className="text-xs text-slate-400 font-medium">
+                      No media uploaded for this project
+                    </p>
+                  </div>
+                )}
+              </div>
+
+              {/* ACTION LINKS */}
+              <div className="pt-6 flex flex-wrap items-center gap-3">
+                {viewingProject.githubLink && (
+                  <a
+                    href={viewingProject.githubLink}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="inline-flex items-center gap-2 text-xs font-semibold text-white bg-slate-900 hover:bg-black px-4 sm:px-5 py-2.5 rounded-xl transition shadow-sm active:scale-95"
+                  >
+                    <CodeBracketIcon className="w-4 h-4" /> GitHub Repository
+                  </a>
+                )}
+
+                {viewingProject.link && (
+                  <a
+                    href={viewingProject.link}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="inline-flex items-center gap-2 text-xs font-semibold text-white bg-indigo-600 hover:bg-indigo-700 px-4 sm:px-5 py-2.5 rounded-xl transition shadow-sm shadow-indigo-500/20 active:scale-95"
+                  >
+                    <GlobeAltIcon className="w-4 h-4" /> Live Demo Link
+                  </a>
+                )}
+              </div>
+
+              {/* TECHNOLOGIES STACK */}
+              <div className="pt-6 space-y-2.5">
+                <h4 className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
+                  Technologies Stack
+                </h4>
+                <div className="flex flex-wrap gap-2">
+                  {Array.isArray(viewingProject.technologies) &&
+                  viewingProject.technologies.length > 0 ? (
+                    viewingProject.technologies.map((tech, idx) => (
+                      <span
+                        key={idx}
+                        className="bg-slate-100/90 hover:bg-indigo-50 text-slate-700 hover:text-indigo-600 border border-slate-200/70 text-xs font-medium px-3 py-1.5 rounded-xl transition"
+                      >
+                        {tech}
+                      </span>
+                    ))
+                  ) : (
+                    <span className="text-xs text-slate-400 italic">
+                      No technologies listed
+                    </span>
+                  )}
                 </div>
-              )}
+              </div>
 
-            {/* External Links */}
-            <div className="flex items-center gap-3">
-              {viewingProject.githubLink && (
-                <a
-                  href={viewingProject.githubLink}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="inline-flex items-center gap-1.5 text-xs font-semibold text-white bg-gray-900 px-3.5 py-2 rounded-xl hover:bg-black transition"
-                >
-                  <CodeBracketIcon className="w-4 h-4" /> GitHub Repository
-                </a>
-              )}
-              {viewingProject.link && (
-                <a
-                  href={viewingProject.link}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="inline-flex items-center gap-1.5 text-xs font-semibold text-white bg-indigo-600 px-3.5 py-2 rounded-xl hover:bg-indigo-700 transition"
-                >
-                  <GlobeAltIcon className="w-4 h-4" /> Live Project Link
-                </a>
-              )}
-            </div>
-
-            {/* Modal Content Sections */}
-            <div className="space-y-4 text-xs">
-              <div>
-                <h4 className="font-bold text-gray-700 uppercase tracking-wide mb-1">
+              {/* DESCRIPTION */}
+              <div className="pt-6 space-y-2.5">
+                <h4 className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
                   Description
                 </h4>
-                <div className="text-gray-800 bg-gray-50 p-3 rounded-xl border border-gray-100 text-xs whitespace-pre-wrap max-h-40 overflow-y-auto">
-                  {viewingProject.description || "N/A"}
+                <div className="text-xs sm:text-sm leading-relaxed text-slate-700 bg-slate-50/80 p-4 sm:p-5 rounded-2xl border border-slate-200/70 whitespace-pre-wrap font-normal">
+                  {viewingProject.description ||
+                    "No project description provided."}
                 </div>
               </div>
 
-              {/* Schema Details Table */}
-              <div className="grid grid-cols-2 gap-3 bg-gray-50/50 p-4 rounded-2xl border border-gray-100">
-                <div>
-                  <span className="text-gray-400 block font-medium">
-                    Featured
-                  </span>
-                  <span className="text-gray-800 font-semibold">
-                    {viewingProject.featured ? "Yes" : "No"}
-                  </span>
-                </div>
-                <div>
-                  <span className="text-gray-400 block font-medium">
-                    Priority
-                  </span>
-                  <span className="text-gray-800 font-semibold">
-                    {viewingProject.priority ?? 0}
-                  </span>
-                </div>
-                <div>
-                  <span className="text-gray-400 block font-medium">Order</span>
-                  <span className="text-gray-800 font-semibold">
-                    {viewingProject.order ?? 0}
-                  </span>
-                </div>
-                <div>
-                  <span className="text-gray-400 block font-medium">
-                    Views / Likes
-                  </span>
-                  <span className="text-gray-800 font-semibold">
-                    {viewingProject.views ?? 0} Views /{" "}
-                    {viewingProject.likes ?? 0} Likes
-                  </span>
+              {/* MONGO DB METRICS & STATS GRID */}
+              <div className="pt-6 space-y-2.5">
+                <h4 className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
+                  Database Details
+                </h4>
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
+                  <div className="p-3.5 bg-slate-50 rounded-2xl border border-slate-200/60">
+                    <span className="text-[9px] font-bold text-slate-400 uppercase block mb-1">
+                      Featured Status
+                    </span>
+                    <span
+                      className={`text-xs font-bold ${
+                        viewingProject.featured
+                          ? "text-amber-600"
+                          : "text-slate-700"
+                      }`}
+                    >
+                      {viewingProject.featured ? "★ Featured" : "Standard"}
+                    </span>
+                  </div>
+
+                  <div className="p-3.5 bg-slate-50 rounded-2xl border border-slate-200/60">
+                    <span className="text-[9px] font-bold text-slate-400 uppercase block mb-1">
+                      Priority Rank
+                    </span>
+                    <span className="text-xs font-bold text-slate-800">
+                      {viewingProject.priority ?? 0}
+                    </span>
+                  </div>
+
+                  <div className="p-3.5 bg-slate-50 rounded-2xl border border-slate-200/60">
+                    <span className="text-[9px] font-bold text-slate-400 uppercase block mb-1">
+                      Display Order
+                    </span>
+                    <span className="text-xs font-bold text-slate-800">
+                      {viewingProject.order ?? 0}
+                    </span>
+                  </div>
+
+                  <div className="p-3.5 bg-slate-50 rounded-2xl border border-slate-200/60">
+                    <span className="text-[9px] font-bold text-slate-400 uppercase block mb-1">
+                      Total Views
+                    </span>
+                    <span className="text-xs font-bold text-slate-800">
+                      {viewingProject.views ?? 0}
+                    </span>
+                  </div>
+
+                  <div className="p-3.5 bg-slate-50 rounded-2xl border border-slate-200/60">
+                    <span className="text-[9px] font-bold text-slate-400 uppercase block mb-1">
+                      Total Likes
+                    </span>
+                    <span className="text-xs font-bold text-rose-600">
+                      ♥ {viewingProject.likes ?? 0}
+                    </span>
+                  </div>
+
+                  <div className="p-3.5 bg-slate-50 rounded-2xl border border-slate-200/60">
+                    <span className="text-[9px] font-bold text-slate-400 uppercase block mb-1">
+                      Created At
+                    </span>
+                    <span className="text-xs font-bold text-slate-700 truncate block">
+                      {viewingProject.createdAt
+                        ? new Date(
+                            viewingProject.createdAt,
+                          ).toLocaleDateString()
+                        : "N/A"}
+                    </span>
+                  </div>
+
+                  <div className="p-3.5 bg-slate-50 rounded-2xl border border-slate-200/60 col-span-2 sm:col-span-2">
+                    <span className="text-[9px] font-bold text-slate-400 uppercase block mb-1">
+                      Updated At
+                    </span>
+                    <span className="text-xs font-bold text-slate-700 truncate block">
+                      {viewingProject.updatedAt
+                        ? new Date(viewingProject.updatedAt).toLocaleString()
+                        : "N/A"}
+                    </span>
+                  </div>
                 </div>
               </div>
             </div>
 
-            <div className="flex justify-end pt-2">
+            {/* 3. STICKY FOOTER */}
+            <div className="px-5 sm:px-8 py-3.5 bg-slate-50 border-t border-slate-100 flex items-center justify-end shrink-0">
               <button
                 onClick={() => setViewingProject(null)}
-                className="bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold px-5 py-2 rounded-xl text-xs transition"
+                className="bg-slate-900 hover:bg-black text-white font-semibold text-xs px-6 py-2.5 rounded-xl transition shadow-xs active:scale-95 cursor-pointer"
               >
-                Close
+                Close Inspector
               </button>
             </div>
           </div>

@@ -49,7 +49,7 @@ function Login() {
       localStorage.setItem("token", res.data.token);
 
       if (res.data.user.role === "admin") {
-        toast.success("Administrator authenticated");
+        toast.success("Administrator authenticated!");
         navigate("/admin/dashboard");
       } else {
         const msg = "Unauthorized access. Administrator privileges required.";
@@ -90,8 +90,9 @@ function Login() {
         <div className="mb-6">
           <button
             type="button"
+            disabled={loading}
             onClick={handleBack}
-            className="inline-flex items-center gap-2 rounded-full border border-gray-800 bg-[#161616] px-4 py-2 text-sm font-medium text-gray-400 hover:text-blue-400 hover:border-blue-500/40 hover:bg-blue-500/5 active:scale-95 transition-all cursor-pointer"
+            className="inline-flex items-center gap-2 rounded-full border border-gray-800 bg-[#161616] px-4 py-2 text-sm font-medium text-gray-400 hover:text-blue-400 hover:border-blue-500/40 hover:bg-blue-500/5 active:scale-95 transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:text-gray-400 disabled:hover:border-gray-800 disabled:hover:bg-[#161616] disabled:active:scale-100"
           >
             <ArrowLeft size={16} />
             <span>Back</span>
@@ -116,8 +117,9 @@ function Login() {
             <input
               type="email"
               autoFocus
+              disabled={loading}
               placeholder="admin@example.com"
-              className="w-full px-4 py-3 bg-[#181818] border border-gray-800 rounded-xl text-base text-white placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+              className="w-full px-4 py-3 bg-[#181818] border border-gray-800 rounded-xl text-base text-white placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all disabled:opacity-50 disabled:cursor-not-allowed"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
             />
@@ -131,16 +133,18 @@ function Login() {
             <div className="relative">
               <input
                 type={showPassword ? "text" : "password"}
+                disabled={loading}
                 placeholder="••••••••"
-                className="w-full px-4 py-3 pr-12 bg-[#181818] border border-gray-800 rounded-xl text-base text-white placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                className="w-full px-4 py-3 pr-12 bg-[#181818] border border-gray-800 rounded-xl text-base text-white placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
               />
 
               <button
                 type="button"
+                disabled={loading}
                 onClick={() => setShowPassword((prev) => !prev)}
-                className="absolute inset-y-0 right-0 px-4 flex items-center text-gray-500 hover:text-blue-400 transition-colors"
+                className="absolute inset-y-0 right-0 px-4 flex items-center text-gray-500 hover:text-blue-400 transition-colors disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:text-gray-500"
                 tabIndex={-1}
               >
                 {showPassword ? (
@@ -155,10 +159,10 @@ function Login() {
           <button
             type="submit"
             disabled={loading}
-            className={`w-full py-3.5 rounded-xl text-base font-semibold transition-all flex items-center justify-center gap-2 cursor-pointer shadow-lg ${
+            className={`w-full py-3.5 rounded-xl text-base font-semibold transition-all flex items-center justify-center gap-2 shadow-lg ${
               loading
-                ? "bg-blue-600/50 text-blue-200 cursor-not-allowed"
-                : "bg-blue-600 hover:bg-blue-500 text-white active:scale-[0.98]"
+                ? "bg-blue-600/50 text-blue-200 cursor-not-allowed opacity-75"
+                : "bg-blue-600 hover:bg-blue-500 text-white active:scale-[0.98] cursor-pointer"
             }`}
           >
             {loading && <Loader2 className="w-5 h-5 animate-spin" />}

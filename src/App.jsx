@@ -41,6 +41,7 @@ import AppsShowcase from "./components/AppsShowcase";
 import AppPromoModal from "./components/AppPromoModal";
 import PoetryPromoModal from "./components/PoetryPromoModal";
 import SectionNavigatorModal from "./components/SectionNavigatorModal";
+import Users from "./admin/Users.jsx";
 
 //! To run the backend for DEVELOPMENT -> npm run dev
 //! To run the backend for PRODUCTION -> npm start
@@ -53,6 +54,14 @@ function App({ isNavModalOpen, setIsNavModalOpen, onOpenNavModal }) {
 
   return (
     <>
+      {/* Render modals only on public pages */}
+      {!isAdminPage && (
+        <>
+          <AppPromoModal />
+          <PoetryPromoModal />
+        </>
+      )}
+
       {!isAdminPage && (
         <Navbar
           isNavModalOpen={isNavModalOpen}
@@ -162,6 +171,14 @@ function App({ isNavModalOpen, setIsNavModalOpen, onOpenNavModal }) {
             </AdminRoute>
           }
         />
+        <Route
+          path="/admin/users"
+          element={
+            <AdminRoute>
+              <Users />
+            </AdminRoute>
+          }
+        />
 
         <Route path="*" element={<NotFound />} />
       </Routes>
@@ -178,9 +195,6 @@ export default function AppWrapper() {
   return (
     <Router>
       <ScrollToTop />
-
-      <AppPromoModal />
-      <PoetryPromoModal />
 
       <SectionNavigatorModal
         isOpen={isNavModalOpen}

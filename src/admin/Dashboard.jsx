@@ -27,7 +27,7 @@ import {
   ArrowUpRight,
   BriefcaseBusiness,
   ChevronRight,
-  ShieldCheck,
+  Users,
 } from "lucide-react";
 
 import AdminLayout from "@/components/AdminLayout";
@@ -41,22 +41,34 @@ const getGreeting = () => {
   return "Good evening";
 };
 
-const formatDateTime = () =>
-  new Date().toLocaleString("en-IN", {
+const formatDateTime = () => {
+  const now = new Date();
+
+  const datePart = now.toLocaleDateString("en-GB", {
     weekday: "long",
-    month: "long",
     day: "numeric",
+    month: "long",
     year: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
-    second: "2-digit",
   });
+
+  const timePart = now
+    .toLocaleTimeString("en-US", {
+      hour: "2-digit",
+      minute: "2-digit",
+      second: "2-digit",
+      hour12: true,
+    })
+    .toLowerCase();
+
+  return `${datePart} at ${timePart}`;
+};
 
 export default function Dashboard() {
   const navigate = useNavigate();
   const token = localStorage.getItem("token");
 
   const [counts, setCounts] = useState({
+    users: 0,
     projects: 0,
     blogs: 0,
     messages: 0,
@@ -79,6 +91,7 @@ export default function Dashboard() {
       const res = await axios.get(`${API}/dashboard`, { headers });
 
       const data = {
+        users: res.data?.usersCount || 0,
         projects: res.data?.projectsCount || 0,
         blogs: res.data?.blogsCount || 0,
         messages: res.data?.messagesCount || 0,
@@ -98,7 +111,6 @@ export default function Dashboard() {
 
   useEffect(() => {
     fetchData();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [token]);
 
   useEffect(() => {
@@ -114,32 +126,32 @@ export default function Dashboard() {
 
   return (
     <AdminLayout>
-      <div className="min-h-screen bg-gray-50/50 p-4 sm:p-6 lg:p-8 space-y-8 max-w-7xl mx-auto">
+      <div className="min-h-screen bg-gray-50/50 p-3 sm:p-6 lg:p-8 space-y-6 sm:space-y-8 max-w-7xl mx-auto">
         {/* Header Banner Card */}
-        <div className="bg-white/80 backdrop-blur-xl border border-gray-200/80 rounded-3xl p-6 shadow-sm space-y-6">
+        <div className="bg-white/80 backdrop-blur-xl border border-gray-200/80 rounded-2xl sm:rounded-3xl p-4 sm:p-6 shadow-sm space-y-5 sm:space-y-6">
           {/* Row 1: Greeting & Actions */}
           <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
             <div className="flex items-start gap-3">
-              <div className="h-11 w-11 rounded-2xl bg-indigo-50 border border-indigo-100 flex items-center justify-center shrink-0">
-                <UserCircle className="w-6 h-6 text-indigo-600" />
+              <div className="h-10 w-10 sm:h-11 sm:w-11 rounded-2xl bg-indigo-50 border border-indigo-100 flex items-center justify-center shrink-0">
+                <UserCircle className="w-5 h-5 sm:w-6 sm:h-6 text-indigo-600" />
               </div>
 
               <div className="min-w-0 pt-0.5">
-                <h1 className="text-xl sm:text-2xl lg:text-3xl font-black text-gray-900 tracking-tight">
+                <h1 className="text-lg sm:text-2xl lg:text-3xl font-black text-gray-900 tracking-tight">
                   {getGreeting()}, Admin 👋
                 </h1>
-                <p className="text-sm text-gray-500 mt-0.5">
-                  Track everything in one place — projects, blogs, messages &
-                  YouTube.
+                <p className="text-xs sm:text-sm text-gray-500 mt-0.5">
+                  Track everything in one place — users, projects, blogs,
+                  messages & YouTube.
                 </p>
               </div>
             </div>
 
-            <div className="flex flex-wrap items-center gap-2">
+            <div className="flex items-center gap-2">
               <button
                 onClick={fetchData}
                 disabled={refreshing}
-                className={`inline-flex items-center justify-center gap-2 px-4 py-2 rounded-xl border shadow-sm transition font-semibold text-xs cursor-pointer ${
+                className={`flex-1 sm:flex-initial inline-flex items-center justify-center gap-2 px-3.5 py-2 rounded-xl border shadow-sm transition font-semibold text-xs cursor-pointer ${
                   refreshing
                     ? "bg-gray-100 text-gray-400 cursor-not-allowed border-gray-200"
                     : "bg-white hover:bg-gray-50 text-gray-800 border-gray-200"
@@ -153,19 +165,19 @@ export default function Dashboard() {
 
               <button
                 onClick={() => setLogoutModalOpen(true)}
-                className="inline-flex items-center justify-center px-4 py-2 rounded-xl bg-red-600 hover:bg-red-700 text-white font-semibold text-xs shadow-sm transition cursor-pointer"
+                className="flex-1 sm:flex-initial inline-flex items-center justify-center px-4 py-2 rounded-xl bg-red-600 hover:bg-red-700 text-white font-semibold text-xs shadow-sm transition cursor-pointer"
               >
                 Logout
               </button>
             </div>
           </div>
 
-          {/* Row 2: Search & Live Clock */}
+          {/* Row 2: Search & Responsive Live Clock */}
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3 pt-2 border-t border-gray-100">
             <div className="relative w-full md:max-w-[480px]">
               <Search className="w-4 h-4 absolute left-3 top-2.5 text-gray-400" />
               <input
-                placeholder="Search projects, blogs, videos..."
+                placeholder="Search projects, blogs, users..."
                 className="w-full pl-9 pr-14 py-2 text-xs rounded-xl border border-gray-200 bg-gray-50/50 shadow-inner outline-none focus:bg-white focus:ring-1 focus:ring-indigo-500 transition"
               />
               <div className="absolute right-2.5 top-2 hidden sm:flex items-center gap-1 text-[10px] text-gray-400 border border-gray-200 bg-white px-1.5 py-0.5 rounded font-mono">
@@ -173,15 +185,26 @@ export default function Dashboard() {
               </div>
             </div>
 
-            <div className="flex items-center gap-2 bg-gray-50 px-3.5 py-2 rounded-xl border border-gray-200 shadow-sm text-xs font-mono text-gray-600 w-fit">
-              <Clock className="w-3.5 h-3.5 text-indigo-500" />
-              <span className="whitespace-nowrap">{dateTime}</span>
+            {/* 🚀 Fully Responsive Live Clock */}
+            <div className="flex items-center justify-center sm:justify-start gap-2 bg-gray-50 px-3 sm:px-3.5 py-2 rounded-xl border border-gray-200 shadow-sm text-[11px] sm:text-xs font-mono text-gray-600 w-full sm:w-auto shrink-0">
+              <Clock className="w-3.5 h-3.5 text-indigo-500 shrink-0" />
+              <span className="truncate tracking-tight sm:tracking-normal">
+                {dateTime}
+              </span>
             </div>
           </div>
 
           {/* Row 3: Metrics Quick Badges */}
           <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3 pt-2">
             <div className="flex gap-2 overflow-x-auto no-scrollbar pb-1">
+              {/* 🚀 Added Users Quick Badge */}
+              <span className="shrink-0 px-3 py-1 rounded-full bg-indigo-50/80 border border-indigo-100 text-xs text-indigo-800">
+                Users:{" "}
+                <span className="font-bold text-indigo-950">
+                  {counts.users}
+                </span>
+              </span>
+
               <span className="shrink-0 px-3 py-1 rounded-full bg-gray-50 border border-gray-200 text-xs text-gray-600">
                 Projects:{" "}
                 <span className="font-semibold text-gray-900">
@@ -227,11 +250,21 @@ export default function Dashboard() {
               Quick Actions
             </span>
             <span className="hidden sm:inline text-xs">
-              Manage content and add new items ✨
+              Manage content and registered users ✨
             </span>
           </div>
 
-          <div className="flex flex-wrap gap-2.5">
+          <div className="flex flex-wrap gap-2 sm:gap-2.5">
+            {/* 🚀 Users Action Button */}
+            <button
+              onClick={() => navigate("/admin/users")}
+              className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-900 text-white font-semibold text-xs shadow-sm transition cursor-pointer"
+            >
+              <Users className="w-3.5 h-3.5" />
+              Users
+              <ArrowUpRight className="w-3.5 h-3.5 opacity-90" />
+            </button>
+
             <button
               onClick={() => navigate("/admin/projects")}
               className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-xs shadow-sm transition cursor-pointer"
@@ -271,9 +304,10 @@ export default function Dashboard() {
         </div>
 
         {/* Metrics Section Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-3 gap-5">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-3 gap-4 sm:gap-5">
           {loading ? (
             <>
+              <MetricCardSkeleton />
               <MetricCardSkeleton />
               <MetricCardSkeleton />
               <MetricCardSkeleton />
@@ -283,6 +317,15 @@ export default function Dashboard() {
             </>
           ) : (
             <>
+              {/* 🚀 Users Metric Card */}
+              <MetricCard
+                title="Total Users"
+                count={counts.users}
+                icon={<Users className="w-5 h-5" />}
+                badge="Accounts"
+                link="/admin/users"
+              />
+
               <MetricCard
                 title="Total Projects"
                 count={counts.projects}
@@ -329,7 +372,16 @@ export default function Dashboard() {
         </div>
 
         {/* Dashboard Content Overview Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-5">
+          {/* 🚀 Users Overview Card */}
+          <OverviewCard
+            title="User Management"
+            description="Manage user accounts, monitor signups, roles, and access controls."
+            icon={<Users className="w-5 h-5 text-indigo-600" />}
+            onClick={() => navigate("/admin/users")}
+            count={`${counts.users} Users`}
+          />
+
           <OverviewCard
             title="Projects & Portfolio"
             description="Manage your featured projects, live URLs, and tech stacks."
@@ -344,14 +396,6 @@ export default function Dashboard() {
             icon={<FileText className="w-5 h-5 text-indigo-600" />}
             onClick={() => navigate("/admin/blogs")}
             count={`${counts.blogs} Posts`}
-          />
-
-          <OverviewCard
-            title="Messages & Inquiry"
-            description="View inbound contact submissions and client inquiries."
-            icon={<Mail className="w-5 h-5 text-indigo-600" />}
-            onClick={() => navigate("/admin/contact-messages")}
-            count={`${counts.messages} Unread/Total`}
           />
         </div>
 
@@ -445,7 +489,7 @@ function MetricCard({ title, count, icon, badge, link }) {
           <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide">
             {title}
           </p>
-          <p className="mt-3 text-4xl font-black text-gray-900 tracking-tight">
+          <p className="mt-3 text-3xl sm:text-4xl font-black text-gray-900 tracking-tight">
             {count}
           </p>
         </div>
@@ -473,7 +517,7 @@ function OverviewCard({ title, description, icon, onClick, count }) {
   return (
     <div
       onClick={onClick}
-      className="group bg-white/80 backdrop-blur-xl border border-gray-200/80 p-6 rounded-2xl shadow-sm hover:shadow-md transition cursor-pointer flex flex-col justify-between space-y-4"
+      className="group bg-white/80 backdrop-blur-xl border border-gray-200/80 p-5 sm:p-6 rounded-2xl shadow-sm hover:shadow-md transition cursor-pointer flex flex-col justify-between space-y-4"
     >
       <div className="space-y-3">
         <div className="flex items-center justify-between">

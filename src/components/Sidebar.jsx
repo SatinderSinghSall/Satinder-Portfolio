@@ -15,6 +15,7 @@ import {
   Layers,
   ShieldCheck,
   UserCheck,
+  Users,
 } from "lucide-react";
 import toast from "react-hot-toast";
 
@@ -51,6 +52,19 @@ export default function Sidebar({ isOpen = false, onClose = () => {} }) {
           label: "Dashboard",
           path: "/admin/dashboard",
           icon: <LayoutDashboard size={22} />,
+        },
+      ],
+    },
+
+    {
+      groupTitle: "USER MANAGEMENT",
+      items: [
+        {
+          id: "users",
+          type: "single",
+          label: "Users",
+          path: "/admin/users",
+          icon: <Users size={22} />,
         },
       ],
     },
@@ -191,18 +205,19 @@ export default function Sidebar({ isOpen = false, onClose = () => {} }) {
         `}
       >
         {/* Big Premium Header */}
-        <div className="p-5 border-b border-slate-200 flex items-center justify-between bg-slate-50/80">
-          <div className="flex items-center gap-3.5">
+        <div className="p-5 border-b border-slate-200 flex items-center justify-between bg-slate-50/80 gap-2">
+          <div className="flex items-center gap-3 min-w-0">
             <div className="h-11 w-11 rounded-2xl bg-gradient-to-tr from-indigo-600 to-indigo-500 flex items-center justify-center shadow-lg shadow-indigo-600/30 text-white shrink-0">
               <ShieldCheck size={26} />
             </div>
-            <div>
-              <h2 className="text-lg font-extrabold text-slate-900 tracking-tight leading-none mb-1">
+            <div className="min-w-0 flex-1">
+              <h2 className="text-lg font-extrabold text-slate-900 tracking-tight leading-none mb-1 truncate">
                 Admin Panel
               </h2>
-              <div className="flex items-center gap-1.5">
-                <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                <span className="text-[11px] font-bold text-indigo-600 uppercase tracking-wider">
+              {/* Single-line responsive tag */}
+              <div className="flex items-center gap-1.5 min-w-0">
+                <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse shrink-0"></span>
+                <span className="text-[10px] sm:text-[11px] font-bold text-indigo-600 uppercase tracking-wider whitespace-nowrap truncate">
                   Control & Management
                 </span>
               </div>
@@ -211,7 +226,7 @@ export default function Sidebar({ isOpen = false, onClose = () => {} }) {
 
           <button
             onClick={onClose}
-            className="lg:hidden p-2 rounded-xl text-slate-400 hover:bg-slate-200/60 hover:text-slate-800 transition active:scale-95"
+            className="lg:hidden p-2 rounded-xl text-slate-400 hover:bg-slate-200/60 hover:text-slate-800 transition active:scale-95 shrink-0"
             aria-label="Close Sidebar"
           >
             <X size={22} />
